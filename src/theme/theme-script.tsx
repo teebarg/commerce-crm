@@ -13,6 +13,7 @@ declare global {
 const code = function () {
     const localStorageKey = "__PREFERRED_THEME__";
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     window.__onThemeChange = function () {};
 
     function setTheme(newTheme: Theme) {
@@ -50,6 +51,7 @@ const code = function () {
     setTheme(preferredTheme ?? (darkQuery.matches ? "dark" : "light"));
 };
 
+// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 const getTheme = `(${code})();`;
 
 export function ThemeScript() {

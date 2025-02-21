@@ -17,7 +17,7 @@ const Publish: React.FC<Props> = ({ id }) => {
 
     const { enqueueSnackbar } = useSnackbar();
 
-    const mutation = api.user.update.useMutation({
+    const mutation = api.draft.publish.useMutation({
         onSuccess: async () => {
             enqueueSnackbar("Draft published successfully.", { variant: "success" });
             await utils.user.invalidate();
@@ -28,22 +28,8 @@ const Publish: React.FC<Props> = ({ id }) => {
         },
     });
 
-    // const mutation = useMutation({
-    //     mutationFn: (data: DraftPublish) => DraftService.publish({ requestBody: data }),
-    //     onSuccess: () => {
-    //         showToast.success("Success!", "Draft published successfully.");
-    //     },
-    //     onError: (err: ApiError) => {
-    //         const errDetail = (err.body as any)?.detail?.detail ?? "An error occurred";
-    //         showToast.error("Error", errDetail);
-    //     },
-    //     onSettled: () => {
-    //         queryClient.invalidateQueries({ queryKey: ["drafts"] });
-    //     },
-    // });
-
     const publishPost = () => {
-        mutation.mutate({ id });
+        mutation.mutate(id);
     };
 
     return (

@@ -20,7 +20,7 @@ export const userRouter = createTRPCRouter({
             const users = await ctx.db.user.findMany({
                 where: search
                     ? {
-                          OR: [{ first_name: { contains: search, mode: "insensitive" } }, { last_name: { contains: search, mode: "insensitive" } }],
+                          OR: [{ firstName: { contains: search, mode: "insensitive" } }, { lastName: { contains: search, mode: "insensitive" } }],
                       }
                     : undefined,
                 orderBy: { createdAt: sort },
@@ -31,8 +31,8 @@ export const userRouter = createTRPCRouter({
             const total = await ctx.db.user.count({
                 where: search
                     ? {
-                        OR: [{ first_name: { contains: search, mode: "insensitive" } }, { last_name: { contains: search, mode: "insensitive" } }],
-                    }
+                          OR: [{ firstName: { contains: search, mode: "insensitive" } }, { lastName: { contains: search, mode: "insensitive" } }],
+                      }
                     : undefined,
             });
 
@@ -49,6 +49,7 @@ export const userRouter = createTRPCRouter({
         return ctx.db.user.create({
             data: {
                 ...input,
+                password: "",
             },
         });
     }),

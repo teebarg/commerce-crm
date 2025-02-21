@@ -168,7 +168,7 @@ const MenuItemComponent: React.FC<{
 };
 
 const Sidebar: React.FC = () => {
-    const currentUser = null;
+    // const currentUser = null;
     const [isCollapsed, setIsCollapsed] = useState(false);
     const navItems: (MenuItem | SubMenuItem)[] = [
         {
