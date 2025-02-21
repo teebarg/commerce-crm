@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Draft {
+  id             String    @id @default(cuid())
+  title          String
+  content        String
+  image          String?
+  link           String?
+  platform       String?
+  isPublished    Boolean? @map("is_published")
+  scheduledTime  DateTime? @db.Timestamp(6) @map("scheduled_time")
+  userId         String @map("user_id")
+  user           User     @relation(fields: [userId], references: [id], onDelete: NoAction)
+
+  createdAt     DateTime? @default(now()) @map("created_at")
+  updatedAt     DateTime? @updatedAt @map("updated_at")
+
+  @@map("drafts")
+}
+
+model NotificationTemplate {
+  id         String   @id @default(cuid())
+  title      String   @unique
+  icon       String?
+  body       String
+  excerpt    String?
+
+  createdAt     DateTime? @default(now()) @map("created_at")
+  updatedAt     DateTime? @updatedAt @map("updated_at")
+
+  @@map("notification_templates")
+}
+
+model PushSubscription {
+  id         String   @id @default(cuid())
+  endpoint   String   @unique
+  p256dh     String
+  auth       String
+  group      String?
+
+  createdAt     DateTime? @default(now()) @map("created_at")
+  updatedAt     DateTime? @updatedAt @map("updated_at")
+
+  @@map("push_subscriptions")
+}
+
+model Tenant {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  slug       String   @unique
+
+  createdAt     DateTime? @default(now()) @map("created_at")
+  updatedAt     DateTime? @updatedAt @map("updated_at")
+
+  @@map("tenants")
+}
+
+model Tweet {
+  id         String   @id @default(cuid())
+  content    String   @unique
+  twitterId  String   @unique @map("twitter_id")
+
+  createdAt     DateTime? @default(now()) @map("created_at")
+  updatedAt     DateTime? @updatedAt @map("updated_at")
+
+  @@map("tweets")
+}
+
+enum Role {
+  ADMIN    @map("admin")
+  CUSTOMER @map("customer")
+
+  @@map("roles")
+}
+
+enum Status {
+    PENDING   @map("pending")
+    ACTIVE    @map("active")
+    INACTIVE  @map("inactive")
+
+    @@map("statuses")
+}
+
+// Necessary for Next auth
+model Account {
+    id                       String  @id @default(cuid())
+    userId                   String
+    type                     String
+    provider                 String
+    providerAccountId        String
+    refresh_token            String? // @db.Text
+    access_token             String? // @db.Text
+    expires_at               Int?
+    token_type               String?
+    scope                    String?
+    id_token                 String? // @db.Text
+    session_state            String?
+    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    refresh_token_expires_in Int?
+
+    @@unique([provider, providerAccountId])
+
+    @@map("accounts")
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("sessions")
+}
+
+model User {
+    id            String    @id @default(cuid())
+    firstName     String? @map("first_name")
+    lastName      String? @map("last_name")
+    email         String?   @unique
+    emailVerified DateTime?
+    status        Status    @default(PENDING)
+    password      String
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    drafts        Draft[]
+
+    createdAt     DateTime? @default(now()) @map("created_at")
+    updatedAt     DateTime? @updatedAt @map("updated_at")
+
+    @@index([firstName, lastName])
+
+    @@map("users")
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+
+    @@map("verification_tokens")
+}
