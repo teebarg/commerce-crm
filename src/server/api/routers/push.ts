@@ -33,7 +33,7 @@ export const pushNotificationRouter = createTRPCRouter({
     }),
 
     // subscriptions
-    createSubscription: protectedProcedure.input(pushSubscriptionSchema).mutation(async ({ ctx, input }) => {
+    createSubscription: publicProcedure.input(pushSubscriptionSchema).mutation(async ({ ctx, input }) => {
         return ctx.db.pushSubscription.create({
             data: {
                 ...input,
@@ -41,7 +41,7 @@ export const pushNotificationRouter = createTRPCRouter({
         });
     }),
     getSubscription: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
-        return await ctx.db.pushSubscription.findUnique({ where: { id: input } });
+        return await ctx.db.pushSubscription.findUnique({ where: { endpoint: input } });
     }),
     unsubscribe: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
         return await ctx.db.pushSubscription.delete({ where: { id: input } });
