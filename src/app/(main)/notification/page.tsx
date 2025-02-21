@@ -19,7 +19,7 @@ export default function Notification() {
 
     return (
         <div className="bg-content2 w-full min-h-screen">
-            <div className="py-10">
+            <div>
                 <header>
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <h1 className="text-3xl font-bold leading-tight text-default-900 flex items-center">
