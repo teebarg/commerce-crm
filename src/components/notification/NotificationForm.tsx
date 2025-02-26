@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,16 @@ export function NotificationForm({ onPreview }: NotificationFormProps) {
                 />
             </div>
 
-            <Select value={value} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setValue(e.target.value)} items={[]} className="max-w-sm" type="text" label="Select Group" />
+            <Select
+                value={value}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setValue(e.target.value)}
+                items={[
+                    { value: "1", label: "React" },
+                    { value: "2", label: "Python" },
+                ]}
+                className="max-w-sm"
+                label="Select Group"
+            />
 
             <Button className="min-w-24" color="primary" onClick={handlePreview} leftIcon={<Eye className="h-4 w-4" />}>
                 Preview

@@ -18,7 +18,7 @@ export default function Notification() {
     });
 
     return (
-        <div className="bg-content2 w-full min-h-screen">
+        <div className="bg-content2 w-full min-h-screen pt-8">
             <div>
                 <header>
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,7 +29,7 @@ export default function Notification() {
                     </div>
                 </header>
                 <main>
-                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="max-w-7xl mx-auto sm:px-6">
                         <div className="px-4 py-8 sm:px-0">
                             <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
                                 <div className="space-y-8 col-span-2">

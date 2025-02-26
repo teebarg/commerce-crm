@@ -29,7 +29,7 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
     const mutation = api.push.deleteTemplate.useMutation({
         onSuccess: async () => {
             await utils.push.invalidate();
-            confirmationModal.close()
+            confirmationModal.close();
         },
         onError: (error: unknown) => {
             enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });
@@ -51,8 +51,8 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
             <div className="space-y-4">
                 <h3 className="text-lg font-medium text-default-900">Templates</h3>
                 <div>
-                    <Button color="primary" onClick={createSlider.open}>
-                        Add <Plus />
+                    <Button leftIcon={<Plus />} color="primary" onClick={createSlider.open}>
+                        Add
                     </Button>
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

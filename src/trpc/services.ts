@@ -1,9 +1,11 @@
 import webpush from "web-push";
 
-export const sendNotificationsToSubscribers = (subscriptions: any[], notification: { title: any; body: any; }) => {
+export const sendNotificationsToSubscribers = (subscriptions: any[], notification: { title: any; body: any }) => {
     const failedSubscriptions: any[] = [];
 
-    subscriptions.forEach((subscriber: { endpoint: any; p256dh: any; auth: any; id: any; }) => {
+    webpush.setVapidDetails(`mailto:${process.env.ADMIN_EMAIL}`, process.env.VAPID_PUBLIC_KEY!, process.env.VAPID_PRIVATE_KEY!);
+
+    subscriptions.forEach((subscriber: { endpoint: any; p256dh: any; auth: any; id: any }) => {
         const subscription = {
             endpoint: subscriber.endpoint,
             keys: {

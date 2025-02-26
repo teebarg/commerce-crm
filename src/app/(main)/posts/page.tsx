@@ -85,7 +85,7 @@ export default async function Posts({ searchParams }: { searchParams: SearchPara
                                     searchQuery={q}
                                 >
                                     {drafts.map((item: Draft, index: number) => (
-                                        <tr key={index} className="even:bg-zinc-700">
+                                        <tr key={index} className="even:bg-content1">
                                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
                                                 {(page - 1) * PER_PAGE + index + 1}
                                             </td>
