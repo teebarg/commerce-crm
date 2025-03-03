@@ -1,7 +1,7 @@
 import { type Metadata } from "next";
 import React from "react";
 import { redirect } from "next/navigation";
-import SideBar from "@/components/ui/sidebar";
+import SideBar from "@/components/layout/sidebar";
 import { auth } from "@/server/auth";
 import UserMenu from "@/components/generic/user-menu";
 import dynamic from "next/dynamic";

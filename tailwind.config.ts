@@ -20,6 +20,10 @@ export default {
     content: ["./src/**/*.tsx"],
     theme: {
         extend: {
+            backgroundImage: {
+                "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+                "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+            },
             backgroundColor: {
                 content1: "hsl(var( --content1))",
                 content2: "hsl(var( --content2))",
@@ -65,18 +69,56 @@ export default {
             colors: {
                 background: generateColorScale("background"),
                 foreground: generateColorScale("foreground"),
-                primary: generateColorScale("primary"),
-                secondary: generateColorScale("secondary"),
+                // primary: generateColorScale("primary"),
+                // secondary: generateColorScale("secondary"),
                 default: generateColorScale("default"),
                 danger: generateColorScale("danger"),
                 success: generateColorScale("success"),
                 warning: generateColorScale("warning"),
+                // muted: {
+                //     DEFAULT: "hsl(var(--muted))",
+                //     foreground: "hsl(var(--muted-foreground))",
+                // },
+                // border: "hsl(var(--border))",
+                divider: "hsl(var(--divider))",
+                card: {
+                    DEFAULT: "hsl(var(--card))",
+                    foreground: "hsl(var(--card-foreground))",
+                },
+                popover: {
+                    DEFAULT: "hsl(var(--popover))",
+                    foreground: "hsl(var(--popover-foreground))",
+                },
+                primary: {
+                    DEFAULT: "hsl(var(--primary))",
+                    foreground: "hsl(var(--primary-foreground))",
+                },
+                secondary: {
+                    DEFAULT: "hsl(var(--secondary))",
+                    foreground: "hsl(var(--secondary-foreground))",
+                },
                 muted: {
                     DEFAULT: "hsl(var(--muted))",
                     foreground: "hsl(var(--muted-foreground))",
                 },
+                accent: {
+                    DEFAULT: "hsl(var(--accent))",
+                    foreground: "hsl(var(--accent-foreground))",
+                },
+                destructive: {
+                    DEFAULT: "hsl(var(--destructive))",
+                    foreground: "hsl(var(--destructive-foreground))",
+                },
                 border: "hsl(var(--border))",
-                divider: "hsl(var(--divider))",
+                input: "hsl(var(--input))",
+                ring: "hsl(var(--ring))",
+                chart: {
+                    "1": "hsl(var(--chart-1))",
+                    "2": "hsl(var(--chart-2))",
+                    "3": "hsl(var(--chart-3))",
+                    "4": "hsl(var(--chart-4))",
+                    "5": "hsl(var(--chart-5))",
+                },
             },
             keyframes: {
                 blob: {
@@ -107,12 +149,30 @@ export default {
                         transform: "translateX(100%)",
                     },
                 },
+                "accordion-down": {
+                    from: {
+                        height: "0",
+                    },
+                    to: {
+                        height: "var(--radix-accordion-content-height)",
+                    },
+                },
+                "accordion-up": {
+                    from: {
+                        height: "var(--radix-accordion-content-height)",
+                    },
+                    to: {
+                        height: "0",
+                    },
+                },
             },
             animation: {
                 blob: "blob 15s infinite",
                 "blob-delayed": "blob 15s infinite 2s",
                 "spinner-ease-spin": "spinner-spin 0.8s ease infinite",
                 "spinner-linear-spin": "spinner-spin 0.8s linear infinite",
+                "accordion-down": "accordion-down 0.2s ease-out",
+                "accordion-up": "accordion-up 0.2s ease-out",
             },
             maxWidth: {
                 "8xl": "88rem", // 1408px
