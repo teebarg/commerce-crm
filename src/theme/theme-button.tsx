@@ -16,7 +16,7 @@ export default function ThemeToggle() {
         return null;
     }
 
-    const icon = theme === "dark" ? <SunFilled className="h-8 w-8" /> : <MoonFilled className="h-8 w-8" />;
+    const icon = theme === "dark" ? <SunFilled className="h-6 w-6" /> : <MoonFilled className="h-6 w-6" />;
 
     return (
         <button aria-label="theme" className="text-primary" type="button" onClick={toggleTheme}>

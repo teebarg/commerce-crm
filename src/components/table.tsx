@@ -1,16 +1,16 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 "use client";
 
-import React, { cloneElement, isValidElement } from "react";
+import React from "react";
 import type { Pagination as PaginationType } from "@/utils/types";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 
-import Pagination from "./pagination";
-import SlideOver from "./slideover";
+import Pagination from "@/components/pagination";
 import { Plus } from "nui-react-icons";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Table as TableUI, TableHeader, TableBody, TableRow, TableHead } from "@/components/ui/table";
+import { cn } from "@/utils/utils";
+import Drawer from "@/components/drawer";
 
 interface Props {
     children: React.ReactNode;
@@ -25,11 +25,7 @@ interface Props {
 
 const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, canSearch = true, searchQuery, form, isDataOnly = false }) => {
     const { updateQuery } = useUpdateQuery();
-    const state = useOverlayTriggerState({});
-    const closeSlideOver = () => {
-        state.close();
-    };
-    const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: closeSlideOver }) : form;
+    // const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: closeSlideOver }) : form;
 
     const onSearchChange = React.useCallback(
         (query: string) => {
@@ -58,9 +54,16 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, 
                         </div>
                         <div className="flex items-center gap-3">
                             {canAdd && (
-                                <Button variant="primary" leftIcon={<Plus />} className="" onClick={state.open}>
-                                    Add New
-                                </Button>
+                                <Drawer
+                                    direction="right"
+                                    trigger={
+                                        <Button leftIcon={<Plus />} color="secondary">
+                                            Add New
+                                        </Button>
+                                    }
+                                >
+                                    {form}
+                                </Drawer>
                             )}
                         </div>
                     </div>
@@ -73,28 +76,23 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, 
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <div className="overflow-hidden shadow sm:rounded-lg">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-content3">
-                                <thead>
-                                    <tr>
+                            <TableUI>
+                                <TableHeader>
+                                    <TableRow>
                                         {columns.map((column: string, index: number) => (
-                                            <th key={index} className="py-3.5 pl-4 pr-3 text-left text-xs font-semibold text-default-500" scope="col">
+                                            <TableHead className={cn(index === columns.length - 1 && "text-right")} key={index}>
                                                 {column}
-                                            </th>
+                                            </TableHead>
                                         ))}
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-background">{children}</tbody>
-                            </table>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>{children}</TableBody>
+                            </TableUI>
                         </div>
                     </div>
                 </div>
             </div>
             {pagination && pagination?.totalPages > 1 && <Pagination pagination={pagination} />}
-            {state.isOpen && (
-                <SlideOver className="bg-zinc-900" isOpen={state.isOpen} title="Add New" onClose={closeSlideOver}>
-                    {state.isOpen && formWithHandler}
-                </SlideOver>
-            )}
         </React.Fragment>
     );
 };

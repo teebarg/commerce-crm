@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button2";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LayoutDashboard, Package, ShoppingCart, CreditCard, Users, MapPin, Star, BarChart3, Settings, Menu, Store } from "lucide-react";
+import { cn } from "@/utils/utils";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
     className?: string;

@@ -21,7 +21,7 @@ interface Props {
     onClose?: () => void;
 }
 
-const UpdatePost: React.FC<Props> = ({ current }) => {
+const UpdatePost: React.FC<Props> = ({ current, onClose }) => {
     const router = useRouter();
     const utils = api.useUtils();
 
@@ -31,7 +31,8 @@ const UpdatePost: React.FC<Props> = ({ current }) => {
         onSuccess: async () => {
             enqueueSnackbar("Draft updated successfully", { variant: "success" });
             await utils.draft.invalidate();
-            router.refresh();
+            onClose?.();
+            // router.refresh();
         },
         onError: (error: unknown) => {
             enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });

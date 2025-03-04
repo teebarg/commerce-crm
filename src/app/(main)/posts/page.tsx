@@ -1,6 +1,6 @@
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
-import { Table } from "@/components/ui/table";
+import { Table as TableUI } from "@/components/table";
 import { Actions } from "@/components/generic/actions";
 import { type Draft } from "@prisma/client";
 import { CreatePost } from "@/components/post/create-form";
@@ -8,22 +8,13 @@ import { Publish } from "@/components/post/publish";
 import { UpdatePost } from "@/components/post/update-form";
 import { format } from "date-fns";
 import { Calendar } from "nui-react-icons";
+import { TableCell, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 const getPostStatus = (post: any) => {
-    if (post.is_published) return "published";
-    if (post.scheduled_time) return "scheduled";
+    if (post.isPublished) return "published";
+    if (post.scheduledTime) return "scheduled";
     return "draft";
-};
-
-const getStatusStyle = (status: string) => {
-    switch (status) {
-        case "published":
-            return "bg-green-100 text-green-700";
-        case "scheduled":
-            return "bg-purple-100 text-purple-700";
-        default:
-            return "bg-orange-100 text-orange-700";
-    }
 };
 
 type SearchParams = Promise<{
@@ -35,7 +26,7 @@ const PER_PAGE = 5;
 
 export default async function Posts({ searchParams }: { searchParams: SearchParams }) {
     const { q, page: p = "1" } = await searchParams;
-    const page = parseInt(p, 10)
+    const page = parseInt(p, 10);
     const { drafts, ...pagination } = await api.draft.all({ query: q, page, pageSize: PER_PAGE, sort: "desc" });
     const session = await auth();
 
@@ -78,19 +69,17 @@ export default async function Posts({ searchParams }: { searchParams: SearchPara
                                 <div className="py-6 px-2">
                                     <h2 className="text-xl font-semibold text-default-800">Recent Posts</h2>
                                 </div>
-                                <Table
-                                    columns={["No", "Name", "Role", "Status", "Created At"]}
+                                <TableUI
+                                    columns={["No", "Name", "Role", "", "Status", "Created At", "Actions"]}
                                     form={<CreatePost />}
                                     pagination={pagination}
                                     searchQuery={q}
                                 >
                                     {drafts.map((item: Draft, index: number) => (
-                                        <tr key={index} className="even:bg-content1">
-                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                                {(page - 1) * PER_PAGE + index + 1}
-                                            </td>
-                                            <td className="truncate max-w-28">{item.title}</td>
-                                            <td className="truncate max-w-72">
+                                        <TableRow key={index}>
+                                            <TableCell>{(page - 1) * PER_PAGE + index + 1}</TableCell>
+                                            <TableCell className="truncate max-w-28">{item.title}</TableCell>
+                                            <TableCell className="truncate max-w-72">
                                                 <div className="space-y-2">
                                                     <p className="text-default-800">{item.content}</p>
                                                     {item.scheduledTime && (
@@ -100,22 +89,19 @@ export default async function Posts({ searchParams }: { searchParams: SearchPara
                                                         </div>
                                                     )}
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <div className="flex items-center gap-2">{!item.isPublished && <Publish id={item.id} />}</div>
-                                            </td>
-                                            <td>
-                                                <span className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(getPostStatus(item))}`}>
+                                            </TableCell>
+                                            <TableCell>{!item.isPublished && <Publish id={item.id} />}</TableCell>
+                                            <TableCell>
+                                                <Badge variant={item.isPublished ? "default" : item.scheduledTime ? "secondary" : "outline"}>
                                                     {getPostStatus(item)}
-                                                </span>
-                                            </td>
-                                            <td>
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
                                                 <div className="text-sm text-default-500">
                                                     {item.createdAt && <span>{format(new Date(item.createdAt), "MMM d, yyyy h:mm a")}</span>}
                                                 </div>
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm">{new Date(item.createdAt!).toLocaleDateString()}</td>
-                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                                            </TableCell>
+                                            <TableCell className="text-right">
                                                 {!item.isPublished && (
                                                     <Actions
                                                         deleteAction={deletePost}
@@ -124,10 +110,10 @@ export default async function Posts({ searchParams }: { searchParams: SearchPara
                                                         label="draft"
                                                     />
                                                 )}
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
-                                </Table>
+                                </TableUI>
                             </div>
                         </div>
                     </main>

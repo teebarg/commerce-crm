@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { format } from "date-fns";
 import type React from "react";
 

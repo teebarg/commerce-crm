@@ -3,14 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Pencil, Plus, Trash } from "nui-react-icons";
 import { useState } from "react";
-import { useOverlayTriggerState } from "react-stately";
 import { type NotificationTemplate } from "@prisma/client";
 import { api } from "@/trpc/react";
 import { useSnackbar } from "notistack";
-import { Modal } from "@/components/ui/modal";
 import { Confirm } from "@/components/ui/confirm";
-import SlideOver from "@/components/ui/slideover";
 import { TemplateForm } from "./form";
+import Drawer from "@/components/drawer";
+
 
 interface TemplateSelectorProps {
     templates: Array<NotificationTemplate> | undefined;
@@ -18,42 +17,60 @@ interface TemplateSelectorProps {
 }
 
 export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps) {
-    const [id, setId] = useState<string>("");
-    const [template, setTemplate] = useState<any>(null);
-    const confirmationModal = useOverlayTriggerState({});
-    const createSlider = useOverlayTriggerState({});
-    const editSlider = useOverlayTriggerState({});
     const { enqueueSnackbar } = useSnackbar();
     const utils = api.useUtils();
 
     const mutation = api.push.deleteTemplate.useMutation({
         onSuccess: async () => {
             await utils.push.invalidate();
-            confirmationModal.close();
         },
         onError: (error: unknown) => {
             enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });
         },
     });
 
-    const handleDelete = (id: string) => {
-        setId(id);
-        confirmationModal.open();
-    };
+    const create = api.push.createTemplate.useMutation({
+        onSuccess: async () => {
+            enqueueSnackbar("Template created successfully", { variant: "success" });
+            await utils.push.invalidate();
+        },
+        onError: (error) => {
+            enqueueSnackbar(`Error - ${error as unknown as string}`, { variant: "error" });
+        },
+    });
 
-    const handleEdit = (template: any) => {
-        setTemplate(template);
-        editSlider.open();
-    };
+    const update = api.push.updateTemplate.useMutation({
+        onSuccess: async () => {
+            enqueueSnackbar("Template updated successfully", { variant: "success" });
+            await utils.push.invalidate();
+            // router.refresh();
+        },
+        onError: (error: unknown) => {
+            enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });
+        },
+    });
 
     return (
         <>
             <div className="space-y-4">
                 <h3 className="text-lg font-medium text-default-900">Templates</h3>
                 <div>
-                    <Button leftIcon={<Plus />} color="primary" onClick={createSlider.open}>
-                        Add
-                    </Button>
+                    <Drawer
+                        direction="right"
+                        title="Create Template"
+                        trigger={
+                            <Button leftIcon={<Plus />} color="primary">
+                                Add
+                            </Button>
+                        }
+                        action={
+                            <Button isLoading={create.isPending} form="my-drawer-form" type="submit" color="danger" className="h-10 rounded-md px-8">
+                                Proceed
+                            </Button>
+                        }
+                    >
+                        <TemplateForm onSubmit={(formData) => create.mutate(formData)} />
+                    </Drawer>
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {templates?.map((template) => (
@@ -68,38 +85,62 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
                                 <p className="mt-1 text-sm text-default-500">{template.excerpt}</p>
                             </div>
                             <div className="flex flex-row-reverse mt-4 gap-2 w-full">
-                                <Button color="danger" onClick={() => handleDelete(template.id)} className="min-w-0">
-                                    <Trash />
-                                </Button>
-                                <Button color="secondary" onClick={() => handleEdit(template)} className="min-w-0">
-                                    <Pencil />
-                                </Button>
+                                <Drawer
+                                    shouldScaleBackground={false}
+                                    direction="top"
+                                    trigger={
+                                        <Button color="danger" className="min-w-0">
+                                            <Trash />
+                                        </Button>
+                                    }
+                                    action={
+                                        <Button
+                                            onClick={() => void mutation.mutate(template.id)}
+                                            isLoading={mutation.isPending}
+                                            type="button"
+                                            color="danger"
+                                            className="h-10 rounded-md px-8"
+                                        >
+                                            Delete
+                                        </Button>
+                                    }
+                                >
+                                    <Confirm
+                                        title="Delete template?"
+                                        content={`Are you sure you want to delete template ${template.title}? This action cannot be undone.`}
+                                    />
+                                </Drawer>
+                                <Drawer
+                                    direction="right"
+                                    title={`Edit ${template.title}`}
+                                    trigger={
+                                        <Button color="secondary" className="min-w-0">
+                                            <Pencil />
+                                        </Button>
+                                    }
+                                    action={
+                                        <Button
+                                            isLoading={create.isPending || update.isPending}
+                                            form="my-drawer-form"
+                                            type="submit"
+                                            color="danger"
+                                            className="h-10 rounded-md px-8"
+                                        >
+                                            Update
+                                        </Button>
+                                    }
+                                >
+                                    <TemplateForm
+                                        onSubmit={(formData) => update.mutate({ ...formData, id: template.id })}
+                                        current={template}
+                                        type="update"
+                                    />
+                                </Drawer>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
-            {createSlider.isOpen && (
-                <SlideOver className="bg-zinc-900" isOpen={createSlider.isOpen} title="Add template" onClose={createSlider.close}>
-                    {createSlider.isOpen && <TemplateForm onClose={createSlider.close} />}
-                </SlideOver>
-            )}
-            {editSlider.isOpen && (
-                <SlideOver className="bg-zinc-900" isOpen={editSlider.isOpen} title="Edit template" onClose={editSlider.close}>
-                    {editSlider.isOpen && <TemplateForm current={template} type="update" onClose={editSlider.close} />}
-                </SlideOver>
-            )}
-
-            {confirmationModal.isOpen && (
-                <Modal isOpen={confirmationModal.isOpen} onClose={confirmationModal.close}>
-                    <Confirm
-                        title="Delete template?"
-                        content="Are you sure you want to delete this template? This action cannot be undone."
-                        onClose={confirmationModal.close}
-                        onConfirm={() => void mutation.mutate(id)}
-                    />
-                </Modal>
-            )}
         </>
     );
 }

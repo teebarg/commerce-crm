@@ -11,20 +11,23 @@ import { Input } from "@/components/ui/input";
 import { type z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { TextArea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 import { notificationTemplateSchema } from "@/trpc/schema";
+
+type Form = z.infer<typeof notificationTemplateSchema>;
 
 interface Props {
     current?: NotificationTemplate;
     type?: "create" | "update";
     onClose?: () => void;
+    onSubmit: (data: Form) => void;
 }
 
 interface ChildRef {
     submit: () => void;
 }
 
-const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current }, _ref) => {
+const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onSubmit, onClose, current }, _ref) => {
     const router = useRouter();
     const isCreate = type === "create";
     const utils = api.useUtils();
@@ -59,7 +62,7 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
 
     const formRef = useRef<HTMLFormElement>(null);
 
-    type Form = z.infer<typeof notificationTemplateSchema>;
+    // type Form = z.infer<typeof notificationTemplateSchema>;
 
     const {
         register,
@@ -76,20 +79,34 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
         id: NotificationTemplate["id"];
     }
 
-    const onSubmit = (data: Form): void => {
-        if (isCreate) {
-            create.mutate(data);
-        } else {
-            if (!current) return;
-            const updateData: UpdateData = { ...data, id: current.id };
-            update.mutate(updateData);
-        }
+    const onSubmit2= (data: Form): void => {
+        onSubmit(data);
+
+        // if (isCreate) {
+        //     // create.mutate(data);
+        //     onSubmit(data);
+        // } else {
+        //     if (!current) return;
+        //     const updateData: UpdateData = { ...data, id: current.id };
+        //     // update.mutate(updateData);
+        //     onSubmit(updateData);
+        // }
     };
 
     return (
         <React.Fragment>
             <div className="mx-auto w-full">
-                <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                <form
+                    id="my-drawer-form"
+                    ref={formRef}
+                    onSubmit={handleSubmit(onSubmit2)}
+                    // onSubmit={(e) => {
+                    //     e.preventDefault();
+                    //     const formData = new FormData(e.currentTarget);
+                    //     onSubmit(formData);
+                    // }}
+                    className="space-y-8"
+                >
                     <Input
                         type="text"
                         id="title"
@@ -113,7 +130,7 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                         placeholder="Excerpt"
                     />
                     <Input label="Icon (emoji or URL)" type="text" id="icon" {...register("icon")} className="mt-1" placeholder="🔔" />
-                    <TextArea
+                    <Textarea
                         label="Message"
                         id="body"
                         {...register("body", {
@@ -123,14 +140,14 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                         className="mt-1"
                         placeholder="Notification message..."
                     />
-                    <div className="flex justify-end space-x-2">
+                    {/* <div className="flex justify-end space-x-2">
                         <Button type="button" variant="danger" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button isLoading={create.isPending || update.isPending} variant="primary" type="submit">
                             {isCreate ? "Create" : "Update"}
                         </Button>
-                    </div>
+                    </div> */}
                 </form>
             </div>
         </React.Fragment>

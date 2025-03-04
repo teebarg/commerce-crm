@@ -1,10 +1,11 @@
 import { type Metadata } from "next";
 import React from "react";
 import { redirect } from "next/navigation";
-import SideBar from "@/components/layout/sidebar";
+// import { Sidebar } from "@/components/layout/sidebar2";
+import Sidebar from "@/components/layout/sidebar3";
 import { auth } from "@/server/auth";
-import UserMenu from "@/components/generic/user-menu";
-import dynamic from "next/dynamic";
+import Header from "@/components/layout/header2";
+// import { Header } from "@/components/layout/header";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
 
@@ -12,14 +13,8 @@ export const metadata: Metadata = {
     metadataBase: new URL(BASE_URL),
 };
 
-const getThemeToggler = () =>
-    dynamic(() => import("@/theme/theme-button"), {
-        loading: () => <div className="w-6 h-6" />,
-    });
-
-export default async function PageLayout(props: { children: React.ReactNode }) {
+export default async function PageLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
-    const ThemeButton = getThemeToggler();
 
     if (!session?.user) {
         redirect("/api/auth/signin");
@@ -27,16 +22,11 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
 
     return (
         <React.Fragment>
-            <div className="flex min-h-screen">
-                <span className="hidden sm:block min-w-[20rem] h-screen overflow-y-auto">
-                    <SideBar />
-                </span>
-                <div className="flex-1 h-screen overflow-y-auto flex flex-col">
-                    <div className="flex flex-row-reverse gap-2 items-center py-2 px-4 shadow-xl">
-                        <UserMenu />
-                        <ThemeButton />
-                    </div>
-                    <main className="flex-1">{props.children}</main>
+            <div className="flex h-screen overflow-hidden">
+                <Sidebar />
+                <div className="flex-1 flex flex-col overflow-auto h-screen">
+                    <Header />
+                    <main className="flex-1 overflow-y-auto py-6 px-6">{children}</main>
                 </div>
             </div>
         </React.Fragment>
