@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button2";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
     DropdownMenu,
@@ -14,7 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Eye, MoreHorizontal, Search, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, MoreHorizontal, Search, ArrowUpDown } from "lucide-react";
 
 interface Order {
     id: string;

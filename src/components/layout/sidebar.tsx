@@ -1,326 +1,196 @@
+// File: components/Sidebar.tsx
 "use client";
 
-import React, { useState } from "react";
-// import { usePathname } from "next/navigation";
 import Link from "next/link";
-
-import { cn } from "@/utils/utils";
-
-import {
-    Bell,
-    Cart,
-    ChevronRight,
-    CogSixTooth,
-    CogSixToothSolid,
-    DocumentIcon,
-    Home,
-    Layout,
-    MessageSquare,
-    UserGroup,
-    Users,
-    Window,
-} from "nui-react-icons";
 import { usePathname } from "next/navigation";
+import { Home, ShoppingBag, Users, CreditCard, Package, Star, MapPin, Settings, BarChart, LogOut, Menu, X } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface MenuItem {
+const navItems = [
+    { label: "Dashboard", href: "/store", icon: <Home className="w-5 h-5 text-sky-500" /> },
+    { label: "Orders", href: "/store/orders", icon: <ShoppingBag className="w-5 h-5 text-pink-500" /> },
+    { label: "Products", href: "/store/products", icon: <Package className="w-5 h-5 text-amber-500" /> },
+    { label: "Customers", href: "/store/customers", icon: <Users className="w-5 h-5 text-green-500" /> },
+    { label: "Payments", href: "/store/payments", icon: <CreditCard className="w-5 h-5 text-blue-500" /> },
+    { label: "Reviews", href: "/store/reviews", icon: <Star className="w-5 h-5 text-yellow-500" /> },
+    { label: "Addresses", href: "/store/addresses", icon: <MapPin className="w-5 h-5 text-orange-500" /> },
+    { label: "Analytics", href: "/store/analytics", icon: <BarChart className="w-5 h-5 text-gray-500" /> },
+    { label: "Settings", href: "/store/settings", icon: <Settings className="w-5 h-5 text-sky-500" /> },
+];
+
+const general = [
+    { label: "Home", href: "/", icon: <Home className="w-5 h-5 text-sky-500" /> },
+    { label: "Posts", href: "/posts", icon: <Home className="w-5 h-5 text-sky-500" /> },
+    { label: "Push Notification", href: "/notification", icon: <ShoppingBag className="w-5 h-5 text-pink-500" /> },
+    { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5 text-sky-500" /> },
+];
+
+interface Props {
     label: string;
     href: string;
-    icon?: React.ReactNode;
-    suffix?: React.ReactNode;
-    disabled?: boolean;
-    exact?: boolean; // Whether to match the route exactly
+    icon: React.ReactNode;
+    isActive?: boolean;
+    isCollapsed?: boolean;
 }
 
-interface SubMenuItem {
-    subMenu: string;
-    icon?: React.ReactNode;
-    suffix?: React.ReactNode;
-    menuItems: (MenuItem | SubMenuItem)[];
-}
-
-const MenuLink = ({ href, className, children, disabled }: { href: string; className: string; children: React.ReactNode; disabled?: boolean }) => {
-    if (disabled) {
-        return <span className={className}>{children}</span>;
-    }
-
+const NavLink: React.FC<Props> = ({ label, href, icon, isActive, isCollapsed }) => {
     return (
-        <Link className={className} href={href}>
-            {children}
+        <Link
+            key={href}
+            href={href}
+            className={`
+                flex items-center ${isCollapsed ? "justify-center" : "justify-start"}
+                p-3 rounded-md transition-colors
+                ${isActive ? "bg-indigo-50 text-indigo-600" : ""}
+            `}
+        >
+            {icon}
+            {!isCollapsed && <span className="ml-3 font-medium">{label}</span>}
+            {isActive && !isCollapsed && <motion.div className="absolute right-0 w-1 h-8 bg-indigo-600 rounded-l-md" layoutId="activeIndicator" />}
         </Link>
     );
 };
 
-const SubMenuComponent: React.FC<{
-    item: SubMenuItem;
-    level?: number;
-    isCollapsed?: boolean;
-}> = ({ item, isCollapsed, level = 0 }) => {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+export default function Sidebar() {
     const pathname = usePathname();
-    const contentRef = React.useRef<HTMLDivElement>(null);
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-    const isChildActive = React.useCallback(
-        (items: (MenuItem | SubMenuItem)[]): boolean => {
-            const isActive = (href: string, exact = true) => (exact ? pathname === href : pathname?.startsWith(href));
+    const toggleCollapse = () => {
+        setIsCollapsed(!isCollapsed);
+    };
 
-            return items.some((subItem) => {
-                if ("subMenu" in subItem) {
-                    return isChildActive(subItem.menuItems);
-                }
-
-                return isActive(subItem.href, subItem.exact);
-            });
-        },
-        [pathname]
-    );
-
-    React.useEffect(() => {
-        if (isChildActive(item.menuItems)) {
-            setIsOpen(true);
-        }
-    }, [pathname, isChildActive, item.menuItems]);
+    const toggleMobile = () => {
+        setIsMobileOpen(!isMobileOpen);
+    };
 
     return (
-        <div className="w-full">
-            <button
-                className={cn(
-                    "w-full flex items-center justify-between p-4 text-default-500 hover:text-default-600 transition-colors duration-200 group",
-                    {
-                        "pl-4": level === 0,
-                        "hover:bg-content2 bg-content1 pl-8": level === 1,
-                        "hover:bg-content2 bg-content3 pl-12": level === 2,
-                    }
-                )}
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <div className="flex items-center gap-2">
-                    {item.icon && <div className="text-inherit group-hover:text-inherit transition-colors duration-200">{item.icon}</div>}
-                    <span
-                        className={cn("text-sm font-medium", {
-                            hidden: isCollapsed,
-                        })}
-                    >
-                        {item.subMenu}
-                    </span>
-                </div>
-                <div
-                    className={cn("text-sm font-medium transform transition-transform duration-200", {
-                        hidden: isCollapsed,
-                        "rotate-90": isOpen,
-                    })}
-                >
-                    <ChevronRight size={18} />
-                </div>
+        <div className="flex h-screen">
+            {/* Mobile menu button */}
+            <button onClick={toggleMobile} className="lg:hidden fixed z-20 top-4 left-4 p-2 rounded-md bg-white shadow-md">
+                <Menu className="w-5 h-5" />
             </button>
 
-            <div
-                className={`
-                    overflow-hidden transition-all duration-300 ease-in-out
-                    ${isOpen ? "max-h-96" : "max-h-0"}
-                `}
-            >
-                <div ref={contentRef}>
-                    {item.menuItems.map((subItem, index) =>
-                        "subMenu" in subItem ? (
-                            <SubMenuComponent key={index} item={subItem} level={(level || 0) + 1} />
-                        ) : (
-                            <MenuItemComponent key={index} item={subItem} level={(level || 0) + 1} />
-                        )
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-};
+            {/* Mobile overlay */}
+            {isMobileOpen && <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30" onClick={toggleMobile} />}
 
-const MenuItemComponent: React.FC<{
-    item: MenuItem;
-    level?: number;
-    isCollapsed?: boolean;
-}> = ({ item, isCollapsed, level = 0 }) => {
-    return (
-        <MenuLink
-            className={cn(
-                "flex items-center justify-between p-4 transition-all duration-200 group",
-                `${item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-500 hover:text-default-600"}`,
-                {
-                    "pl-4": level === 0,
-                    "hover:bg-content2 bg-content1 pl-8": level === 1,
-                    "hover:bg-content2 bg-content3 pl-12": level === 2,
-                    "hover:bg-content3 bg-content4 pl-16": level === 3,
-                }
-            )}
-            href={item.href}
-        >
-            <div className="flex items-center gap-2">
-                {item.icon && <div className="text-inherit group-hover:text-inherit transition-colors duration-200">{item.icon}</div>}
-                <span
-                    className={cn("text-sm font-medium", {
-                        hidden: isCollapsed,
-                    })}
+            {/* Sidebar */}
+            <AnimatePresence>
+                <motion.aside
+                    className={`bg-content1 border-r z-40 ${isCollapsed ? "w-20" : "w-72"} transition-all duration-300 ease-in-out hidden lg:block`}
+                    initial={{ x: -100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
                 >
-                    {item.label}
-                </span>
-            </div>
-            {item.suffix && <div className="flex items-center">{item.suffix}</div>}
-        </MenuLink>
-    );
-};
-
-const Sidebar: React.FC = () => {
-    // const currentUser = null;
-    const [isCollapsed, setIsCollapsed] = useState(false);
-    const navItems: (MenuItem | SubMenuItem)[] = [
-        {
-            subMenu: "Admin",
-            icon: <CogSixTooth size={20} />,
-            menuItems: [
-                {
-                    label: "Dashboard",
-                    href: "/",
-                    icon: <Home size={18} />,
-                },
-                {
-                    label: "Settings",
-                    href: "/settings",
-                    icon: <CogSixTooth size={18} />,
-                },
-                {
-                    label: "Items",
-                    href: "/items",
-                    icon: <Window size={18} />,
-                },
-                {
-                    label: "Admin",
-                    href: "/admin",
-                    icon: <Users size={18} />,
-                },
-            ],
-        },
-        {
-            subMenu: "Store",
-            icon: <CogSixTooth size={20} />,
-            menuItems: [
-                {
-                    label: "Dashboard",
-                    href: "/store",
-                    icon: <Layout />,
-                },
-                {
-                    label: "Customers",
-                    href: "/store/customers",
-                    icon: <UserGroup />,
-                },
-                {
-                    label: "Products",
-                    href: "/store/products",
-                    icon: <DocumentIcon />,
-                },
-                {
-                    label: "Orders",
-                    href: "/store/orders",
-                    icon: <Cart />,
-                },
-                {
-                    label: "Survey",
-                    href: "/store/survey",
-                    icon: <MessageSquare />,
-                },
-                {
-                    label: "Settings",
-                    href: "/store/settings",
-                    icon: <CogSixToothSolid />,
-                },
-            ],
-        },
-        {
-            subMenu: "Social",
-            icon: <CogSixTooth size={20} />,
-            menuItems: [
-                {
-                    label: "Posts",
-                    href: "/posts",
-                    icon: <Home size={18} />,
-                },
-            ],
-        },
-        {
-            subMenu: "Push Notification",
-            icon: <Bell size={20} />,
-            menuItems: [
-                {
-                    label: "Send",
-                    href: "/notification",
-                    icon: <Bell size={18} />,
-                },
-            ],
-        },
-    ];
-
-    const navs = [
-        {
-            group: "General",
-            iems: navItems,
-        },
-    ];
-
-    return (
-        <div
-            className={cn("w-80", {
-                "w-20": isCollapsed,
-            })}
-        >
-            <div className=" w-[inherit]" />
-            <div
-                className={cn(
-                    "fixed h-screen bg-gradient-to-b from-default-100 via-danger-100 to-secondary-100 border-r border-default-100 flex flex-col",
-                    "transition-all duration-300 ease-in-out w-[inherit] text-default-500 overflow-y-auto"
-                )}
-            >
-                <div className="p-4 flex items-center justify-between mb-4">
-                    <h1
-                        className={cn("font-semibold text-3xl transition-opacity duration-200 opacity-100", {
-                            "!opacity-0 w-0": isCollapsed,
-                        })}
-                    >
-                        Socials
-                    </h1>
-                    <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200" onClick={() => setIsCollapsed(!isCollapsed)}>
-                        <ChevronRight className={`transform transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} size={20} />
-                    </button>
-                </div>
-
-                <div className="flex flex-col flex-1 overflow-y-auto">
-                    <div className="flex-1">
-                        {navs.map((nav, index: number) => (
-                            <React.Fragment key={index}>
-                                <div
-                                    className={`px-4 mb-2 transition-opacity duration-200 mt-8 first:mt-0 ${
-                                        isCollapsed ? "opacity-0" : "opacity-70"
-                                    }`}
-                                >
-                                    <p className="text-xs font-bold text-default-500 uppercase tracking-wider">{nav.group}</p>
-                                </div>
-
-                                <nav>
-                                    {nav.iems.map((item, index: number) =>
-                                        "subMenu" in item ? (
-                                            <SubMenuComponent key={index} isCollapsed={isCollapsed} item={item} />
-                                        ) : (
-                                            <MenuItemComponent key={index} isCollapsed={isCollapsed} item={item} />
-                                        )
-                                    )}
-                                </nav>
-                            </React.Fragment>
-                        ))}
+                    <div className="flex flex-col h-full">
+                        <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} p-4 border-b`}>
+                            {!isCollapsed && <span className="text-xl font-bold">Shop Admin</span>}
+                            <button onClick={toggleCollapse} className="p-1 rounded hover:bg-gray-100">
+                                <Menu className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <ScrollArea className="flex-1 py-4">
+                            <div className="text-sm pl-2.5">Store</div>
+                            <nav className="px-2 space-y-1">
+                                {navItems.map((item) => {
+                                    const isActive = pathname === item.href;
+                                    return (
+                                        <NavLink
+                                            key={item.href}
+                                            href={item.href}
+                                            label={item.label}
+                                            icon={item.icon}
+                                            isActive={isActive}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                    );
+                                })}
+                            </nav>
+                            <div className="text-sm pl-2.5 mt-4">General</div>
+                            {general.map((item) => {
+                                const isActive = pathname === item.href;
+                                return (
+                                    <NavLink
+                                        key={item.href}
+                                        href={item.href}
+                                        label={item.label}
+                                        icon={item.icon}
+                                        isActive={isActive}
+                                        isCollapsed={isCollapsed}
+                                    />
+                                );
+                            })}
+                        </ScrollArea>
+                        <div className="p-4 border-t border-gray-200">
+                            <button
+                                className={`flex items-center ${
+                                    isCollapsed ? "justify-center w-full" : ""
+                                } text-red-500 hover:text-red-600 transition-colors`}
+                            >
+                                <LogOut className="w-5 h-5" />
+                                {!isCollapsed && <span className="ml-3 font-medium">Logout</span>}
+                            </button>
+                        </div>
                     </div>
-                    {/* <div className="">
-                        {currentUser?.email && <p className="text-secondary text-sm p-2 max-w-44">Logged in as: {currentUser.email}</p>}
-                    </div> */}
-                </div>
-            </div>
+                </motion.aside>
+            </AnimatePresence>
+
+            {/* Mobile Sidebar */}
+            <AnimatePresence>
+                {isMobileOpen && (
+                    <motion.div
+                        className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl z-40 lg:hidden"
+                        initial={{ x: -100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -100, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="flex flex-col h-full">
+                            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                                <span className="text-xl font-bold">Shop Admin</span>
+                                <button onClick={toggleMobile} className="p-1 rounded hover:bg-gray-100">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <div className="flex-1 py-6 overflow-y-auto">
+                                <nav className="px-2 space-y-1">
+                                    {navItems.map((item) => {
+                                        const isActive = pathname === item.href;
+                                        return (
+                                            <Link
+                                                key={item.href}
+                                                href={item.href}
+                                                className={`
+                                                    flex items-center px-3 py-3 rounded-md transition-colors
+                                                    ${isActive ? "bg-indigo-50 text-indigo-600" : ""}
+                                                `}
+                                                onClick={toggleMobile}
+                                            >
+                                                {item.icon}
+                                                <span className="ml-3 font-medium">{item.label}</span>
+                                                {isActive && (
+                                                    <motion.div
+                                                        className="absolute right-0 w-1 h-8 bg-indigo-600 rounded-l-md"
+                                                        layoutId="mobileActiveIndicator"
+                                                    />
+                                                )}
+                                            </Link>
+                                        );
+                                    })}
+                                </nav>
+                            </div>
+                            <div className="p-4 border-t">
+                                <button className="flex items-center text-red-500 hover:text-red-600 transition-colors">
+                                    <LogOut className="w-5 h-5" />
+                                    <span className="ml-3 font-medium">Logout</span>
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
-};
-
-export default Sidebar;
+}

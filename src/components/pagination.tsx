@@ -10,7 +10,7 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-} from "@/components/ui/pagination2";
+} from "@/components/ui/pagination";
 
 interface Props {
     pagination: PaginationType;

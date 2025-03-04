@@ -3,8 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "@/components/ui/datepicker";
 import { api } from "@/trpc/react";
-import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
 import { Calendar } from "nui-react-icons";
 import type React from "react";
 import { useRef, useState } from "react";
@@ -12,29 +10,26 @@ import { type z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { draftSchema } from "@/trpc/schema";
+import { toast } from "sonner";
 
 type Props = {
     onClose?: () => void;
 };
 
 const CreatePost: React.FC<Props> = ({ onClose }) => {
-    const router = useRouter();
     const utils = api.useUtils();
-
-    const { enqueueSnackbar } = useSnackbar();
 
     const mutation = api.draft.create.useMutation({
         onSuccess: async () => {
-            enqueueSnackbar("Draft created successfully", { variant: "success" });
+            toast.success(`Draft created successfully`);
             await utils.draft.invalidate();
             if (formRef.current) {
                 formRef.current.reset();
-                router.refresh();
                 onClose?.();
             }
         },
         onError: (error: unknown) => {
-            enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });
+            toast.error(`Error - ${error as string}`);
         },
     });
 

@@ -3,11 +3,11 @@
 import { Edit, Eye, Trash } from "nui-react-icons";
 import React, { cloneElement, isValidElement, useState } from "react";
 import { useOverlayTriggerState } from "react-stately";
-import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import { Confirm } from "@/components/ui/confirm";
 import Drawer from "@/components/drawer";
-import { Button } from "@/components/ui/button2";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface Props {
     label?: string;
@@ -18,7 +18,6 @@ interface Props {
 }
 
 const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, deleteAction }) => {
-    const { enqueueSnackbar } = useSnackbar();
     const deleteModalState = useOverlayTriggerState({});
     const slideOverState = useOverlayTriggerState({});
     const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: slideOverState.close }) : form;
@@ -32,7 +31,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
             router.refresh();
             deleteModalState.close();
         } catch (error) {
-            enqueueSnackbar(`Error deleting ${label} - ${error as string}`, { variant: "error" });
+            toast.error(`Error - ${error as string}`);
         } finally {
             setIsDeleting(false);
         }

@@ -1,11 +1,9 @@
 import { type Metadata } from "next";
 import React from "react";
 import { redirect } from "next/navigation";
-// import { Sidebar } from "@/components/layout/sidebar2";
-import Sidebar from "@/components/layout/sidebar3";
+import Sidebar from "@/components/layout/sidebar";
 import { auth } from "@/server/auth";
-import Header from "@/components/layout/header2";
-// import { Header } from "@/components/layout/header";
+import Header from "@/components/layout/header";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
 

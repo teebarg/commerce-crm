@@ -7,12 +7,11 @@ import { api } from "@/trpc/react";
 import { draftSchema } from "@/trpc/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Draft } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
 import { Calendar } from "nui-react-icons";
 import type React from "react";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { type z } from "zod";
 
 interface Props {
@@ -22,20 +21,16 @@ interface Props {
 }
 
 const UpdatePost: React.FC<Props> = ({ current, onClose }) => {
-    const router = useRouter();
     const utils = api.useUtils();
-
-    const { enqueueSnackbar } = useSnackbar();
 
     const update = api.draft.update.useMutation({
         onSuccess: async () => {
-            enqueueSnackbar("Draft updated successfully", { variant: "success" });
+            toast.success("Draft updated successfully");
             await utils.draft.invalidate();
             onClose?.();
-            // router.refresh();
         },
         onError: (error: unknown) => {
-            enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });
+            toast.error(`Error - ${error as string}`);
         },
     });
     const [scheduledFor, setScheduledFor] = useState<Date | undefined>(current?.scheduledTime ? new Date(current.scheduledTime) : undefined);

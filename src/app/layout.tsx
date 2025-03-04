@@ -3,9 +3,7 @@ import { type Metadata } from "next";
 
 import { Outfit } from "next/font/google";
 import { cn } from "@/utils/utils";
-import NotificationProviders from "./notistack-providers";
 import { TRPCReactProvider } from "@/trpc/react";
-import OverlayClientProvider from "./overlay-providers";
 import { ThemeScript } from "@/theme/theme-script";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
@@ -37,13 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </head>
             <body className="min-h-screen">
                 <TRPCReactProvider>
-                    <NotificationProviders>
-                        <OverlayClientProvider>
-                            {children}
-                            <Toaster />
-                            <SonnerToaster />
-                        </OverlayClientProvider>
-                    </NotificationProviders>
+                    {children}
+                    <Toaster />
+                    <SonnerToaster position="top-right" richColors expand={false} duration={10000} closeButton  />
                 </TRPCReactProvider>
             </body>
         </html>

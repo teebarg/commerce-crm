@@ -2,14 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Pencil, Plus, Trash } from "nui-react-icons";
-import { useState } from "react";
 import { type NotificationTemplate } from "@prisma/client";
 import { api } from "@/trpc/react";
-import { useSnackbar } from "notistack";
 import { Confirm } from "@/components/ui/confirm";
 import { TemplateForm } from "./form";
 import Drawer from "@/components/drawer";
-
+import { toast } from "sonner";
 
 interface TemplateSelectorProps {
     templates: Array<NotificationTemplate> | undefined;
@@ -17,7 +15,6 @@ interface TemplateSelectorProps {
 }
 
 export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps) {
-    const { enqueueSnackbar } = useSnackbar();
     const utils = api.useUtils();
 
     const mutation = api.push.deleteTemplate.useMutation({
@@ -25,28 +22,27 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
             await utils.push.invalidate();
         },
         onError: (error: unknown) => {
-            enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });
+            toast.error(`Error - ${error as string}`);
         },
     });
 
     const create = api.push.createTemplate.useMutation({
         onSuccess: async () => {
-            enqueueSnackbar("Template created successfully", { variant: "success" });
+            toast.success("Template created successfully");
             await utils.push.invalidate();
         },
         onError: (error) => {
-            enqueueSnackbar(`Error - ${error as unknown as string}`, { variant: "error" });
+            toast.error(`Error - ${error as unknown as string}`);
         },
     });
 
     const update = api.push.updateTemplate.useMutation({
         onSuccess: async () => {
-            enqueueSnackbar("Template updated successfully", { variant: "success" });
+            toast.success("Template updated successfully");
             await utils.push.invalidate();
-            // router.refresh();
         },
         onError: (error: unknown) => {
-            enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });
+            toast.error(`Error - ${error as unknown as string}`);
         },
     });
 
@@ -64,7 +60,7 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
                             </Button>
                         }
                         action={
-                            <Button isLoading={create.isPending} form="my-drawer-form" type="submit" color="danger" className="h-10 rounded-md px-8">
+                            <Button isLoading={create.isPending} form="notification-form" type="submit" variant="secondary">
                                 Proceed
                             </Button>
                         }
@@ -98,8 +94,7 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
                                             onClick={() => void mutation.mutate(template.id)}
                                             isLoading={mutation.isPending}
                                             type="button"
-                                            color="danger"
-                                            className="h-10 rounded-md px-8"
+                                            variant="destructive"
                                         >
                                             Delete
                                         </Button>
@@ -119,22 +114,12 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
                                         </Button>
                                     }
                                     action={
-                                        <Button
-                                            isLoading={create.isPending || update.isPending}
-                                            form="my-drawer-form"
-                                            type="submit"
-                                            color="danger"
-                                            className="h-10 rounded-md px-8"
-                                        >
+                                        <Button isLoading={update.isPending} form="notification-form" type="submit" variant="secondary">
                                             Update
                                         </Button>
                                     }
                                 >
-                                    <TemplateForm
-                                        onSubmit={(formData) => update.mutate({ ...formData, id: template.id })}
-                                        current={template}
-                                        type="update"
-                                    />
+                                    <TemplateForm onSubmit={(formData) => update.mutate({ ...formData, id: template.id })} current={template} />
                                 </Drawer>
                             </div>
                         </div>
