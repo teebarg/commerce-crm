@@ -54,22 +54,22 @@ export const draftRouter = createTRPCRouter({
         })
     }),
 
-    get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+    get: publicProcedure.input(z.number()).query(async ({ input, ctx }) => {
         return await ctx.db.draft.findUnique({ where: { id: input } });
     }),
 
-    update: protectedProcedure.input(draftSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
+    update: protectedProcedure.input(draftSchema.extend({ id: z.number() })).mutation(async ({ input, ctx }) => {
         return await ctx.db.draft.update({
             where: { id: input.id },
             data: { ...input },
         });
     }),
 
-    delete: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+    delete: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
         return await ctx.db.draft.delete({ where: { id: input } });
     }),
 
-    publish: publicProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+    publish: publicProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
         return await ctx.db.draft.findUnique({ where: { id: input } });
     }),
 });

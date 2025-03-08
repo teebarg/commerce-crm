@@ -8,7 +8,7 @@ import type React from "react";
 import { toast } from "sonner";
 
 type Props = {
-    id: string;
+    id: number;
 };
 
 const Publish: React.FC<Props> = ({ id }) => {

@@ -26,7 +26,7 @@ declare module "next-auth" {
 
     interface User {
         // ...other properties
-        id?: number;
+        // id?: number;
         firstName?: string | null | undefined;
         lastName?: string | null | undefined;
         email?: string | null | undefined;
@@ -61,7 +61,7 @@ export const authConfig = {
 
                         if (validPassword) {
                             return {
-                                id: user.id,
+                                // id: user.id,
                                 email: user.email,
                                 firstName: user.firstName,
                                 lastName: user.lastName,

@@ -30,7 +30,7 @@ export default async function Posts({ searchParams }: { searchParams: SearchPara
     const { drafts, ...pagination } = await api.draft.all({ query: q, page, pageSize: PER_PAGE, sort: "desc" });
     const session = await auth();
 
-    const deletePost = async (id: string) => {
+    const deletePost = async (id: number) => {
         "use server";
         try {
             await api.draft.delete(id);

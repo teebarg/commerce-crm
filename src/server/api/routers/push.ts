@@ -22,13 +22,13 @@ export const pushNotificationRouter = createTRPCRouter({
             },
         });
     }),
-    updateTemplate: protectedProcedure.input(notificationTemplateSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
+    updateTemplate: protectedProcedure.input(notificationTemplateSchema.extend({ id: z.number() })).mutation(async ({ input, ctx }) => {
         return await ctx.db.notificationTemplate.update({
             where: { id: input.id },
             data: { ...input },
         });
     }),
-    deleteTemplate: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+    deleteTemplate: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
         return await ctx.db.notificationTemplate.delete({ where: { id: input } });
     }),
 
@@ -43,7 +43,7 @@ export const pushNotificationRouter = createTRPCRouter({
     getSubscription: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
         return await ctx.db.pushSubscription.findUnique({ where: { endpoint: input } });
     }),
-    unsubscribe: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+    unsubscribe: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
         return await ctx.db.pushSubscription.delete({ where: { id: input } });
     }),
 

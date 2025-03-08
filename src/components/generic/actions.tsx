@@ -14,7 +14,7 @@ interface Props {
     item: Record<any, any>;
     form: React.ReactNode;
     showDetails?: boolean;
-    deleteAction?: (id: string) => Promise<void>;
+    deleteAction?: (id: number) => Promise<void>;
 }
 
 const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, deleteAction }) => {
@@ -24,7 +24,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-    const onConfirmDelete = async (id: string) => {
+    const onConfirmDelete = async (id: number) => {
         try {
             setIsDeleting(true);
             await deleteAction?.(id);
@@ -70,7 +70,6 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                     <Delete onClick={() => onDelete(item)} />
                 </span> */}
                 <Drawer
-                    // shouldScaleBackground={false}
                     open={deleteModalState.isOpen}
                     onOpenChange={deleteModalState.setOpen}
                     direction="top"
