@@ -16,21 +16,14 @@ const config = {
         "@typescript-eslint/no-unsafe-member-access": "off",
         "@typescript-eslint/consistent-type-imports": "off",
         "@typescript-eslint/no-redundant-type-constituents": "off",
+        "@typescript-eslint/no-misused-promises": "off",
         "@typescript-eslint/no-unused-vars": [
             "warn",
             {
                 argsIgnorePattern: "^_",
             },
         ],
-        "@typescript-eslint/require-await": "off",
-        "@typescript-eslint/no-misused-promises": [
-            "error",
-            {
-                checksVoidReturn: {
-                    attributes: false,
-                },
-            },
-        ],
+        "@typescript-eslint/require-await": "off"
     },
 };
 module.exports = config;

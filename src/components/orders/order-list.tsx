@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -15,108 +14,36 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Eye, MoreHorizontal, Search, ArrowUpDown } from "lucide-react";
+import { OrderStatus, PaymentStatus } from "@prisma/client";
+import { ExtendedOrder, type Pagination } from "@/types/generic";
+import PaginationUI from "@/components/pagination";
 
-interface Order {
-    id: string;
-    customer: string;
-    date: string;
-    total: string;
-    status: "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
-    paymentStatus: "Paid" | "Pending" | "Failed";
-}
 
-export function OrderList() {
-    const [orders, setOrders] = useState<Order[]>([
-        {
-            id: "#ORD-001",
-            customer: "John Smith",
-            date: "2025-04-01",
-            total: "$129.99",
-            status: "Delivered",
-            paymentStatus: "Paid",
-        },
-        {
-            id: "#ORD-002",
-            customer: "Sarah Johnson",
-            date: "2025-04-02",
-            total: "$79.50",
-            status: "Processing",
-            paymentStatus: "Paid",
-        },
-        {
-            id: "#ORD-003",
-            customer: "Michael Brown",
-            date: "2025-04-02",
-            total: "$249.99",
-            status: "Shipped",
-            paymentStatus: "Paid",
-        },
-        {
-            id: "#ORD-004",
-            customer: "Emily Davis",
-            date: "2025-04-03",
-            total: "$59.99",
-            status: "Pending",
-            paymentStatus: "Pending",
-        },
-        {
-            id: "#ORD-005",
-            customer: "David Wilson",
-            date: "2025-04-03",
-            total: "$199.00",
-            status: "Cancelled",
-            paymentStatus: "Failed",
-        },
-        {
-            id: "#ORD-006",
-            customer: "Jessica Martinez",
-            date: "2025-04-04",
-            total: "$149.99",
-            status: "Processing",
-            paymentStatus: "Paid",
-        },
-        {
-            id: "#ORD-007",
-            customer: "Robert Taylor",
-            date: "2025-04-04",
-            total: "$89.99",
-            status: "Shipped",
-            paymentStatus: "Paid",
-        },
-        {
-            id: "#ORD-008",
-            customer: "Jennifer Anderson",
-            date: "2025-04-05",
-            total: "$299.99",
-            status: "Delivered",
-            paymentStatus: "Paid",
-        },
-    ]);
-
-    const getStatusColor = (status: Order["status"]) => {
+export function OrderList({ orders, pagination }: { orders: ExtendedOrder[]; pagination: Pagination }) {
+    const getStatusColor = (status: OrderStatus) => {
         switch (status) {
-            case "Pending":
+            case OrderStatus.PENDING:
                 return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-            case "Processing":
+            case OrderStatus.PROCESSING:
                 return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-            case "Shipped":
+            case OrderStatus.SHIPPED:
                 return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
-            case "Delivered":
+            case OrderStatus.DELIVERED:
                 return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-            case "Cancelled":
+            case OrderStatus.CANCELED:
                 return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
             default:
                 return "";
         }
     };
 
-    const getPaymentStatusColor = (status: Order["paymentStatus"]) => {
+    const getPaymentStatusColor = (status: PaymentStatus | null) => {
         switch (status) {
-            case "Paid":
+            case PaymentStatus.COMPLETED:
                 return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-            case "Pending":
+            case PaymentStatus.PENDING:
                 return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-            case "Failed":
+            case PaymentStatus.FAILED:
                 return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
             default:
                 return "";
@@ -165,11 +92,15 @@ export function OrderList() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {orders.map((order) => (
-                                <TableRow key={order.id}>
-                                    <TableCell className="font-medium">{order.id}</TableCell>
-                                    <TableCell>{order.customer}</TableCell>
-                                    <TableCell>{order.date}</TableCell>
+                            {orders.map((order: ExtendedOrder, index: number) => (
+                                <TableRow key={index}>
+                                    <TableCell className="font-medium">{order.order_number}</TableCell>
+                                    <TableCell>
+                                        {order.user.firstName} {order.user.lastName}
+                                    </TableCell>
+                                    <TableCell>
+                                        <span>{new Date(order.created_at).toLocaleDateString()}</span>
+                                    </TableCell>
                                     <TableCell>{order.total}</TableCell>
                                     <TableCell>
                                         <Badge className={getStatusColor(order.status)} variant="outline">
@@ -177,8 +108,8 @@ export function OrderList() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge className={getPaymentStatusColor(order.paymentStatus)} variant="outline">
-                                            {order.paymentStatus}
+                                        <Badge className={getPaymentStatusColor(order.payment_status)} variant="outline">
+                                            {order.payment_status}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -207,6 +138,7 @@ export function OrderList() {
                     </Table>
                 </div>
                 {/* pagination */}
+                {pagination && pagination?.totalPages > 1 && <PaginationUI pagination={pagination} />}
             </CardContent>
         </Card>
     );

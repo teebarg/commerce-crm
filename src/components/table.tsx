@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import type { Pagination as PaginationType } from "@/utils/types";
+import type { Pagination as PaginationType } from "@/types/generic";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 import Pagination from "@/components/pagination";
 import { Plus } from "nui-react-icons";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Table as TableUI, TableHeader, TableBody, TableRow, TableHead } from "@/components/ui/table";
+import { Table, TableHeader, TableBody, TableRow, TableHead } from "@/components/ui/table";
 import { cn } from "@/utils/utils";
 import Drawer from "@/components/drawer";
 
@@ -23,7 +23,7 @@ interface Props {
     isDataOnly?: boolean;
 }
 
-const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, canSearch = true, searchQuery, form, isDataOnly = false }) => {
+const TableUI: React.FC<Props> = ({ columns, children, pagination, canAdd = true, canSearch = true, searchQuery, form, isDataOnly = false }) => {
     const { updateQuery } = useUpdateQuery();
     // const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: closeSlideOver }) : form;
 
@@ -76,7 +76,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, 
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <div className="overflow-hidden shadow sm:rounded-lg">
-                            <TableUI>
+                            <Table>
                                 <TableHeader>
                                     <TableRow>
                                         {columns.map((column: string, index: number) => (
@@ -87,7 +87,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, 
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>{children}</TableBody>
-                            </TableUI>
+                            </Table>
                         </div>
                     </div>
                 </div>
@@ -97,4 +97,4 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, 
     );
 };
 
-export { Table };
+export { TableUI };

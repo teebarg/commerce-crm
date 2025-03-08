@@ -1,6 +1,6 @@
 "use client";
 
-import type { NotificationPreview as NotificationPreviewType } from "@/utils/types";
+import type { NotificationPreview as NotificationPreviewType } from "@/types/generic";
 import { Button } from "@/components/ui/button";
 import { Bell, Send } from "nui-react-icons";
 import { api } from "@/trpc/react";

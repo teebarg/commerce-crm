@@ -15,7 +15,7 @@ import { db } from "@/server/db";
 declare module "next-auth" {
     interface Session extends DefaultSession {
         user: {
-            id: string;
+            id: number;
             firstName: string;
             lastName: string;
             email: string;
@@ -26,7 +26,7 @@ declare module "next-auth" {
 
     interface User {
         // ...other properties
-        id?: string;
+        id?: number;
         firstName?: string | null | undefined;
         lastName?: string | null | undefined;
         email?: string | null | undefined;
@@ -106,7 +106,7 @@ export const authConfig = {
         },
         async session({ session, token }) {
             if (token?.sub) {
-                session.user.id = token.sub;
+                // session.user.id = token.id;
                 session.user.firstName = (token.user as User).firstName!;
                 session.user.lastName = (token.user as User).lastName!;
             }

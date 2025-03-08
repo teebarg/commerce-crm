@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye } from "nui-react-icons";
 import { useState } from "react";
-import { type NotificationPreview } from "@/utils/types";
+import { type NotificationPreview } from "@/types/generic";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface NotificationFormProps {

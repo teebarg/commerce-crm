@@ -1,16 +1,9 @@
-import { Cart, Package, Users } from "nui-react-icons";
+import { Package, Users } from "nui-react-icons";
 import React from "react";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { RecentSales } from "@/components/dashboard/recent-sales";
 import { OverviewChart } from "@/components/dashboard/overview-chart";
-import { ProductInventory } from "@/components/dashboard/product-inventory";
-import {
-    ShoppingCart,
-    DollarSign,
-    //   Users,
-    //   Package,
-    TrendingUp,
-} from "lucide-react";
+import { ShoppingCart, DollarSign, TrendingUp } from "lucide-react";
 
 export default async function Dashboard() {
     return (
@@ -55,7 +48,6 @@ export default async function Dashboard() {
                 <OverviewChart />
                 <RecentSales />
             </div>
-            <ProductInventory />
         </div>
     );
 }

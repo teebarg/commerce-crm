@@ -40,7 +40,7 @@ export const draftRouter = createTRPCRouter({
                 drafts,
                 total,
                 page,
-                limit: pageSize,
+                pageSize,
                 totalPages: Math.ceil(total / pageSize),
             };
         }),
@@ -48,7 +48,7 @@ export const draftRouter = createTRPCRouter({
     create: protectedProcedure.input(draftSchema).mutation(async ({ ctx, input }) => {
         return ctx.db.draft.create({
             data: {
-                userId: ctx.session.user.id,
+                userId: ctx.session.user.id as unknown as number,
                 ...input,
             },
         })

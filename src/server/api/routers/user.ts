@@ -54,18 +54,18 @@ export const userRouter = createTRPCRouter({
         });
     }),
 
-    get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+    get: publicProcedure.input(z.number().int().positive()).query(async ({ input, ctx }) => {
         return await ctx.db.user.findUnique({ where: { id: input } });
     }),
 
-    update: protectedProcedure.input(userSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
+    update: protectedProcedure.input(userSchema.extend({ id: z.number().int().positive() })).mutation(async ({ input, ctx }) => {
         return await ctx.db.user.update({
             where: { id: input.id },
             data: { ...input },
         });
     }),
 
-    delete: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+    delete: protectedProcedure.input(z.number().int().positive()).mutation(async ({ input, ctx }) => {
         return await ctx.db.user.delete({ where: { id: input } });
     }),
 });

@@ -2,7 +2,7 @@
 
 import React from "react";
 import {
-    Drawer as DrawerUI,
+    Drawer,
     DrawerTrigger,
     DrawerContent,
     DrawerHeader,
@@ -23,11 +23,11 @@ interface Props extends Omit<React.ComponentPropsWithoutRef<typeof DrawerPrimiti
     description?: string | React.ReactNode;
 }
 
-const Drawer: React.FC<Props> = ({ action, children, direction, trigger, title, description, ...props }) => {
+const DrawerUI: React.FC<Props> = ({ action, children, direction, trigger, title, description, ...props }) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { fadeFromIndex, ...restProps } = props;
     return (
-        <DrawerUI direction={direction} {...restProps}>
+        <Drawer direction={direction} {...restProps}>
             <DrawerTrigger> {trigger} </DrawerTrigger>
             <DrawerContent direction={direction} className="p-4">
                 <DrawerHeader>
@@ -44,8 +44,8 @@ const Drawer: React.FC<Props> = ({ action, children, direction, trigger, title, 
                     </DrawerFooter>
                 )}
             </DrawerContent>
-        </DrawerUI>
+        </Drawer>
     );
 };
 
-export default Drawer;
+export default DrawerUI;

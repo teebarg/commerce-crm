@@ -1,6 +1,6 @@
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
-import { Table as TableUI } from "@/components/table";
+import { TableUI } from "@/components/table";
 import { Actions } from "@/components/generic/actions";
 import { type Draft } from "@prisma/client";
 import { CreatePost } from "@/components/post/create-form";

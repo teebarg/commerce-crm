@@ -6,7 +6,7 @@ import { TemplateSelector } from "@/components/notification/TemplateSelector";
 import { NotificationForm } from "@/components/notification/NotificationForm";
 import { api } from "@/trpc/react";
 import { useState } from "react";
-import type { NotificationPreview as NotificationPreviewType } from "@/utils/types";
+import type { NotificationPreview as NotificationPreviewType } from "@/types/generic";
 
 export default function Notification() {
     const [templates] = api.push.templates.useSuspenseQuery();

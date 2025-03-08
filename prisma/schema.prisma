@@ -1,14 +1,269 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
+// Define the datasource (PostgreSQL assumed)
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// Define the generator for Prisma Client
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Enums for consistent data values
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  PAYPAL
+  CASH_ON_DELIVERY
+  BANK_TRANSFER
+  PAYSTACK
+}
+
+enum ProductStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+}
+
+enum CartStatus {
+  ACTIVE
+  ABANDONED
+  CONVERTED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum ShippingMethod {
+  STANDARD
+  EXPRESS
+  PICKUP
+}
+
+// ShippingFee Model
+model ShippingFee {
+  id              Int       @id @default(autoincrement())
+  type            ShippingMethod
+  amount          Float     @db.DoublePrecision
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  @@map("shipping_fees")
+}
+
+// Address Model
+model Address {
+  id              Int       @id @default(autoincrement())
+  user            User  @relation(fields: [user_id], references: [id])
+  user_id         Int
+  street          String
+  city            String
+  state           String
+  zip             String
+  country         String
+  saved           Boolean   @default(false)
+  shipping_orders Order[]   @relation("ShippingAddress")
+  billing_orders  Order[]   @relation("BillingAddress")
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  @@map("addresses")
+}
+
+// Product Model
+model Product {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  slug          String          @unique
+  sku           String          @unique
+  description   String
+  status        ProductStatus   @default(IN_STOCK)
+  variants      ProductVariant[]
+  categories    Category[]      @relation("ProductCategories")
+  images        ProductImage[]
+  reviews       Review[]
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  @@map("products")
+}
+
+// ProductVariant Model
+model ProductVariant {
+  id          Int       @id @default(autoincrement())
+  product     Product   @relation(fields: [product_id], references: [id])
+  product_id  Int
+  name        String   @unique
+  slug        String   @unique
+  sku         String   @unique
+  status      ProductStatus   @default(IN_STOCK)
+  price       Float     @db.DoublePrecision
+  inventory   Int
+  order_items OrderItem[]
+  cart_items  CartItem[] // Added relation to CartItem
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@map("product_variants")
+}
+
+// Category Model
+model Category {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  slug       String    @unique
+  products   Product[] @relation("ProductCategories")
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+// Product Image Model
+model ProductImage {
+  id          Int      @id @default(autoincrement())
+  url         String
+  product     Product  @relation(fields: [product_id], references: [id])
+  product_id  Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("product_images")
+}
+
+// Review Model
+model Review {
+  id          Int      @id @default(autoincrement())
+  text        String
+  rating      Int
+  user        User @relation(fields: [user_id], references: [id])
+  user_id     Int
+  product     Product  @relation(fields: [product_id], references: [id])
+  product_id  Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("reviews")
+}
+
+// Order Model
+model Order {
+  id              Int          @id @default(autoincrement())
+  order_number    String       @unique
+  user            User         @relation(fields: [user_id], references: [id])
+  user_id         Int
+  shipping_address Address     @relation("ShippingAddress", fields: [shipping_address_id], references: [id])
+  shipping_address_id Int
+  billing_address Address      @relation("BillingAddress", fields: [billing_address_id], references: [id])
+  billing_address_id Int
+  order_items     OrderItem[]
+  total           Float       @db.DoublePrecision
+  subtotal        Float       @db.DoublePrecision
+  tax             Float       @db.DoublePrecision
+  status          OrderStatus @default(PENDING)
+  payment         Payment?
+  payment_status  PaymentStatus? @default(PENDING)
+  shipping_method ShippingMethod?
+  shipping_fee    Float       @db.DoublePrecision
+  coupon          Coupon?      @relation(fields: [coupon_id], references: [id])
+  coupon_id       Int?
+  cart            Cart?        @relation(fields: [cart_id], references: [id]) // Optional link to originating cart
+  cart_id         Int?         @unique // Added relation to Cart
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+
+  @@map("orders")
+}
+
+// OrderItem Model
+model OrderItem {
+  id           Int            @id @default(autoincrement())
+  order        Order          @relation(fields: [order_id], references: [id])
+  order_id     Int
+  variant      ProductVariant @relation(fields: [variant_id], references: [id])
+  variant_id   Int
+  quantity     Int
+  price        Float          @db.DoublePrecision
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+
+  @@map("order_items")
+}
+
+// Payment Model
+model Payment {
+  id             Int           @id @default(autoincrement())
+  order          Order         @relation(fields: [order_id], references: [id])
+  order_id       Int           @unique
+  amount         Float         @db.DoublePrecision
+  payment_method PaymentMethod
+  transaction_id String
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+// Coupon Model
+model Coupon {
+  id             Int          @id @default(autoincrement())
+  code           String       @unique
+  discount_type  DiscountType
+  discount_value Float        @db.DoublePrecision
+  expiration_date DateTime
+  orders         Order[]
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+
+  @@map("coupons")
+}
+
+// Cart Model (New)
+model Cart {
+  id           Int         @id @default(autoincrement())
+  user         User        @relation(fields: [user_id], references: [id])
+  user_id      Int
+  items        CartItem[]  // List of items in the cart
+  status       CartStatus  @default(ACTIVE) // Tracks if cart is active, abandoned, or converted
+  order        Order?      @relation // Links to the order if cart is converted
+  created_at   DateTime    @default(now())
+  last_updated DateTime    @updatedAt // Used to detect abandoned carts
+
+  @@map("carts")
+}
+
+// CartItem Model (New)
+model CartItem {
+  id           Int            @id @default(autoincrement())
+  cart         Cart           @relation(fields: [cart_id], references: [id])
+  cart_id      Int
+  variant      ProductVariant @relation(fields: [variant_id], references: [id])
+  variant_id   Int
+  quantity     Int
+  price        Float          @db.DoublePrecision
+  image        String?
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+
+  @@map("cart_items")
+}
+
 model Draft {
-  id             String    @id @default(cuid())
+  id             Int         @id @default(autoincrement())
   title          String
   content        String
   image          String?
@@ -16,7 +271,7 @@ model Draft {
   platform       String?
   isPublished    Boolean? @map("is_published")
   scheduledTime  DateTime? @db.Timestamp(6) @map("scheduled_time")
-  userId         String @map("user_id")
+  userId         Int @map("user_id")
   user           User     @relation(fields: [userId], references: [id], onDelete: NoAction)
 
   createdAt     DateTime? @default(now()) @map("created_at")
@@ -26,7 +281,7 @@ model Draft {
 }
 
 model NotificationTemplate {
-  id         String   @id @default(cuid())
+  id         Int   @id @default(autoincrement())
   title      String   @unique
   icon       String?
   body       String
@@ -39,7 +294,7 @@ model NotificationTemplate {
 }
 
 model PushSubscription {
-  id         String   @id @default(cuid())
+  id         Int   @id @default(autoincrement())
   endpoint   String   @unique
   p256dh     String
   auth       String
@@ -52,7 +307,7 @@ model PushSubscription {
 }
 
 model Tenant {
-  id         String   @id @default(cuid())
+  id         Int   @id @default(autoincrement())
   name       String   @unique
   slug       String   @unique
 
@@ -63,7 +318,7 @@ model Tenant {
 }
 
 model Tweet {
-  id         String   @id @default(cuid())
+  id         Int   @id @default(autoincrement())
   content    String   @unique
   twitterId  String   @unique @map("twitter_id")
 
@@ -90,8 +345,8 @@ enum Status {
 
 // Necessary for Next auth
 model Account {
-    id                       String  @id @default(cuid())
-    userId                   String
+    id                       Int         @id @default(autoincrement())
+    userId                   Int
     type                     String
     provider                 String
     providerAccountId        String
@@ -111,17 +366,18 @@ model Account {
 }
 
 model Session {
-    id           String   @id @default(cuid())
+    id           Int         @id @default(autoincrement())
     sessionToken String   @unique
-    userId       String
+    userId       Int
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@map("sessions")
 }
 
+// User Model
 model User {
-    id            String    @id @default(cuid())
+    id           Int         @id @default(autoincrement())
     firstName     String? @map("first_name")
     lastName      String? @map("last_name")
     email         String?   @unique
@@ -132,11 +388,15 @@ model User {
     accounts      Account[]
     sessions      Session[]
     drafts        Draft[]
-
+    role          Role @default(CUSTOMER)
+    addresses     Address[]
+    orders        Order[]
+    reviews       Review[]
+    carts         Cart[]    // Added relation to Cart
     createdAt     DateTime? @default(now()) @map("created_at")
     updatedAt     DateTime? @updatedAt @map("updated_at")
 
-    @@index([firstName, lastName])
+    @@index([firstName, lastName, email])
 
     @@map("users")
 }

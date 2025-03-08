@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { type Pagination as PaginationType } from "@/utils/types";
+import { type Pagination as PaginationType } from "@/types/generic";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import {
-    Pagination as PaginationUI,
+    Pagination,
     PaginationContent,
     PaginationItem,
     PaginationLink,
@@ -16,7 +16,7 @@ interface Props {
     pagination: PaginationType;
 }
 
-const Pagination: React.FC<Props> = ({ pagination }) => {
+const PaginationUI: React.FC<Props> = ({ pagination }) => {
     const { updateQuery } = useUpdateQuery(100);
 
     const page = pagination?.page ?? 1;
@@ -37,7 +37,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
     );
 
     return (
-        <PaginationUI>
+        <Pagination>
             <PaginationContent>
                 <PaginationItem>
                     <PaginationPrevious disabled={page === 1} onClick={onPreviousPage} />
@@ -53,8 +53,8 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                     <PaginationNext disabled={pagination?.totalPages === 1 || page == pagination?.totalPages} onClick={onNextPage} />
                 </PaginationItem>
             </PaginationContent>
-        </PaginationUI>
+        </Pagination>
     );
 };
 
-export default Pagination;
+export default PaginationUI;
