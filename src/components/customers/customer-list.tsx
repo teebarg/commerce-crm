@@ -1,93 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Search, MoreHorizontal, ArrowUpDown, UserPlus } from "lucide-react";
+import { Search, ArrowUpDown, UserPlus } from "lucide-react";
+import { Role, Status } from "@prisma/client";
+import { ExtendedUser, Pagination } from "@/types/generic";
+import { AnimatePresence, motion } from "framer-motion";
+import { useOverlayTriggerState } from "react-stately";
+import DrawerUI from "../drawer";
+import PaginationUI from "../pagination";
+import { UserActions } from "./customer-actions";
+import UserForm from "./user-form";
 
-interface Customer {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-    initials: string;
-    status: "Active" | "Inactive";
-    orders: number;
-    spent: string;
-    lastOrder: string;
+interface CustomerListProps {
+    users: ExtendedUser[];
+    pagination: Pagination;
 }
 
-export function CustomerList() {
-    const [customers, setCustomers] = useState<Customer[]>([
-        {
-            id: "1",
-            name: "Olivia Martin",
-            email: "olivia.martin@email.com",
-            avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1761&auto=format&fit=crop&ixlib=rb-4.0.3",
-            initials: "OM",
-            status: "Active",
-            orders: 12,
-            spent: "$1,248.50",
-            lastOrder: "2025-04-01",
-        },
-        {
-            id: "2",
-            name: "Jackson Lee",
-            email: "jackson.lee@email.com",
-            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3",
-            initials: "JL",
-            status: "Active",
-            orders: 8,
-            spent: "$958.75",
-            lastOrder: "2025-03-28",
-        },
-        {
-            id: "3",
-            name: "Isabella Nguyen",
-            email: "isabella.nguyen@email.com",
-            avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3",
-            initials: "IN",
-            status: "Active",
-            orders: 5,
-            spent: "$429.99",
-            lastOrder: "2025-03-25",
-        },
-        {
-            id: "4",
-            name: "William Kim",
-            email: "will@email.com",
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3",
-            initials: "WK",
-            status: "Inactive",
-            orders: 2,
-            spent: "$149.00",
-            lastOrder: "2025-02-15",
-        },
-        {
-            id: "5",
-            name: "Sofia Davis",
-            email: "sofia.davis@email.com",
-            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3",
-            initials: "SD",
-            status: "Active",
-            orders: 9,
-            spent: "$849.25",
-            lastOrder: "2025-03-30",
-        },
-    ]);
+export const CustomerList: React.FC<CustomerListProps> = ({ users, pagination }) => {
+    const addState = useOverlayTriggerState({});
+    const [isVisible, setIsVisible] = useState<boolean>(false);
 
+    useEffect(() => {
+        setIsVisible(true);
+    }, []);
+
+    const getStatusColor = (status: Status | null) => {
+        switch (status) {
+            case Status.ACTIVE:
+                return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+            case Status.PENDING:
+                return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
+            case Status.INACTIVE:
+                return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+            default:
+                return "";
+        }
+    };
     return (
         <Card>
             <CardHeader>
@@ -101,81 +54,80 @@ export function CustomerList() {
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input type="search" placeholder="Search customers..." className="w-full pl-8" />
                         </div>
-                        <Button>
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            Add New
-                        </Button>
+                        <DrawerUI
+                            open={addState.isOpen}
+                            onOpenChange={addState.setOpen}
+                            direction="right"
+                            title="Create User"
+                            trigger={
+                                <span className="h-10 rounded-md px-8 bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none">
+                                    <UserPlus className="mr-2 h-4 w-4" /> Add Product
+                                </span>
+                            }
+                        >
+                            <UserForm onClose={addState.close} />
+                        </DrawerUI>
                     </div>
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Customer</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>
-                                    <div className="flex items-center gap-1">
-                                        Orders
-                                        <ArrowUpDown className="h-3 w-3" />
-                                    </div>
-                                </TableHead>
-                                <TableHead>
-                                    <div className="flex items-center gap-1">
-                                        Spent
-                                        <ArrowUpDown className="h-3 w-3" />
-                                    </div>
-                                </TableHead>
-                                <TableHead>Last Order</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {customers.map((customer) => (
-                                <TableRow key={customer.id}>
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <Avatar className="h-9 w-9">
-                                                <AvatarImage src={customer.avatar} alt={customer.name} />
-                                                <AvatarFallback>{customer.initials}</AvatarFallback>
-                                            </Avatar>
-                                            <div>
-                                                <div className="font-medium">{customer.name}</div>
-                                                <div className="text-sm text-muted-foreground">{customer.email}</div>
+                <AnimatePresence>
+                    {isVisible && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Customer</TableHead>
+                                        <TableHead>Role</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>
+                                            <div className="flex items-center gap-1">
+                                                Orders
+                                                <ArrowUpDown className="h-3 w-3" />
                                             </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant={customer.status === "Active" ? "default" : "secondary"}>{customer.status}</Badge>
-                                    </TableCell>
-                                    <TableCell>{customer.orders}</TableCell>
-                                    <TableCell>{customer.spent}</TableCell>
-                                    <TableCell>{customer.lastOrder}</TableCell>
-                                    <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem>View profile</DropdownMenuItem>
-                                                <DropdownMenuItem>View orders</DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem>Edit customer</DropdownMenuItem>
-                                                <DropdownMenuItem>Send email</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
-                {/* Pagination */}
+                                        </TableHead>
+                                        <TableHead>Last Order</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {users.map((user: ExtendedUser, idx: number) => (
+                                        <TableRow key={idx}>
+                                            <TableCell>
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar className="h-9 w-9">
+                                                        <AvatarImage src={user.image ?? ""} alt={user.firstName + " " + user.lastName} />
+                                                        <AvatarFallback>{user.firstName?.charAt(0) + user.lastName!.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <div className="font-medium">{user.firstName + " " + user.lastName}</div>
+                                                        <div className="text-sm text-muted-foreground">{user.email}</div>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={user.role == Role.ADMIN ? "default" : "secondary"}>{user.role.toLowerCase()}</Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge className={getStatusColor(user.status)} variant="outline">
+                                                    {user.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>{user.orders.length}</TableCell>
+                                            <TableCell>{user.orders[user.orders.length - 1]?.created_at.toLocaleDateString() ?? "N/A"}</TableCell>
+                                            <TableCell className="text-right">
+                                                <UserActions user={user} />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            {/* Pagination */}
+                            <PaginationUI pagination={pagination} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </CardContent>
         </Card>
     );
-}
+};

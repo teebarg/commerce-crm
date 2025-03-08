@@ -1,4 +1,4 @@
-import { Category, Order, OrderItem, Product, ProductImage, ProductVariant, User } from "@prisma/client";
+import { Category, Order, OrderItem, Product, ProductImage, ProductVariant, Review, User } from "@prisma/client";
 
 export type Pagination = {
     total: number;
@@ -24,3 +24,7 @@ export interface NotificationPreview {
     icon?: string | null
 }
 
+export interface ExtendedUser extends User {
+    reviews: Review[];
+    orders: Order[];
+}

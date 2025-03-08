@@ -6,12 +6,6 @@ export const draftSchema = z.object({
     scheduledTime: z.date().optional(),
 });
 
-export const userSchema = z.object({
-    firstName: z.string().min(1),
-    lastName: z.string().min(1),
-    email: z.string().min(1).email(),
-});
-
 export const pushSubscriptionSchema = z.object({
     endpoint: z.string().min(1),
     p256dh: z.string().min(1),

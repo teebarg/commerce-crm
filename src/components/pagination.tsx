@@ -37,7 +37,7 @@ const PaginationUI: React.FC<Props> = ({ pagination }) => {
     );
 
     return (
-        <Pagination>
+        <Pagination className="mt-4">
             <PaginationContent>
                 <PaginationItem>
                     <PaginationPrevious disabled={page === 1} onClick={onPreviousPage} />
