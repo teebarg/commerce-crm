@@ -65,17 +65,32 @@ model ShippingFee {
   @@map("shipping_fees")
 }
 
+// Tag Model
+model Tag {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  slug        String    @unique
+  products    Product[]
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@map("tags")
+}
+
 // Address Model
 model Address {
   id              Int       @id @default(autoincrement())
-  user            User  @relation(fields: [user_id], references: [id])
+  user            User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id         Int
-  street          String
+  first_name      String?
+  last_name       String?
+  address_1       String
+  address_2       String?
   city            String
   state           String
-  zip             String
-  country         String
-  saved           Boolean   @default(false)
+  postal_code     String
+  phone           String?
+  is_billing      Boolean   @default(false)
   shipping_orders Order[]   @relation("ShippingAddress")
   billing_orders  Order[]   @relation("BillingAddress")
   created_at      DateTime  @default(now())
@@ -95,7 +110,10 @@ model Product {
   variants      ProductVariant[]
   categories    Category[]      @relation("ProductCategories")
   images        ProductImage[]
+  ratings       Int       @default(0) @db.Integer
   reviews       Review[]
+  tags          Tag[]
+  favorites     Favorite[]
   created_at    DateTime        @default(now())
   updated_at    DateTime        @updatedAt
 
@@ -105,13 +123,14 @@ model Product {
 // ProductVariant Model
 model ProductVariant {
   id          Int       @id @default(autoincrement())
-  product     Product   @relation(fields: [product_id], references: [id])
+  product     Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
   product_id  Int
   name        String   @unique
   slug        String   @unique
   sku         String   @unique
   status      ProductStatus   @default(IN_STOCK)
   price       Float     @db.DoublePrecision
+  old_price   Float?     @db.DoublePrecision
   inventory   Int
   order_items OrderItem[]
   cart_items  CartItem[] // Added relation to CartItem
@@ -119,6 +138,18 @@ model ProductVariant {
   updated_at  DateTime  @updatedAt
 
   @@map("product_variants")
+}
+
+model Favorite {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id     Int
+  product     Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product_id  Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@map("favorites")
 }
 
 // Category Model
@@ -137,7 +168,7 @@ model Category {
 model ProductImage {
   id          Int      @id @default(autoincrement())
   url         String
-  product     Product  @relation(fields: [product_id], references: [id])
+  product     Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
   product_id  Int
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
@@ -148,11 +179,12 @@ model ProductImage {
 // Review Model
 model Review {
   id          Int      @id @default(autoincrement())
-  text        String
+  comment     String
   rating      Int
-  user        User @relation(fields: [user_id], references: [id])
+  verified    Boolean  @default(false)
+  user        User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id     Int
-  product     Product  @relation(fields: [product_id], references: [id])
+  product     Product  @relation(fields: [product_id], references: [id], onDelete: NoAction)
   product_id  Int
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
@@ -164,11 +196,11 @@ model Review {
 model Order {
   id              Int          @id @default(autoincrement())
   order_number    String       @unique
-  user            User         @relation(fields: [user_id], references: [id])
+  user            User         @relation(fields: [user_id], references: [id], onDelete: NoAction)
   user_id         Int
-  shipping_address Address     @relation("ShippingAddress", fields: [shipping_address_id], references: [id])
+  shipping_address Address     @relation("ShippingAddress", fields: [shipping_address_id], references: [id], onDelete: NoAction)
   shipping_address_id Int
-  billing_address Address      @relation("BillingAddress", fields: [billing_address_id], references: [id])
+  billing_address Address      @relation("BillingAddress", fields: [billing_address_id], references: [id], onDelete: NoAction)
   billing_address_id Int
   order_items     OrderItem[]
   total           Float       @db.DoublePrecision
@@ -179,9 +211,9 @@ model Order {
   payment_status  PaymentStatus? @default(PENDING)
   shipping_method ShippingMethod?
   shipping_fee    Float       @db.DoublePrecision
-  coupon          Coupon?      @relation(fields: [coupon_id], references: [id])
+  coupon          Coupon?      @relation(fields: [coupon_id], references: [id], onDelete: NoAction)
   coupon_id       Int?
-  cart            Cart?        @relation(fields: [cart_id], references: [id]) // Optional link to originating cart
+  cart            Cart?        @relation(fields: [cart_id], references: [id], onDelete: NoAction) // Optional link to originating cart
   cart_id         Int?         @unique // Added relation to Cart
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
@@ -192,9 +224,9 @@ model Order {
 // OrderItem Model
 model OrderItem {
   id           Int            @id @default(autoincrement())
-  order        Order          @relation(fields: [order_id], references: [id])
+  order        Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
   order_id     Int
-  variant      ProductVariant @relation(fields: [variant_id], references: [id])
+  variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
   variant_id   Int
   quantity     Int
   price        Float          @db.DoublePrecision
@@ -207,7 +239,7 @@ model OrderItem {
 // Payment Model
 model Payment {
   id             Int           @id @default(autoincrement())
-  order          Order         @relation(fields: [order_id], references: [id])
+  order          Order         @relation(fields: [order_id], references: [id], onDelete: NoAction)
   order_id       Int           @unique
   amount         Float         @db.DoublePrecision
   payment_method PaymentMethod
@@ -235,7 +267,7 @@ model Coupon {
 // Cart Model (New)
 model Cart {
   id           Int         @id @default(autoincrement())
-  user         User        @relation(fields: [user_id], references: [id])
+  user         User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id      Int
   items        CartItem[]  // List of items in the cart
   status       CartStatus  @default(ACTIVE) // Tracks if cart is active, abandoned, or converted
@@ -249,9 +281,9 @@ model Cart {
 // CartItem Model (New)
 model CartItem {
   id           Int            @id @default(autoincrement())
-  cart         Cart           @relation(fields: [cart_id], references: [id])
+  cart         Cart           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
   cart_id      Int
-  variant      ProductVariant @relation(fields: [variant_id], references: [id])
+  variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
   variant_id   Int
   quantity     Int
   price        Float          @db.DoublePrecision
@@ -377,7 +409,7 @@ model Session {
 
 // User Model
 model User {
-    id           Int         @id @default(autoincrement())
+    id            Int         @id @default(autoincrement())
     firstName     String? @map("first_name")
     lastName      String? @map("last_name")
     email         String?   @unique
@@ -392,6 +424,7 @@ model User {
     addresses     Address[]
     orders        Order[]
     reviews       Review[]
+    favorites     Favorite[]
     carts         Cart[]    // Added relation to Cart
     createdAt     DateTime? @default(now()) @map("created_at")
     updatedAt     DateTime? @updatedAt @map("updated_at")

@@ -37,15 +37,29 @@ CREATE TABLE "shipping_fees" (
 );
 
 -- CreateTable
+CREATE TABLE "tags" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "tags_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "addresses" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "street" TEXT NOT NULL,
+    "first_name" TEXT,
+    "last_name" TEXT,
+    "address_1" TEXT NOT NULL,
+    "address_2" TEXT,
     "city" TEXT NOT NULL,
     "state" TEXT NOT NULL,
-    "zip" TEXT NOT NULL,
-    "country" TEXT NOT NULL,
-    "saved" BOOLEAN NOT NULL DEFAULT false,
+    "postal_code" TEXT NOT NULL,
+    "phone" TEXT,
+    "is_billing" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -60,6 +74,7 @@ CREATE TABLE "products" (
     "sku" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "status" "ProductStatus" NOT NULL DEFAULT 'IN_STOCK',
+    "ratings" INTEGER NOT NULL DEFAULT 0,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -75,11 +90,23 @@ CREATE TABLE "product_variants" (
     "sku" TEXT NOT NULL,
     "status" "ProductStatus" NOT NULL DEFAULT 'IN_STOCK',
     "price" DOUBLE PRECISION NOT NULL,
+    "old_price" DOUBLE PRECISION,
     "inventory" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "product_variants_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "favorites" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "product_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "favorites_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -107,8 +134,9 @@ CREATE TABLE "product_images" (
 -- CreateTable
 CREATE TABLE "reviews" (
     "id" SERIAL NOT NULL,
-    "text" TEXT NOT NULL,
+    "comment" TEXT NOT NULL,
     "rating" INTEGER NOT NULL,
+    "verified" BOOLEAN NOT NULL DEFAULT false,
     "user_id" INTEGER NOT NULL,
     "product_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -205,7 +233,7 @@ CREATE TABLE "cart_items" (
 
 -- CreateTable
 CREATE TABLE "drafts" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     "image" TEXT,
@@ -222,7 +250,7 @@ CREATE TABLE "drafts" (
 
 -- CreateTable
 CREATE TABLE "notification_templates" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "icon" TEXT,
     "body" TEXT NOT NULL,
@@ -235,7 +263,7 @@ CREATE TABLE "notification_templates" (
 
 -- CreateTable
 CREATE TABLE "push_subscriptions" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "endpoint" TEXT NOT NULL,
     "p256dh" TEXT NOT NULL,
     "auth" TEXT NOT NULL,
@@ -248,7 +276,7 @@ CREATE TABLE "push_subscriptions" (
 
 -- CreateTable
 CREATE TABLE "tenants" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -259,7 +287,7 @@ CREATE TABLE "tenants" (
 
 -- CreateTable
 CREATE TABLE "tweets" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "content" TEXT NOT NULL,
     "twitter_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -289,7 +317,7 @@ CREATE TABLE "accounts" (
 
 -- CreateTable
 CREATE TABLE "sessions" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "sessionToken" TEXT NOT NULL,
     "userId" INTEGER NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL,
@@ -322,10 +350,25 @@ CREATE TABLE "verification_tokens" (
 );
 
 -- CreateTable
+CREATE TABLE "_ProductToTag" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "_ProductCategories" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tags_name_key" ON "tags"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tags_slug_key" ON "tags"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "products_name_key" ON "products"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "products_slug_key" ON "products"("slug");
@@ -334,10 +377,16 @@ CREATE UNIQUE INDEX "products_slug_key" ON "products"("slug");
 CREATE UNIQUE INDEX "products_sku_key" ON "products"("sku");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "product_variants_name_key" ON "product_variants"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "product_variants_slug_key" ON "product_variants"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "product_variants_sku_key" ON "product_variants"("sku");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "categories_slug_key" ON "categories"("slug");
@@ -391,6 +440,12 @@ CREATE UNIQUE INDEX "verification_tokens_token_key" ON "verification_tokens"("to
 CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_tokens"("identifier", "token");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "_ProductToTag_AB_unique" ON "_ProductToTag"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_ProductToTag_B_index" ON "_ProductToTag"("B");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_ProductCategories_AB_unique" ON "_ProductCategories"("A", "B");
 
 -- CreateIndex
@@ -401,6 +456,12 @@ ALTER TABLE "addresses" ADD CONSTRAINT "addresses_user_id_fkey" FOREIGN KEY ("us
 
 -- AddForeignKey
 ALTER TABLE "product_variants" ADD CONSTRAINT "product_variants_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "favorites" ADD CONSTRAINT "favorites_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "favorites" ADD CONSTRAINT "favorites_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "product_images" ADD CONSTRAINT "product_images_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -452,6 +513,12 @@ ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userI
 
 -- AddForeignKey
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ProductToTag" ADD CONSTRAINT "_ProductToTag_A_fkey" FOREIGN KEY ("A") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ProductToTag" ADD CONSTRAINT "_ProductToTag_B_fkey" FOREIGN KEY ("B") REFERENCES "tags"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_ProductCategories" ADD CONSTRAINT "_ProductCategories_A_fkey" FOREIGN KEY ("A") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
