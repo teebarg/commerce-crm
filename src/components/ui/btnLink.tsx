@@ -68,7 +68,7 @@ const buttonConfig: BtnConfig = {
 interface BtnLinkProps {
     children: React.ReactNode;
     color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
-    variant?: "solid" | "bordered" | "shadow";
+    variant?: "solid" | "bordered" | "shadow-sm";
     size?: "sm" | "md" | "lg";
     className?: string;
     href: string;
@@ -79,7 +79,7 @@ const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", varia
         <Link
             className={cn(
                 "z-0 group relative inline-flex items-center justify-center whitespace-nowrap",
-                "font-medium overflow-hidden outline-none transition-all hover:opacity-80",
+                "font-medium overflow-hidden outline-hidden transition-all hover:opacity-80",
                 buttonConfig[color][variant],
                 buttonConfig[size],
                 buttonConfig[color].color,

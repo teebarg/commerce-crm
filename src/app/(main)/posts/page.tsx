@@ -57,24 +57,24 @@ export default async function Posts({ searchParams }: { searchParams: SearchPara
                         <div className="space-y-8">
                             <CreatePost />
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="bg-content1 rounded-xl shadow-sm p-6">
+                                <div className="bg-content1 rounded-xl shadow-xs p-6">
                                     <h3 className="text-lg font-semibold text-default-800">Total Posts</h3>
                                     <p className="text-3xl font-bold text-blue-600 mt-2">{pagination.total}</p>
                                 </div>
-                                <div className="bg-content1 rounded-xl shadow-sm p-6">
+                                <div className="bg-content1 rounded-xl shadow-xs p-6">
                                     <h3 className="text-lg font-semibold text-default-800">Published</h3>
                                     <p className="text-3xl font-bold text-green-600 mt-2">
                                         {drafts?.filter((post: Draft) => post.isPublished).length}
                                     </p>
                                 </div>
-                                <div className="bg-content1 rounded-xl shadow-sm p-6">
+                                <div className="bg-content1 rounded-xl shadow-xs p-6">
                                     <h3 className="text-lg font-semibold text-default-800">Drafts & Scheduled</h3>
                                     <p className="text-3xl font-bold text-orange-600 mt-2">
                                         {drafts.filter((post: Draft) => !post.isPublished).length}
                                     </p>
                                 </div>
                             </div>
-                            <div className="bg-content1 rounded-xl shadow-sm p-4">
+                            <div className="bg-content1 rounded-xl shadow-xs p-4">
                                 <div className="py-6 px-2">
                                     <h2 className="text-xl font-semibold text-default-800">Recent Posts</h2>
                                 </div>

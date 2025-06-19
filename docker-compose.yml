@@ -53,8 +53,7 @@ services:
     app:
         build:
             context: .
-            target: dev
-        command: npm run dev
+        command: npm run dev-turbo
         volumes:
             - .:/app
             - /app/node_modules
@@ -62,6 +61,10 @@ services:
             - "2002:3000"
         depends_on:
             - db
+        environment:
+            - NODE_ENV=development
+            - NEXT_TELEMETRY_DISABLED=1
+            - WATCHPACK_POLLING=true
         env_file:
             - .env
         labels:
@@ -71,6 +74,9 @@ services:
             - traefik.http.services.app.loadbalancer.server.port=3000
             - traefik.http.routers.app-http.rule=Host(`crm.localhost`)
             - traefik.http.routers.app-http.entrypoints=http
+        networks:
+            - crm-public
+            - default
     adminer:
         image: adminer:5.3.0
         ports:

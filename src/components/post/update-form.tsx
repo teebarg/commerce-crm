@@ -67,7 +67,7 @@ const UpdatePost: React.FC<Props> = ({ current }) => {
     };
 
     return (
-        <div className="bg-content1 rounded-xl shadow-sm py-6 px-2">
+        <div className="bg-content1 rounded-xl shadow-xs py-6 px-2">
             <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 <div className="space-y-4">
                     <Input

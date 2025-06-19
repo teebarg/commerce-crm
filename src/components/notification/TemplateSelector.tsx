@@ -60,7 +60,7 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
                         <div
                             key={template.id}
                             onClick={() => onSelect(template)}
-                            className="relative rounded-lg border border-gray-300 bg-content1 px-6 py-5 shadow-sm flex flex-col items-start focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="relative rounded-lg border border-gray-300 bg-content1 px-6 py-5 shadow-xs flex flex-col items-start focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                             <div className="flex-1">
                                 <span className="text-2xl mb-2 block">{template.icon}</span>

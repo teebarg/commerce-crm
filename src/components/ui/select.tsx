@@ -17,7 +17,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(({ className, er
                 id="status"
                 className={cn(
                     "w-full h-10 pl-4 pr-10 border rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed",
-                    "focus:outline-none focus:ring-0 hover:border-gray-400 transition-colors disabled:bg-gray-50 disabled:text-gray-500",
+                    "focus:outline-hidden focus:ring-0 hover:border-gray-400 transition-colors disabled:bg-gray-50 disabled:text-gray-500",
                     className
                 )}
             >

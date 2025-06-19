@@ -38,7 +38,7 @@ export function NotificationPreview({ notification }: NotificationPreviewProps) 
             <div className="max-w-sm w-full bg-content2 shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5">
                 <div className="p-4">
                     <div className="flex items-start">
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                             {notification.icon ? (
                                 <span className="text-2xl">{notification.icon}</span>
                             ) : (

@@ -66,7 +66,7 @@ const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOff
 
     return (
         <React.Fragment>
-            <button {...buttonProps} ref={buttonRef} className="inline-flex items-center text-default-500 cursor-pointer outline-none">
+            <button {...buttonProps} ref={buttonRef} className="inline-flex items-center text-default-500 cursor-pointer outline-hidden">
                 {trigger}
             </button>
             {state.isOpen && (

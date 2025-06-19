@@ -41,7 +41,7 @@ const SlideOver: React.FC<SlideoverProps> = ({ isOpen, onClose, children, title,
 
     return (
         <OverlayContainer>
-            {isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40" />}
+            {isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-xs z-40" />}
             <FocusScope contain restoreFocus>
                 <div
                     {...overlayProps}
@@ -49,7 +49,7 @@ const SlideOver: React.FC<SlideoverProps> = ({ isOpen, onClose, children, title,
                     {...modalProps}
                     ref={ref}
                     className={cn(
-                        "fixed flex flex-col top-0 w-[90vw] sm:w-[27%] h-screen shadow-lg transform transition-transform duration-300 z-50 py-5 px-2 bg-zinc-900 focus-visible:outline-none",
+                        "fixed flex flex-col top-0 w-[90vw] sm:w-[27%] h-screen shadow-lg transform transition-transform duration-300 z-50 py-5 px-2 bg-zinc-900 focus-visible:outline-hidden",
                         className,
                         location[direction]
                     )}

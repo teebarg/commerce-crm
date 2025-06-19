@@ -98,7 +98,7 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                             required: "Title is required.",
                         })}
                         error={errors.title?.message}
-                        className="mt-1 shadow-sm sm:text-sm"
+                        className="mt-1 shadow-xs sm:text-sm"
                         placeholder="Notification Title"
                     />
                     <Input
@@ -109,7 +109,7 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                             required: "Excerpt is required.",
                         })}
                         error={errors.excerpt?.message}
-                        className="mt-1 shadow-sm sm:text-sm"
+                        className="mt-1 shadow-xs sm:text-sm"
                         placeholder="Excerpt"
                     />
                     <Input label="Icon (emoji or URL)" type="text" id="icon" {...register("icon")} className="mt-1" placeholder="🔔" />

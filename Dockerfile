@@ -1,7 +1,16 @@
-FROM node:20-alpine AS base
+FROM node:20-slim
+
 WORKDIR /app
 
-FROM base AS deps
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    git \
+    libssl-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package.json package-lock.json ./
 
 # Copy Prisma schema BEFORE install (important)
@@ -9,9 +18,4 @@ COPY prisma ./prisma
 
 RUN npm install
 
-FROM deps AS dev
 COPY . .
-
-EXPOSE 2000
-
-CMD ["npm", "run", "dev"]

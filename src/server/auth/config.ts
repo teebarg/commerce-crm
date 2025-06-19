@@ -139,7 +139,32 @@ export const authConfig = {
         strategy: "jwt",
         maxAge: 60 * 60 * 24,
     },
+    pages: {
+        // signIn: "/auth/signin",
+        // error: "/auth/error",
+        // verifyRequest: "/auth/verify-request",
+    },
     callbacks: {
+        async signIn({ user, account }) {
+            if (account?.provider === "email") {
+                const existingUser = await db.user.findUnique({
+                    where: { email: user.email! },
+                });
+
+                if (!existingUser) {
+                    await db.user.create({
+                        data: {
+                            email: user.email!,
+                            firstName: "User",
+                            lastName: "User",
+                            status: "PENDING",
+                            password: "password",
+                        },
+                    });
+                }
+            }
+            return true;
+        },
         jwt({ token, user }) {
             if (user) {
                 token.user = {

@@ -273,14 +273,14 @@ const Sidebar: React.FC = () => {
             <div className=" w-[inherit]" />
             <div
                 className={cn(
-                    "fixed h-screen bg-gradient-to-b from-default-100 via-danger-100 to-secondary-100 border-r border-default-100 flex flex-col",
+                    "fixed h-screen bg-linear-to-b from-default-100 via-danger-100 to-secondary-100 border-r border-default-100 flex flex-col",
                     "transition-all duration-300 ease-in-out w-[inherit] text-default-500 overflow-y-auto"
                 )}
             >
                 <div className="p-4 flex items-center justify-between mb-4">
                     <h1
                         className={cn("font-semibold text-3xl transition-opacity duration-200 opacity-100", {
-                            "!opacity-0 w-0": isCollapsed,
+                            "opacity-0! w-0": isCollapsed,
                         })}
                     >
                         Socials

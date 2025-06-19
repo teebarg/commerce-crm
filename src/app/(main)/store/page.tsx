@@ -2,7 +2,7 @@ import { Cart, Package, Users } from "nui-react-icons";
 import React from "react";
 
 const StatCard = ({ icon, label, value, trend }: { icon: React.ReactNode; label: string; value: string; trend: string }) => (
-    <div className="bg-content2 p-6 rounded-xl shadow-sm">
+    <div className="bg-content2 p-6 rounded-xl shadow-xs">
         <div className="flex items-center justify-between">
             <div>
                 <p className="text-default-500 text-sm">{label}</p>
@@ -28,7 +28,7 @@ export default async function Dashboard() {
 
             <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Recent Orders */}
-                <div className="bg-content2 p-6 rounded-xl shadow-sm">
+                <div className="bg-content2 p-6 rounded-xl shadow-xs">
                     <h2 className="text-lg font-semibold mb-4">Recent Orders</h2>
                     <div className="space-y-4">
                         {/* We'll implement this with real data later */}
@@ -37,7 +37,7 @@ export default async function Dashboard() {
                 </div>
 
                 {/* Customer Satisfaction */}
-                <div className="bg-content2 p-6 rounded-xl shadow-sm">
+                <div className="bg-content2 p-6 rounded-xl shadow-xs">
                     <h2 className="text-lg font-semibold mb-4">Customer Satisfaction</h2>
                     <div className="space-y-4">
                         {/* We'll implement this with real data later */}

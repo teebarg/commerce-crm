@@ -58,7 +58,7 @@ const CreatePost: React.FC<Props> = ({ onClose }) => {
     };
 
     return (
-        <div className="bg-content1 rounded-xl shadow-sm p-6">
+        <div className="bg-content1 rounded-xl shadow-xs p-6">
             <h2 className="text-xl font-semibold text-default-800 mb-4">Create Post</h2>
             <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 <div className="space-y-4">

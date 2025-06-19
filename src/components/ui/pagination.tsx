@@ -47,7 +47,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                         className={cn(
                             "absolute flex overflow-visible items-center justify-center origin-center select-none",
                             "touch-none pointer-events-none z-20 data-[moving=true]:transition-transform !data-[moving=true]:duration-300",
-                            "opacity-0 data-[moving]:opacity-100 min-w-9 w-9 h-9 text-sm rounded-xl bg-indigo-700 text-white"
+                            "opacity-0 data-moving:opacity-100 min-w-9 w-9 h-9 text-sm rounded-xl bg-indigo-700 text-white"
                         )}
                         data-moving={page !== pagination?.page || false}
                         data-slot="cursor"
@@ -59,7 +59,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                         aria-disabled={pagination?.totalPages === 1 || page == 1 ? "true" : "false"}
                         aria-label="previous page button"
                         className={cn(
-                            "flex flex-wrap truncate box-border items-center justify-center outline-none data-[disabled=true]:opacity-50",
+                            "flex flex-wrap truncate box-border items-center justify-center outline-hidden data-[disabled=true]:opacity-50",
                             "data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-gray-200",
                             "min-w-9 w-9 h-9 text-sm rounded-xl"
                         )}
@@ -81,7 +81,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                             aria-label={`pagination item ${index + 1} ${page == index + 1 ? "active" : ""}`}
                             className={cn(
                                 "select-none touch-none bg-gray-400 transition-transform-background flex flex-wrap truncate",
-                                "box-border items-center justify-center text-white outline-none data-[disabled=true]:text-gray-100",
+                                "box-border items-center justify-center text-white outline-hidden data-[disabled=true]:text-gray-100",
                                 "data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-gray-500",
                                 "active:bg-gray-500 min-w-9 w-9 h-9 text-sm rounded-xl"
                             )}
@@ -100,7 +100,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                         aria-disabled={pagination?.totalPages === 1 || page == pagination?.totalPages ? "true" : "false"}
                         aria-label="next page button"
                         className={cn(
-                            "flex flex-wrap truncate box-border items-center justify-center outline-none data-[disabled=true]:opacity-50",
+                            "flex flex-wrap truncate box-border items-center justify-center outline-hidden data-[disabled=true]:opacity-50",
                             "data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-gray-200",
                             "min-w-9 w-9 h-9 text-sm rounded-xl"
                         )}

@@ -11,7 +11,7 @@ export default async function Settings() {
 
             <div className="space-y-6">
                 {/* Company Information */}
-                <div className="bg-content2 rounded-xl shadow-sm p-6">
+                <div className="bg-content2 rounded-xl shadow-xs p-6">
                     <h2 className="text-lg font-semibold mb-4">Company Information</h2>
                     <div className="space-y-4">
                         <Input type="text" label="Company Name" className="max-w-sm" placeholder="Enter company name" />
@@ -20,7 +20,7 @@ export default async function Settings() {
                 </div>
 
                 {/* Notification Settings */}
-                <div className="bg-content2 rounded-xl shadow-sm p-6">
+                <div className="bg-content2 rounded-xl shadow-xs p-6">
                     <h2 className="text-lg font-semibold mb-4">Notification Settings</h2>
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
@@ -34,7 +34,7 @@ export default async function Settings() {
                 </div>
 
                 {/* Payment Settings */}
-                <div className="bg-content2 rounded-xl shadow-sm p-6">
+                <div className="bg-content2 rounded-xl shadow-xs p-6">
                     <h2 className="text-lg font-semibold mb-4">Payment Settings</h2>
                     <Select
                         items={[
