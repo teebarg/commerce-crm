@@ -3,8 +3,14 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type User, type DefaultSession, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import argon2 from "argon2";
+import EmailProvider from "next-auth/providers/email";
+import GoogleProvider from "next-auth/providers/google";
 
 import { db } from "@/server/db";
+import { env } from "@/env";
+import { createTransport } from "nodemailer";
+import { renderEmail } from "@/utils/email";
+import handlebars from "handlebars";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -84,6 +90,48 @@ export const authConfig = {
                     type: "password",
                 },
             },
+        }),
+        EmailProvider({
+            server: {
+                host: env.EMAIL_SERVER,
+                port: env.EMAIL_SERVER_PORT,
+                auth: {
+                    user: env.EMAIL_SERVER_USER,
+                    pass: env.EMAIL_SERVER_PASSWORD,
+                },
+            },
+            from: env.EMAIL_FROM,
+            async sendVerificationRequest({ identifier: email, url, provider }) {
+                const transport = createTransport(provider.server);
+                const emailHtml = await renderEmail("magic-link", { magic_link_url: url });
+
+                // Text version
+                const textTemplate = handlebars.compile(`
+                    Sign in to your account
+
+                    Click this link to sign in:
+                    {{url}}
+
+                    This link will expire in 24 hours and can only be used once.
+                    If you didn't request this email, you can safely ignore it.
+
+                    ---
+                    {{env.NEXT_PUBLIC_NAME}} Team
+                `);
+                const emailText = textTemplate({ url });
+
+                await transport.sendMail({
+                    to: email,
+                    from: provider.from,
+                    subject: "Sign in to your account",
+                    text: emailText,
+                    html: emailHtml,
+                });
+            },
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         }),
     ],
     adapter: PrismaAdapter(db),

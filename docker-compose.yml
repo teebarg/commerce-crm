@@ -1,0 +1,95 @@
+services:
+    traefik:
+        image: traefik:v2.9
+        command:
+            # Enable Docker in Traefik, so that it reads labels from Docker services
+            - --providers.docker
+            # Add a constraint to only use services with the label for this stack
+            - --providers.docker.constraints=Label(`traefik.constraint-label`, `crm-public`)
+            - --api.insecure=true
+            - --providers.docker=true
+            - --providers.docker.exposedbydefault=false
+            - --entrypoints.http.address=:80
+            - --entrypoints.https.address=:443
+            # - --log.level=DEBUG  # Debug logging
+        ports:
+            - 2000:80 # HTTP entrypoint
+            - 2001:8080 # Traefik dashboard
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+            - crm-public
+            - default
+        labels:
+            # Enable Traefik
+            - traefik.enable=true
+            - traefik.constraint-label=crm-public
+            # Dashboard route setup
+            - traefik.http.routers.traefik-dashboard.entrypoints=http
+            - traefik.http.routers.traefik-dashboard.rule=Host(`traefik.localhost`)
+            - traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080
+            - traefik.http.routers.traefik-dashboard.service=api@internal
+            - traefik.http.middlewares.https-redirect.contenttype.autodetect=false
+
+    db:
+        image: postgres:15
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U admin -d commerce-crm"]
+            interval: 10s
+            retries: 5
+            start_period: 30s
+            timeout: 10s
+        ports:
+            - "2003:5432"
+        networks:
+            - crm-public
+            - default
+        environment:
+            POSTGRES_USER: admin
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: commerce-crm
+        volumes:
+            - db-data:/var/lib/postgresql/data
+    app:
+        build:
+            context: .
+            target: dev
+        command: npm run dev
+        volumes:
+            - .:/app
+            - /app/node_modules
+        ports:
+            - "2002:3000"
+        depends_on:
+            - db
+        env_file:
+            - .env
+        labels:
+            - traefik.enable=true
+            - traefik.docker.network=crm-public
+            - traefik.constraint-label=crm-public
+            - traefik.http.services.app.loadbalancer.server.port=3000
+            - traefik.http.routers.app-http.rule=Host(`crm.localhost`)
+            - traefik.http.routers.app-http.entrypoints=http
+    adminer:
+        image: adminer:5.3.0
+        ports:
+            - "2004:8080"
+        networks:
+            - crm-public
+            - default
+        depends_on:
+            - db
+        labels:
+            - traefik.enable=true
+            - traefik.docker.network=crm-public
+            - traefik.constraint-label=crm-public
+            - traefik.http.services.adminer.loadbalancer.server.port=8080
+            - traefik.http.routers.adminer-http.rule=Host(`adminer.localhost`)
+            - traefik.http.routers.adminer-http.entrypoints=http
+volumes:
+    db-data:
+
+networks:
+    crm-public:
+        external: false
