@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "@/components/ui/datepicker";
 import { Input } from "@/components/ui/input";
+import { PostSchema } from "@/schemas/post.schema";
 import { api } from "@/trpc/react";
-import { draftSchema } from "@/trpc/schema";
+// import { PostSchema } from "@/trpc/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type Draft } from "@prisma/client";
+import { type Post } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { Calendar } from "nui-react-icons";
 import type React from "react";
@@ -16,7 +17,7 @@ import { toast } from "sonner";
 import { type z } from "zod";
 
 interface Props {
-    current?: Draft;
+    current?: Post;
     type?: "create" | "update";
     onClose?: () => void;
 }
@@ -25,10 +26,10 @@ const UpdatePost: React.FC<Props> = ({ current }) => {
     const router = useRouter();
     const utils = api.useUtils();
 
-    const update = api.draft.update.useMutation({
+    const update = api.post.update.useMutation({
         onSuccess: async () => {
-            toast.success("Draft updated successfully");
-            await utils.draft.invalidate();
+            toast.success("Post updated successfully");
+            await utils.post.invalidate();
             router.refresh();
         },
         onError: (error: unknown) => {
@@ -40,14 +41,14 @@ const UpdatePost: React.FC<Props> = ({ current }) => {
 
     const formRef = useRef<HTMLFormElement>(null);
 
-    type Form = z.infer<typeof draftSchema>;
+    type Form = z.infer<typeof PostSchema>;
 
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<Form>({
-        resolver: zodResolver(draftSchema),
+        resolver: zodResolver(PostSchema),
         defaultValues: {
             content: current?.content,
             title: current?.title,
@@ -55,12 +56,13 @@ const UpdatePost: React.FC<Props> = ({ current }) => {
     });
 
     interface UpdateData extends Form {
-        id: Draft["id"];
+        id: Post["id"];
+        scheduledAt: Date | null;
     }
 
     const onSubmit = (data: Form): void => {
         if (!current) return;
-        const updateData: UpdateData = { ...data, id: current.id, scheduledTime: scheduledFor };
+        const updateData: UpdateData = { ...data, id: current.id, scheduledAt: scheduledFor };
         update.mutate(updateData);
     };
 

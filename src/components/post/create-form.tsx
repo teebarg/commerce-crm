@@ -10,8 +10,9 @@ import { useRef, useState } from "react";
 import { type z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { draftSchema } from "@/trpc/schema";
+// import { PostSchema } from "@/trpc/schema";
 import { toast } from "sonner";
+import { PostSchema } from "@/schemas/post.schema";
 
 type Props = {
     onClose?: () => void;
@@ -21,10 +22,10 @@ const CreatePost: React.FC<Props> = ({ onClose }) => {
     const router = useRouter();
     const utils = api.useUtils();
 
-    const mutation = api.draft.create.useMutation({
+    const mutation = api.post.create.useMutation({
         onSuccess: async () => {
-            toast.success("Draft created successfully");
-            await utils.draft.invalidate();
+            toast.success("Post created successfully");
+            await utils.post.invalidate();
             if (formRef.current) {
                 formRef.current.reset();
                 router.refresh();
@@ -41,14 +42,14 @@ const CreatePost: React.FC<Props> = ({ onClose }) => {
 
     const formRef = useRef<HTMLFormElement>(null);
 
-    type Form = z.infer<typeof draftSchema>;
+    type Form = z.infer<typeof PostSchema>;
 
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<Form>({
-        resolver: zodResolver(draftSchema),
+        resolver: zodResolver(PostSchema),
     });
 
     const onSubmit = (data: Form): void => {

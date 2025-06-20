@@ -109,7 +109,7 @@ const ContentCalendar = () => {
                             <Button variant="outline" size="sm" onClick={() => navigateMonth("prev")}>
                                 <ChevronLeft className="h-4 w-4" />
                             </Button>
-                            <div className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold">
+                            <div className="px-4 py-2 gradient-blue rounded-lg font-semibold">
                                 {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
                             </div>
                             <Button variant="outline" size="sm" onClick={() => navigateMonth("next")}>

@@ -1,26 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-// import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 import { cn } from "@/utils/utils";
 
 import {
     Bell,
-    Cart,
     ChevronRight,
     CogSixTooth,
-    CogSixToothSolid,
-    DocumentIcon,
     Home,
-    Layout,
-    MessageSquare,
-    UserGroup,
     Users,
     Window,
 } from "nui-react-icons";
 import { usePathname } from "next/navigation";
+import { Network } from "lucide-react";
 
 interface MenuItem {
     label: string;
@@ -87,8 +81,8 @@ const SubMenuComponent: React.FC<{
                     "w-full flex items-center justify-between p-4 text-default-500 hover:text-default-600 transition-colors duration-200 group",
                     {
                         "pl-4": level === 0,
-                        "hover:bg-content2 bg-content1 pl-8": level === 1,
-                        "hover:bg-content2 bg-content3 pl-12": level === 2,
+                        "hover:bg-card bg-content1 pl-8": level === 1,
+                        "hover:bg-card bg-content3 pl-12": level === 2,
                     }
                 )}
                 onClick={() => setIsOpen(!isOpen)}
@@ -145,8 +139,8 @@ const MenuItemComponent: React.FC<{
                 `${item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-500 hover:text-default-600"}`,
                 {
                     "pl-4": level === 0,
-                    "hover:bg-content2 bg-content1 pl-8": level === 1,
-                    "hover:bg-content2 bg-content3 pl-12": level === 2,
+                    "hover:bg-card bg-content1 pl-8": level === 1,
+                    "hover:bg-card bg-content3 pl-12": level === 2,
                     "hover:bg-content3 bg-content4 pl-16": level === 3,
                 }
             )}
@@ -198,42 +192,6 @@ const Sidebar: React.FC = () => {
             ],
         },
         {
-            subMenu: "Store",
-            icon: <CogSixTooth size={20} />,
-            menuItems: [
-                {
-                    label: "Dashboard",
-                    href: "/store",
-                    icon: <Layout />,
-                },
-                {
-                    label: "Customers",
-                    href: "/store/customers",
-                    icon: <UserGroup />,
-                },
-                {
-                    label: "Products",
-                    href: "/store/products",
-                    icon: <DocumentIcon />,
-                },
-                {
-                    label: "Orders",
-                    href: "/store/orders",
-                    icon: <Cart />,
-                },
-                {
-                    label: "Survey",
-                    href: "/store/survey",
-                    icon: <MessageSquare />,
-                },
-                {
-                    label: "Settings",
-                    href: "/store/settings",
-                    icon: <CogSixToothSolid />,
-                },
-            ],
-        },
-        {
             subMenu: "Social",
             icon: <CogSixTooth size={20} />,
             menuItems: [
@@ -241,6 +199,11 @@ const Sidebar: React.FC = () => {
                     label: "Posts",
                     href: "/posts",
                     icon: <Home size={18} />,
+                },
+                {
+                    label: "Social",
+                    href: "/social",
+                    icon: <Network size={18} />,
                 },
             ],
         },
@@ -251,6 +214,11 @@ const Sidebar: React.FC = () => {
                 {
                     label: "Send",
                     href: "/notification",
+                    icon: <Bell size={18} />,
+                },
+                {
+                    label: "Push Notification",
+                    href: "/push-notification",
                     icon: <Bell size={18} />,
                 },
             ],

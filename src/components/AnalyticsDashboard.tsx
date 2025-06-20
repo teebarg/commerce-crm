@@ -74,7 +74,7 @@ const AnalyticsDashboard = () => {
         <div className="space-y-6">
             {/* Header Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
+                <Card className="gradient-blue">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium opacity-90">Total Reach</CardTitle>
                         <Eye className="h-4 w-4 opacity-90" />

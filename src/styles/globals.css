@@ -8,9 +8,6 @@
     --radius-50: 50%;
     --radius-1xl: 0.875rem;
     --radius-top-corners: 5px 5px 0 0;
-    --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
 
     --border-width-1: 1px;
     --border-width-3: 3px;
@@ -25,6 +22,19 @@
 
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
+
+    --color-default: hsl(var(--default));
+    --color-default-50: hsl(var(--default-50));
+    --color-default-100: hsl(var(--default-100));
+    --color-default-200: hsl(var(--default-200));
+    --color-default-300: hsl(var(--default-300));
+    --color-default-400: hsl(var(--default-400));
+    --color-default-500: hsl(var(--default-500));
+    --color-default-600: hsl(var(--default-600));
+    --color-default-700: hsl(var(--default-700));
+    --color-default-800: hsl(var(--default-800));
+    --color-default-900: hsl(var(--default-900));
+    --color-default-foreground: hsl(var(--default-foreground));
 
     --color-primary: hsl(var(--primary));
     --color-primary-foreground: hsl(var(--primary-foreground));
@@ -115,7 +125,7 @@
     }
 }
 
-@layer utilities {
+/* @layer utilities {
     html {
         margin: 0;
         width: 100%;
@@ -124,11 +134,24 @@
     body {
         font-family: "Outfit", sans-serif;
     }
-}
+} */
 
 :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
+
+    --default-50: 0 0% 98.04%;
+    --default-100: 240 4.76% 95.88%;
+    --default-200: 240 5.88% 90%;
+    --default-300: 240 4.88% 83.92%;
+    --default-400: 240 5.03% 64.9%;
+    --default-500: 240 3.83% 46.08%;
+    --default-600: 240 5.2% 33.92%;
+    --default-700: 240 5.26% 26.08%;
+    --default-800: 240 3.7% 15.88%;
+    --default-900: 240 5.88% 10%;
+    --default-foreground: 0 0% 0%;
+    --default: 240 4.88% 83.92%;
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -183,6 +206,19 @@
 .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
+
+    --default-50: 240 5.88% 10%;
+    --default-100: 240 3.7% 15.88%;
+    --default-200: 240 5.26% 26.08%;
+    --default-300: 240 5.2% 33.92%;
+    --default-400: 240 3.83% 46.08%;
+    --default-500: 240 5.03% 64.9%;
+    --default-600: 240 4.88% 83.92%;
+    --default-700: 240 5.88% 90%;
+    --default-800: 240 4.76% 95.88%;
+    --default-900: 0 0% 98.04%;
+    --default-foreground: 0 0% 100%;
+    --default: 240 5.26% 26.08%;
 
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
@@ -314,6 +350,11 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 } */
+
+
+.gradient-blue {
+    @apply bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 hover:from-purple-700 hover:to-blue-700
+}
 
 @layer utilities {
     .transition-background {

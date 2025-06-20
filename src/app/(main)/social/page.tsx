@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Calendar, PlusCircle, BarChart3, Settings, Sparkles, Clock, Users, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

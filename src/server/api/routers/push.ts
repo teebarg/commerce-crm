@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { notificationTemplateSchema, pushSubscriptionSchema } from "@/trpc/schema";
 import { sendNotificationsToSubscribers } from "@/trpc/services";
+import { CreateNotificationSchema, NotificationSchema, PushSubscriptionSchema } from "@/schemas/notification.schema";
 
 export const pushNotificationRouter = createTRPCRouter({
     templates: protectedProcedure
         .query(async ({ ctx }) => {
-            const templates = await ctx.db.notificationTemplate.findMany({
+            const templates = await ctx.db.notification.findMany({
                 orderBy: { createdAt: "desc" },
             });
 
@@ -15,25 +15,25 @@ export const pushNotificationRouter = createTRPCRouter({
                 templates,
             };
         }),
-    createTemplate: protectedProcedure.input(notificationTemplateSchema).mutation(async ({ ctx, input }) => {
-        return ctx.db.notificationTemplate.create({
+    createTemplate: protectedProcedure.input(CreateNotificationSchema).mutation(async ({ ctx, input }) => {
+        return ctx.db.notification.create({
             data: {
                 ...input,
             },
         });
     }),
-    updateTemplate: protectedProcedure.input(notificationTemplateSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
-        return await ctx.db.notificationTemplate.update({
+    updateTemplate: protectedProcedure.input(NotificationSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
+        return await ctx.db.notification.update({
             where: { id: input.id },
             data: { ...input },
         });
     }),
     deleteTemplate: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
-        return await ctx.db.notificationTemplate.delete({ where: { id: input } });
+        return await ctx.db.notification.delete({ where: { id: input } });
     }),
 
     // subscriptions
-    createSubscription: publicProcedure.input(pushSubscriptionSchema).mutation(async ({ ctx, input }) => {
+    createSubscription: publicProcedure.input(PushSubscriptionSchema).mutation(async ({ ctx, input }) => {
         return ctx.db.pushSubscription.create({
             data: {
                 ...input,

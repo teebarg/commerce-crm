@@ -57,6 +57,7 @@ services:
         volumes:
             - .:/app
             - /app/node_modules
+            - /app/.next
         ports:
             - "2002:3000"
         depends_on:
@@ -65,8 +66,6 @@ services:
             - NODE_ENV=development
             - NEXT_TELEMETRY_DISABLED=1
             - WATCHPACK_POLLING=true
-        env_file:
-            - .env
         labels:
             - traefik.enable=true
             - traefik.docker.network=crm-public

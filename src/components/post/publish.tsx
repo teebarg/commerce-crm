@@ -15,9 +15,9 @@ const Publish: React.FC<Props> = ({ id }) => {
     const router = useRouter();
     const utils = api.useUtils();
 
-    const mutation = api.draft.publish.useMutation({
+    const mutation = api.post.publish.useMutation({
         onSuccess: async () => {
-            toast.success("Draft published successfully.");
+            toast.success("Post published successfully.");
             await utils.user.invalidate();
             router.refresh();
         },

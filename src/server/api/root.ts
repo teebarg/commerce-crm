@@ -1,5 +1,5 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
-import { draftRouter } from "@/server/api/routers/draft";
+import { postRouter } from "@/server/api/routers/post";
 import { userRouter } from "@/server/api/routers/user";
 import { pushNotificationRouter } from "@/server/api/routers/push";
 
@@ -9,7 +9,7 @@ import { pushNotificationRouter } from "@/server/api/routers/push";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-    draft: draftRouter,
+    post: postRouter,
     user: userRouter,
     push: pushNotificationRouter,
 });

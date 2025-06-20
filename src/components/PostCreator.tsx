@@ -7,15 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const PostCreator = () => {
-    const [postContent, setPostContent] = useState("");
+    const [postContent, setPostContent] = useState<string | undefined>("");
     const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["instagram"]);
-    const [scheduledDate, setScheduledDate] = useState("");
-    const [scheduledTime, setScheduledTime] = useState("");
-    const [isGenerating, setIsGenerating] = useState(false);
-    const { toast } = useToast();
+    const [scheduledDate, setScheduledDate] = useState<string>("");
+    const [scheduledTime, setScheduledTime] = useState<string>("");
+    const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
     const platforms = [
         { id: "instagram", name: "Instagram", icon: Instagram, color: "bg-pink-500" },
@@ -39,34 +38,28 @@ const PostCreator = () => {
             const randomSuggestion = aiSuggestions[Math.floor(Math.random() * aiSuggestions.length)];
             setPostContent(randomSuggestion);
             setIsGenerating(false);
-            toast({
-                title: "AI Content Generated!",
+            toast.success("AI Content Generated!", {
                 description: "Your post has been generated successfully.",
             });
         }, 2000);
     };
 
     const handleSchedulePost = () => {
-        if (!postContent.trim()) {
-            toast({
-                title: "Content Required",
+        if (!postContent?.trim()) {
+            toast.error("Content Required", {
                 description: "Please add content to your post before scheduling.",
-                variant: "destructive",
             });
             return;
         }
 
         if (selectedPlatforms.length === 0) {
-            toast({
-                title: "Platform Required",
+            toast.error("Platform Required", {
                 description: "Please select at least one platform to publish to.",
-                variant: "destructive",
             });
             return;
         }
 
-        toast({
-            title: "Post Scheduled!",
+        toast.success("Post Scheduled!", {
             description: `Your post has been scheduled for ${selectedPlatforms.join(", ")}.`,
         });
 
@@ -77,26 +70,21 @@ const PostCreator = () => {
     };
 
     const handlePublishNow = () => {
-        if (!postContent.trim()) {
-            toast({
-                title: "Content Required",
+        if (!postContent?.trim()) {
+            toast.error("Content Required", {
                 description: "Please add content to your post before publishing.",
-                variant: "destructive",
             });
             return;
         }
 
         if (selectedPlatforms.length === 0) {
-            toast({
-                title: "Platform Required",
+            toast.error("Platform Required", {
                 description: "Please select at least one platform to publish to.",
-                variant: "destructive",
             });
             return;
         }
 
-        toast({
-            title: "Post Published!",
+        toast.success("Post Published!", {
             description: `Your post has been published to ${selectedPlatforms.join(", ")}.`,
         });
 
@@ -120,13 +108,7 @@ const PostCreator = () => {
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="content">Post Content</Label>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={generateAIContent}
-                                    disabled={isGenerating}
-                                    className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0"
-                                >
+                                <Button variant="outline" size="sm" onClick={generateAIContent} disabled={isGenerating} className="gradient-blue">
                                     <Wand2 className={`h-4 w-4 mr-2 ${isGenerating ? "animate-spin" : ""}`} />
                                     {isGenerating ? "Generating..." : "AI Generate"}
                                 </Button>
@@ -134,11 +116,11 @@ const PostCreator = () => {
                             <Textarea
                                 id="content"
                                 placeholder="What's on your mind? Share your thoughts, ideas, or let AI help you create something amazing..."
-                                value={postContent}
+                                value={postContent || ""}
                                 onChange={(e) => setPostContent(e.target.value)}
                                 className="min-h-[120px] resize-none"
                             />
-                            <div className="text-sm text-gray-500">{postContent.length}/2200 characters</div>
+                            <div className="text-sm text-gray-500">{postContent?.length}/2200 characters</div>
                         </div>
 
                         <Separator />
@@ -213,10 +195,7 @@ const PostCreator = () => {
                 {/* Action Buttons */}
                 <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                     <CardContent className="pt-6 space-y-3">
-                        <Button
-                            onClick={handlePublishNow}
-                            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 hover:from-purple-700 hover:to-blue-700"
-                        >
+                        <Button onClick={handlePublishNow} className="w-full gradient-blue" size="lg">
                             <Send className="h-4 w-4 mr-2" />
                             Publish Now
                         </Button>
@@ -228,7 +207,7 @@ const PostCreator = () => {
                 </Card>
 
                 {/* Quick Stats */}
-                <Card className="bg-gradient-to-br from-purple-500 to-blue-600 text-white border-0">
+                <Card className="gradient-blue">
                     <CardHeader>
                         <CardTitle className="text-sm opacity-90">Best Time to Post</CardTitle>
                     </CardHeader>

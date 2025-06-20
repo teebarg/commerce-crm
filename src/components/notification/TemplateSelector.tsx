@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "nui-react-icons";
 import { useOverlayTriggerState } from "react-stately";
-import { type NotificationTemplate } from "@prisma/client";
+import { type Notification } from "@prisma/client";
 import { api } from "@/trpc/react";
 import { Confirm } from "@/components/ui/confirm";
 import { TemplateForm } from "./form";
@@ -13,11 +13,11 @@ import { Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface TemplateSelectorProps {
-    templates: Array<NotificationTemplate> | undefined;
-    onSelect: (template: NotificationTemplate) => void;
+    templates: Array<Notification> | undefined;
+    onSelect: (template: Notification) => void;
 }
 
-const Actions: React.FC<{ template: NotificationTemplate }> = ({ template }) => {
+const Actions: React.FC<{ template: Notification }> = ({ template }) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
     const utils = api.useUtils();

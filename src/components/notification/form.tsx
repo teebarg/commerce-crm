@@ -4,18 +4,18 @@ import React, { forwardRef, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 
-import { type NotificationTemplate } from "@prisma/client";
+import { type Notification } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { type z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { TextArea } from "@/components/ui/textarea";
-import { notificationTemplateSchema } from "@/trpc/schema";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { NotificationSchema } from "@/schemas/notification.schema";
 
 interface Props {
-    current?: NotificationTemplate;
+    current?: Notification;
     type?: "create" | "update";
     onClose?: () => void;
 }
@@ -57,21 +57,21 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
 
     const formRef = useRef<HTMLFormElement>(null);
 
-    type Form = z.infer<typeof notificationTemplateSchema>;
+    type Form = z.infer<typeof NotificationSchema>;
 
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<Form>({
-        resolver: zodResolver(notificationTemplateSchema),
+        resolver: zodResolver(NotificationSchema),
         defaultValues: {
             ...current,
         },
     });
 
     interface UpdateData extends Form {
-        id: NotificationTemplate["id"];
+        id: Notification["id"];
     }
 
     const onSubmit = (data: Form): void => {
@@ -111,7 +111,7 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                         placeholder="Excerpt"
                     />
                     <Input label="Icon (emoji or URL)" type="text" id="icon" {...register("icon")} className="mt-1" placeholder="🔔" />
-                    <TextArea
+                    <Textarea
                         label="Message"
                         id="body"
                         {...register("body", {

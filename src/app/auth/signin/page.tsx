@@ -18,11 +18,11 @@ const AuthUI = () => {
             <div className="relative w-full max-w-md">
                 <div className="backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 p-8 transform transition-all duration-500 hover:scale-[1.02]">
                     <div className="text-center mb-8">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary flex items-center justify-center shadow-lg">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg">
                             {authMode === "email" ? <Send className="w-8 h-8 text-white" /> : <Lock className="w-8 h-8 text-white" />}
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h1>
-                        <p className="text-gray-600">
+                        <h1 className="text-3xl font-bold text-default-900 mb-2">Welcome Back</h1>
+                        <p className="text-default-600">
                             {authMode === "email" ? "Sign in with a magic link" : "Sign in to your account"}
                         </p>
                     </div>

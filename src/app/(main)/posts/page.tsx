@@ -2,7 +2,7 @@ import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
 import { Table } from "@/components/ui/table";
 import { Actions } from "@/components/generic/actions";
-import { type Draft } from "@prisma/client";
+import { type Post } from "@prisma/client";
 import { CreatePost } from "@/components/post/create-form";
 import { Publish } from "@/components/post/publish";
 import { UpdatePost } from "@/components/post/update-form";
@@ -11,7 +11,7 @@ import { Calendar } from "nui-react-icons";
 
 const getPostStatus = (post: any) => {
     if (post.is_published) return "published";
-    if (post.scheduled_time) return "scheduled";
+    if (post.scheduled_at) return "scheduled";
     return "draft";
 };
 
@@ -36,21 +36,21 @@ const PER_PAGE = 5;
 export default async function Posts({ searchParams }: { searchParams: SearchParams }) {
     const { q, page: p = "1" } = await searchParams;
     const page = parseInt(p, 10)
-    const { drafts, ...pagination } = await api.draft.all({ query: q, page, pageSize: PER_PAGE, sort: "desc" });
+    const { posts, ...pagination } = await api.post.all({ query: q, page, pageSize: PER_PAGE, sort: "desc" });
     const session = await auth();
 
     const deletePost = async (id: string) => {
         "use server";
         try {
-            await api.draft.delete(id);
+            await api.post.delete(id);
         } catch (error) {
-            console.error("Failed to delete draft:", error);
+            console.error("Failed to delete post:", error);
         }
     };
 
     return (
         <HydrateClient>
-            <div className="p-8 bg-content2 w-full">
+            <div className="p-8 bg-card w-full">
                 <div className="m-1 max-w-6xl">
                     <p className="text-2xl">Hi, {session?.user?.firstName ?? session?.user?.email} 👋🏼</p>
                     <main className="py-8">
@@ -64,13 +64,13 @@ export default async function Posts({ searchParams }: { searchParams: SearchPara
                                 <div className="bg-content1 rounded-xl shadow-xs p-6">
                                     <h3 className="text-lg font-semibold text-default-800">Published</h3>
                                     <p className="text-3xl font-bold text-green-600 mt-2">
-                                        {drafts?.filter((post: Draft) => post.isPublished).length}
+                                        {posts?.filter((post: Post) => post.isPublished).length}
                                     </p>
                                 </div>
                                 <div className="bg-content1 rounded-xl shadow-xs p-6">
-                                    <h3 className="text-lg font-semibold text-default-800">Drafts & Scheduled</h3>
+                                    <h3 className="text-lg font-semibold text-default-800">Posts & Scheduled</h3>
                                     <p className="text-3xl font-bold text-orange-600 mt-2">
-                                        {drafts.filter((post: Draft) => !post.isPublished).length}
+                                        {posts.filter((post: Post) => !post.isPublished).length}
                                     </p>
                                 </div>
                             </div>
@@ -84,7 +84,7 @@ export default async function Posts({ searchParams }: { searchParams: SearchPara
                                     pagination={pagination}
                                     searchQuery={q}
                                 >
-                                    {drafts.map((item: Draft, index: number) => (
+                                    {posts.map((item: Post, index: number) => (
                                         <tr key={index} className="even:bg-content1">
                                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
                                                 {(page - 1) * PER_PAGE + index + 1}
@@ -121,7 +121,7 @@ export default async function Posts({ searchParams }: { searchParams: SearchPara
                                                         deleteAction={deletePost}
                                                         form={<UpdatePost current={item} />}
                                                         item={item}
-                                                        label="draft"
+                                                        label="post"
                                                     />
                                                 )}
                                             </td>

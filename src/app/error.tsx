@@ -32,8 +32,8 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
     }, [error]);
 
     return (
-        <div className="bg-default-100 flex items-center justify-center h-screen">
-            <div className="max-w-lg mx-auto bg-content2 rounded-lg shadow-lg overflow-hidden">
+        <div className="flex items-center justify-center h-screen">
+            <div className="max-w-lg mx-auto bg-card rounded-lg shadow-lg overflow-hidden">
                 <div className="px-6 py-8">
                     <h1 className="text-4xl font-bold mb-2">500</h1>
                     <p className="text-xl text-default-900 mb-4">Internal Server Error</p>
@@ -45,7 +45,7 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
                         Try again
                     </Button>
                 </div>
-                <div className="px-6 py-4 bg-content2 border-t border-default-100 text-sm text-default-500">
+                <div className="px-6 py-4 border-t border-default-100 text-sm text-default-500">
                     If the problem persists, please contact our support team.
                 </div>
             </div>

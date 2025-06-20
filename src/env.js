@@ -45,7 +45,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    APP_NAME: process.env.APP_NAME,
+    APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
     AUTH_SECRET: process.env.AUTH_SECRET,
     BASE_URL: process.env.BASE_URL,
     CONTACT_EMAIL: process.env.CONTACT_EMAIL,
