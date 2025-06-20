@@ -1,8 +1,8 @@
-"use client";
-
 import { startTransition, useCallback } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { debounce } from "@/utils/utils";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
+import { useProgressBar } from "@/components/ui/progress-bar";
 
 interface QueryParam {
     key: string;
@@ -13,10 +13,11 @@ const useUpdateQuery = (delay = 500) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const progress = useProgressBar();
 
     const updateQuery = useCallback(
         debounce((data: QueryParam[]) => {
-            const params = new URLSearchParams(searchParams?.toString());
+            const params = new URLSearchParams(searchParams);
 
             data.forEach(({ key, value }) => {
                 if (!value || value === "") {
@@ -26,9 +27,11 @@ const useUpdateQuery = (delay = 500) => {
                 }
                 params.set(key, value);
             });
+            progress.start();
 
             startTransition(() => {
                 router.push(`${pathname}?${params.toString()}`);
+                progress.done();
             });
         }, delay),
         [searchParams]

@@ -56,9 +56,9 @@ export function NotificationPreview({ notification }: NotificationPreviewProps) 
                 <Button
                     isLoading={mutation.isPending}
                     className="min-w-24"
-                    color="secondary"
+                    variant="primary"
                     onClick={onSubmit}
-                    leftIcon={<Send className="h-4 w-4" />}
+                    startContent={<Send className="h-4 w-4" />}
                 >
                     Send
                 </Button>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { type Pagination as PaginationType } from "@/utils/types";
-import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import { cn } from "@/utils/utils";
 
 interface Props {

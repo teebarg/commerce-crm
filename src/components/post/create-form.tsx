@@ -93,7 +93,7 @@ const CreatePost: React.FC<Props> = ({ onClose }) => {
                     )}
 
                     <div className="flex justify-end gap-4">
-                        <Button type="submit" isLoading={mutation.isPending} disabled={mutation.isPending} color="primary" className="px-4 py-2">
+                        <Button type="submit" isLoading={mutation.isPending} disabled={mutation.isPending} variant="primary" className="px-4 py-2">
                             Create
                         </Button>
                     </div>

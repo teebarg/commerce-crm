@@ -5,8 +5,8 @@ import { Outfit } from "next/font/google";
 import { cn } from "@/utils/utils";
 import NotificationProviders from "./notistack-providers";
 import { TRPCReactProvider } from "@/trpc/react";
-import OverlayClientProvider from "./overlay-providers";
 import { ThemeScript } from "@/theme/theme-script";
+import { Toaster } from "@/components/ui/sonner";
 
 const outfit = Outfit({
     subsets: ["latin"],
@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html suppressHydrationWarning className={cn("scroll-smooth antialiased", outfit.className)} lang="en">
             <head>
-              <ThemeScript />
+                <ThemeScript />
                 <link href="/favicon-96x96.png" rel="icon" sizes="96x96" type="image/png" />
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
                 <link href="/favicon.ico" rel="shortcut icon" />
@@ -36,7 +36,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <body className="min-h-screen">
                 <TRPCReactProvider>
                     <NotificationProviders>
-                        <OverlayClientProvider>{children}</OverlayClientProvider>
+                        {children}
+                        <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
                     </NotificationProviders>
                 </TRPCReactProvider>
             </body>

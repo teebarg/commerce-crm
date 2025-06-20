@@ -51,7 +51,7 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
             <div className="space-y-4">
                 <h3 className="text-lg font-medium text-default-900">Templates</h3>
                 <div>
-                    <Button leftIcon={<Plus />} color="primary" onClick={createSlider.open}>
+                    <Button startContent={<Plus />} variant="primary" onClick={createSlider.open}>
                         Add
                     </Button>
                 </div>

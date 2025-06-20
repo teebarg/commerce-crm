@@ -132,6 +132,7 @@ export const authConfig = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            allowDangerousEmailAccountLinking: true
         }),
     ],
     adapter: PrismaAdapter(db),
@@ -140,16 +141,19 @@ export const authConfig = {
         maxAge: 60 * 60 * 24,
     },
     pages: {
-        // signIn: "/auth/signin",
-        // error: "/auth/error",
-        // verifyRequest: "/auth/verify-request",
+        signIn: "/auth/signin",
+        error: "/auth/error",
+        verifyRequest: "/auth/verify-request",
     },
     callbacks: {
         async signIn({ user, account }) {
-            if (account?.provider === "email") {
+            if (account?.provider === "email" || account?.provider === "google") {
                 const existingUser = await db.user.findUnique({
                     where: { email: user.email! },
                 });
+
+                const uuid = crypto.randomUUID();
+                const hash = await argon2.hash(uuid);
 
                 if (!existingUser) {
                     await db.user.create({
@@ -158,7 +162,7 @@ export const authConfig = {
                             firstName: "User",
                             lastName: "User",
                             status: "PENDING",
-                            password: "password",
+                            password: hash,
                         },
                     });
                 }

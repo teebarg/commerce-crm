@@ -124,7 +124,7 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                         placeholder="Notification message..."
                     />
                     <div className="flex justify-end space-x-2">
-                        <Button type="button" variant="danger" onClick={onClose}>
+                        <Button type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button isLoading={create.isPending || update.isPending} variant="primary" type="submit">

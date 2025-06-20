@@ -36,10 +36,10 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
                     <h1 className="text-4xl font-bold mb-2">500</h1>
                     <p className="text-xl text-default-900 mb-4">Internal Server Error</p>
                     <p className="text-default-500 mb-6">Oops! Something went wrong on our end. We apologize for the inconvenience.</p>
-                    <BtnLink color="primary" href="/">
+                    <BtnLink variant="primary" href="/">
                         Go back to homepage
                     </BtnLink>
-                    <Button aria-label="try again" className="block mt-6 ml-4" color="danger" type="button" onClick={() => reset()}>
+                    <Button aria-label="try again" className="block mt-6 ml-4" variant="destructive" type="button" onClick={() => reset()}>
                         Try again
                     </Button>
                 </div>

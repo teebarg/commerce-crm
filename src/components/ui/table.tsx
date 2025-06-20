@@ -3,7 +3,7 @@
 
 import React, { cloneElement, isValidElement } from "react";
 import type { Pagination as PaginationType } from "@/utils/types";
-import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import Pagination from "./pagination";
@@ -58,7 +58,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, 
                         </div>
                         <div className="flex items-center gap-3">
                             {canAdd && (
-                                <Button variant="primary" leftIcon={<Plus />} className="" onClick={state.open}>
+                                <Button variant="primary" startContent={<Plus />} onClick={state.open}>
                                     Add New
                                 </Button>
                             )}

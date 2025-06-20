@@ -62,7 +62,7 @@ export function NotificationForm({ onPreview }: NotificationFormProps) {
                 label="Select Group"
             />
 
-            <Button className="min-w-24" color="primary" onClick={handlePreview} leftIcon={<Eye className="h-4 w-4" />}>
+            <Button className="min-w-24" variant="primary" onClick={handlePreview} startContent={<Eye className="h-4 w-4" />}>
                 Preview
             </Button>
         </div>

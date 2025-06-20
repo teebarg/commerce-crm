@@ -35,7 +35,7 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onCl
                         <Button variant="outline" onClick={onClose}>
                             Close
                         </Button>
-                        <Button isLoading={isPending} variant="danger" type="submit" onClick={onSubmit}>
+                        <Button isLoading={isPending} variant="destructive" type="submit" onClick={onSubmit}>
                             Delete
                         </Button>
                     </div>

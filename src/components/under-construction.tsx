@@ -29,7 +29,7 @@ const UnderConstruction: React.FC = () => {
                             </div>
                         </div>
 
-                        <Badge className="mb-8 rounded-full px-6 py-3 text-sm border-0 [&>svg]:size-4" variant="orange">
+                        <Badge className="mb-8 rounded-full px-6 py-3 text-sm border-0 [&>svg]:size-4" variant="secondary">
                             <AlertCircle className="mr-2 h-4 w-4" />
                             Under Construction
                         </Badge>
@@ -47,7 +47,7 @@ const UnderConstruction: React.FC = () => {
                         <div className="text-center">
                             <p className="mb-6 text-gray-600">Want to be notified when this page is ready?</p>
                             <a
-                                href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
+                                href={`mailto:${process.env.CONTACT_EMAIL}`}
                                 className="rounded-full border-2 border-emerald-200 px-8 py-3 text-emerald-600 transition-all duration-200 hover:bg-emerald-50"
                             >
                                 Contact Support

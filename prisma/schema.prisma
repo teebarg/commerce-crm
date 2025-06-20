@@ -8,6 +8,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN    @map("admin")
+  CUSTOMER @map("customer")
+
+  @@map("roles")
+}
+
+enum Status {
+    PENDING   @map("pending")
+    ACTIVE    @map("active")
+    INACTIVE  @map("inactive")
+
+    @@map("statuses")
+}
+
 model Draft {
   id             String    @id @default(cuid())
   title          String
@@ -72,21 +87,6 @@ model Tweet {
   updatedAt     DateTime? @updatedAt @map("updated_at")
 
   @@map("tweets")
-}
-
-enum Role {
-  ADMIN    @map("admin")
-  CUSTOMER @map("customer")
-
-  @@map("roles")
-}
-
-enum Status {
-    PENDING   @map("pending")
-    ACTIVE    @map("active")
-    INACTIVE  @map("inactive")
-
-    @@map("statuses")
 }
 
 // Necessary for Next auth

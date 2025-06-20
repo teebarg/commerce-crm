@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 import { db } from "@/server/db";
 
 export async function GET() {
@@ -8,7 +8,8 @@ export async function GET() {
         try {
             await db.user.count();
             dbStatus = "ok";
-        } catch (dbError) {
+        } catch (error) {
+            console.log(error)
             dbStatus = "unavailable";
         }
 

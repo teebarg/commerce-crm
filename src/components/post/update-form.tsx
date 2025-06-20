@@ -106,7 +106,7 @@ const UpdatePost: React.FC<Props> = ({ current }) => {
                     )}
 
                     <div className="flex justify-end">
-                        <Button type="submit" isLoading={update.isPending} disabled={update.isPending} color="primary" className="px-4 py-2">
+                        <Button type="submit" isLoading={update.isPending} disabled={update.isPending} variant="primary" className="px-4 py-2">
                             Update
                         </Button>
                     </div>
