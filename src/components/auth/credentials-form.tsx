@@ -55,7 +55,6 @@ const CredentialsForm: React.FC = () => {
                 <Input
                     required
                     autoComplete="new-password"
-                    data-testid="password-input"
                     startContent={<Lock className="w-5 h-5 text-gray-400 group-focus-within:text-green-500 transition-colors duration-200" />}
                     onChange={(e) => setPassword(e.target.value)}
                     value={password}
@@ -72,7 +71,7 @@ const CredentialsForm: React.FC = () => {
                 />
             </div>
 
-            <Button type="submit" disabled={loading} isLoading={loading} variant="emerald" className="w-full py-4 mt-4" size="lg">
+            <Button type="submit" disabled={loading} isLoading={loading} variant="primary" className="w-full py-4 mt-4" size="lg">
                 Sign In
             </Button>
         </form>

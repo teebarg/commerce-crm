@@ -40,7 +40,7 @@ export function ProgressBar({ className, children }: { className: string; childr
 
 function useProgress() {
     const [state, setState] = useState<"initial" | "in-progress" | "completing" | "complete">("initial");
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState<number>(0);
 
     useInterval(
         () => {

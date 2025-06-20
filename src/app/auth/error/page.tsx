@@ -94,7 +94,7 @@ export default function ErrorPage() {
                     <div className="text-center relative z-10">
                         <h1 className="text-4xl font-bold text-gray-800 mb-4 flex items-center justify-center gap-2">
                             <LogoSvg className="text-emerald-600 h-12 w-12" />
-                            merch.eco
+                            crm
                         </h1>
                         <p className="text-xl text-gray-600 mb-6 max-w-md">
                             Don&apos;t worry - we&apos;ll get you back on track to sustainable merchandise solutions
@@ -108,7 +108,7 @@ export default function ErrorPage() {
                 <div className="lg:hidden mb-8 text-center">
                     <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center justify-center gap-2">
                         <LogoSvg className="text-emerald-600 h-12 w-12" />
-                        merch.eco
+                        crm
                     </h1>
                 </div>
 

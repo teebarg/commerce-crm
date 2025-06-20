@@ -6,6 +6,7 @@ import { cn } from "@/utils/utils";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeScript } from "@/theme/theme-script";
 import { Toaster } from "@/components/ui/sonner";
+import ProgressBar from "@/components/ui/progress-bar";
 
 const outfit = Outfit({
     subsets: ["latin"],
@@ -29,13 +30,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
                 <link href="/favicon.ico" rel="shortcut icon" />
                 <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
-                <meta content="Merch" name="apple-mobile-web-app-title" />
+                <meta content="Crm" name="apple-mobile-web-app-title" />
                 <link href="/site.webmanifest" rel="manifest" />
             </head>
             <body className="min-h-screen">
                 <TRPCReactProvider>
-                    {children}
-                    <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
+                    <ProgressBar className="">
+                        {children}
+                        <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
+                    </ProgressBar>
                 </TRPCReactProvider>
             </body>
         </html>

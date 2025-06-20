@@ -4,6 +4,8 @@ import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { BtnLink } from "@/components/ui/btnLink";
+import { env } from "@/env";
+
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
     useEffect(() => {
@@ -17,7 +19,7 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
             };
 
             // Send the error to the server
-            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/log-error`, {
+            fetch(`${env.BASE_URL}/api/log-error`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
