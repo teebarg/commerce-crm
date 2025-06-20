@@ -3,7 +3,6 @@ import { type Metadata } from "next";
 
 import { Outfit } from "next/font/google";
 import { cn } from "@/utils/utils";
-import NotificationProviders from "./notistack-providers";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeScript } from "@/theme/theme-script";
 import { Toaster } from "@/components/ui/sonner";
@@ -35,10 +34,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </head>
             <body className="min-h-screen">
                 <TRPCReactProvider>
-                    <NotificationProviders>
-                        {children}
-                        <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
-                    </NotificationProviders>
+                    {children}
+                    <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
                 </TRPCReactProvider>
             </body>
         </html>

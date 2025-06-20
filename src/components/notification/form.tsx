@@ -1,7 +1,6 @@
 "use client";
 
 import React, { forwardRef, useRef } from "react";
-import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 
@@ -13,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
 import { notificationTemplateSchema } from "@/trpc/schema";
+import { toast } from "sonner";
 
 interface Props {
     current?: NotificationTemplate;
@@ -29,11 +29,9 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
     const isCreate = type === "create";
     const utils = api.useUtils();
 
-    const { enqueueSnackbar } = useSnackbar();
-
     const create = api.push.createTemplate.useMutation({
         onSuccess: async () => {
-            enqueueSnackbar("Template created successfully", { variant: "success" });
+            toast.success("Template created successfully");
             await utils.push.invalidate();
             if (formRef.current) {
                 formRef.current.reset();
@@ -42,18 +40,18 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
             }
         },
         onError: (error) => {
-            enqueueSnackbar(`Error - ${error as unknown as string}`, { variant: "error" });
+            toast.error(`Error - ${error as unknown as string}`);
         },
     });
 
     const update = api.push.updateTemplate.useMutation({
         onSuccess: async () => {
-            enqueueSnackbar("Template updated successfully", { variant: "success" });
+            toast.success("Template updated successfully");
             await utils.push.invalidate();
             router.refresh();
         },
         onError: (error: unknown) => {
-            enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });
+            toast.error(`Error - ${error as string}`);
         },
     });
 

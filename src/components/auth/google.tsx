@@ -19,7 +19,7 @@ const Google: React.FC = () => {
 
     return (
         <Button className="w-full" disabled={loading} isLoading={loading} variant="outline" onClick={() => handleGoogle()} size="lg">
-            <Image alt="Google" className="w-5 h-5 mr-2" src="/google.svg" />
+            <Image alt="Google" className="w-5 h-5 mr-2" width={20} height={20} src="/google.svg" />
             Continue with Google
         </Button>
     );

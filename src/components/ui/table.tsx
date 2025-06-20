@@ -7,10 +7,10 @@ import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import Pagination from "./pagination";
-import SlideOver from "./slideover";
 import { Plus } from "nui-react-icons";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Overlay from "@/components/overlay";
 
 interface Props {
     children: React.ReactNode;
@@ -26,10 +26,7 @@ interface Props {
 const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, canSearch = true, searchQuery, form, isDataOnly = false }) => {
     const { updateQuery } = useUpdateQuery();
     const state = useOverlayTriggerState({});
-    const closeSlideOver = () => {
-        state.close();
-    };
-    const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: closeSlideOver }) : form;
+    const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: () => state.close() }) : form;
 
     const onSearchChange = React.useCallback(
         (query: string) => {
@@ -58,9 +55,18 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, 
                         </div>
                         <div className="flex items-center gap-3">
                             {canAdd && (
-                                <Button variant="primary" startContent={<Plus />} onClick={state.open}>
-                                    Add New
-                                </Button>
+                                <Overlay
+                                    open={state.isOpen}
+                                    title="Add New"
+                                    trigger={
+                                        <Button size="iconOnly" startContent={<Plus />}>
+                                            Add New
+                                        </Button>
+                                    }
+                                    onOpenChange={state.setOpen}
+                                >
+                                    {formWithHandler}
+                                </Overlay>
                             )}
                         </div>
                     </div>
@@ -90,11 +96,6 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canAdd = true, 
                 </div>
             </div>
             {pagination && pagination?.totalPages > 1 && <Pagination pagination={pagination} />}
-            {state.isOpen && (
-                <SlideOver className="bg-zinc-900" isOpen={state.isOpen} title="Add New" onClose={closeSlideOver}>
-                    {state.isOpen && formWithHandler}
-                </SlideOver>
-            )}
         </React.Fragment>
     );
 };

@@ -4,7 +4,7 @@ import type { NotificationPreview as NotificationPreviewType } from "@/utils/typ
 import { Button } from "@/components/ui/button";
 import { Bell, Send } from "nui-react-icons";
 import { api } from "@/trpc/react";
-import { useSnackbar } from "notistack";
+import { toast } from "sonner";
 
 interface NotificationPreviewProps {
     notification: NotificationPreviewType;
@@ -13,15 +13,13 @@ interface NotificationPreviewProps {
 export function NotificationPreview({ notification }: NotificationPreviewProps) {
     const utils = api.useUtils();
 
-    const { enqueueSnackbar } = useSnackbar();
-
     const mutation = api.push.notify.useMutation({
         onSuccess: async () => {
-            enqueueSnackbar("Notification sent successfully.", { variant: "success" });
+            toast.success("Notification sent successfully.");
             await utils.push.invalidate();
         },
         onError: (error: unknown) => {
-            enqueueSnackbar(`Error - ${error as string}`, { variant: "error" });
+            toast.error(`Error - ${error as string}`);
         },
     });
 
