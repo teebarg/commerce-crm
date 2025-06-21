@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Send, Users, BarChart3, FileText, Settings } from "lucide-react";
+import { Bell, Send, Users, BarChart3, FileText, Settings, History } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NotificationComposer from "./NotificationComposer";
@@ -82,6 +82,10 @@ const PushNotificationManager = () => {
                                 <FileText className="h-4 w-4" />
                                 <span className="hidden sm:inline">Templates</span>
                             </TabsTrigger>
+                            <TabsTrigger value="history" className="flex items-center gap-2">
+                                <History className="h-4 w-4" />
+                                <span className="hidden sm:inline">History</span>
+                            </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="compose">
@@ -95,6 +99,10 @@ const PushNotificationManager = () => {
                         <TabsContent value="templates">
                             <NotificationTemplates />
                         </TabsContent>
+
+                        <TabsContent value="history">
+              <NotificationHistory />
+            </TabsContent>
                     </Tabs>
                 </CardContent>
             </Card>

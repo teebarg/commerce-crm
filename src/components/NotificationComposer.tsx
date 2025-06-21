@@ -1,21 +1,42 @@
 import { useState } from "react";
-import { Send, Image, Link, Clock, Users, Sparkles } from "lucide-react";
+import { Send, Link, Clock, Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { api } from "@/trpc/react";
 
 const NotificationComposer = () => {
+    const utils = api.useUtils();
     const [title, setTitle] = useState("");
     const [message, setMessage] = useState("");
     const [actionUrl, setActionUrl] = useState("");
     const [iconUrl, setIconUrl] = useState("");
     const [scheduleEnabled, setScheduleEnabled] = useState(false);
-    const [scheduleTime, setScheduleTime] = useState("");
+    const [scheduleTime, setScheduleTime] = useState<string>("");
     const [targetAll, setTargetAll] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
+
+    const mutation = api.push.createNotification.useMutation({
+        onSuccess: async () => {
+            toast.success("Successful!", {
+                description: "Push notification sent successfully.",
+            });
+            await utils.push.invalidate();
+
+            setTitle("");
+            setMessage("");
+            setActionUrl("");
+            setIconUrl("");
+            setScheduleEnabled(false);
+            setScheduleTime("");
+            setTargetAll(true);
+        },
+        onError: (error: unknown) => {
+            toast.error(`Error - ${error as string}`);
+        },
+    });
 
     const handleSendNotification = async () => {
         if (!title || !message) {
@@ -25,34 +46,17 @@ const NotificationComposer = () => {
             return;
         }
 
-        setIsLoading(true);
-        console.log("Sending push notification:", { title, message, actionUrl, iconUrl });
-
-        try {
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-
-            toast.success("Notification Sent!", {
-                description: `Push notification "${title}" has been sent successfully.`,
-            });
-
-            // Reset form
-            setTitle("");
-            setMessage("");
-            setActionUrl("");
-            setIconUrl("");
-        } catch (error) {
-            toast.error("Send Failed", {
-                description: "Failed to send the push notification. Please try again.",
-            });
-        } finally {
-            setIsLoading(false);
-        }
+        mutation.mutate({
+            title: `${iconUrl} ${title}`,
+            body: message,
+            scheduledAt: scheduleEnabled ? new Date(scheduleTime) : undefined,
+            data: { actionUrl },
+            imageUrl: iconUrl,
+        });
     };
 
     return (
         <div className="space-y-6">
-            {/* Notification Preview */}
             <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-purple-700">
@@ -183,13 +187,12 @@ const NotificationComposer = () => {
                             </div>
 
                             <Button
+                                isLoading={mutation.isPending}
                                 onClick={handleSendNotification}
-                                disabled={isLoading || !title || !message}
-                                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                                disabled={mutation.isPending || !title || !message}
+                                className="w-full gradient-blue"
                             >
-                                {isLoading ? (
-                                    <>Loading...</>
-                                ) : scheduleEnabled ? (
+                                {scheduleEnabled ? (
                                     <>
                                         <Clock className="h-4 w-4 mr-2" />
                                         Schedule Notification

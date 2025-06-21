@@ -58,6 +58,14 @@ enum NotificationCategory {
   ANALYTICS
 }
 
+enum NotificationStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+
+  @@map("notification_statuses")
+}
+
 model PushSubscription {
   id       String  @id @default(cuid())
   endpoint String  @unique
@@ -231,6 +239,7 @@ model Notification {
   icon        String?
   imageUrl    String?
   data        Json?
+  status      NotificationStatus @default(DRAFT)
   sentAt      DateTime?
   scheduledAt DateTime?
   template    NotificationTemplate?   @relation(fields: [templateId], references: [id])

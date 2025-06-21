@@ -1,22 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Calendar, PlusCircle, BarChart3, Settings, Sparkles, Clock, Users, TrendingUp, Bell } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Settings, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import PostCreator from "@/components/PostCreator";
-import ContentCalendar from "@/components/ContentCalendar";
-import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import PushNotificationManager from "@/components/PushNotificationManager";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function PushNotification() {
-    const [activeTab, setActiveTab] = useState("dashboard");
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50">
-            {/* Header */}
             <header className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-50">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
@@ -39,22 +29,9 @@ export default function PushNotification() {
                 </div>
             </header>
 
-            {/* Navigation */}
             <div className="container mx-auto px-4 py-6">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-5 mb-8 bg-white/80 backdrop-blur-md">
-                        <TabsTrigger value="push" className="flex items-center gap-2">
-                            <Bell className="h-4 w-4" />
-                            <span className="hidden sm:inline">Push</span>
-                        </TabsTrigger>
-                    </TabsList>
-
-                    {/* Push Notifications */}
-                    <TabsContent value="push">
-                        <PushNotificationManager />
-                    </TabsContent>
-                </Tabs>
+                <PushNotificationManager />
             </div>
         </div>
     );
-};
+}

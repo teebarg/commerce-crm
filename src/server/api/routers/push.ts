@@ -2,21 +2,28 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { sendNotificationsToSubscribers } from "@/trpc/services";
-import { CreateNotificationSchema, NotificationSchema, PushSubscriptionSchema } from "@/schemas/notification.schema";
+import { CreateNotificationSchema, CreateNotificationTemplateSchema, NotificationSchema, PushSubscriptionSchema } from "@/schemas/notification.schema";
 
 export const pushNotificationRouter = createTRPCRouter({
-    templates: protectedProcedure
-        .query(async ({ ctx }) => {
-            const templates = await ctx.db.notification.findMany({
-                orderBy: { createdAt: "desc" },
-            });
+    templates: protectedProcedure.query(async ({ ctx }) => {
+        const templates = await ctx.db.notification.findMany({
+            orderBy: { createdAt: "desc" },
+        });
 
-            return {
-                templates,
-            };
-        }),
-    createTemplate: protectedProcedure.input(CreateNotificationSchema).mutation(async ({ ctx, input }) => {
+        return {
+            templates,
+        };
+    }),
+    createNotification: protectedProcedure.input(CreateNotificationSchema).mutation(async ({ ctx, input }) => {
+        console.log("🚀 ~ createNotification:protectedProcedure.input ~ input:", input)
         return ctx.db.notification.create({
+            data: {
+                ...input,
+            },
+        });
+    }),
+    createTemplate: protectedProcedure.input(CreateNotificationTemplateSchema).mutation(async ({ ctx, input }) => {
+        return ctx.db.notificationTemplate.create({
             data: {
                 ...input,
             },
@@ -52,7 +59,7 @@ export const pushNotificationRouter = createTRPCRouter({
             z.object({
                 title: z.string().min(1),
                 body: z.string().min(1),
-                group: z.string().default("bot")
+                group: z.string().default("bot"),
             })
         )
         .mutation(async ({ input, ctx }) => {
