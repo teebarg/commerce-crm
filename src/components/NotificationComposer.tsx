@@ -8,15 +8,16 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";
 
-const NotificationComposer = () => {
+const NotificationComposer: React.FC = () => {
     const utils = api.useUtils();
-    const [title, setTitle] = useState("");
-    const [message, setMessage] = useState("");
-    const [actionUrl, setActionUrl] = useState("");
-    const [iconUrl, setIconUrl] = useState("");
-    const [scheduleEnabled, setScheduleEnabled] = useState(false);
+    const [title, setTitle] = useState<string>("");
+    const [message, setMessage] = useState<string>("");
+    const [actionUrl, setActionUrl] = useState<string>("");
+    const [iconUrl, setIconUrl] = useState<string>("");
+    const [scheduleEnabled, setScheduleEnabled] = useState<boolean>(false);
+    const [sendNowEnabled, setSendNowEnabled] = useState<boolean>(false);
     const [scheduleTime, setScheduleTime] = useState<string>("");
-    const [targetAll, setTargetAll] = useState(true);
+    const [targetAll, setTargetAll] = useState<boolean>(true);
 
     const mutation = api.push.createNotification.useMutation({
         onSuccess: async () => {
@@ -50,6 +51,7 @@ const NotificationComposer = () => {
             title: `${iconUrl} ${title}`,
             body: message,
             scheduledAt: scheduleEnabled ? new Date(scheduleTime) : undefined,
+            status: scheduleEnabled ? "SCHEDULED" : sendNowEnabled ? "PUBLISHED" : "DRAFT",
             data: { actionUrl },
             imageUrl: iconUrl,
         });
@@ -141,13 +143,22 @@ const NotificationComposer = () => {
                     <CardContent className="space-y-6">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-purple-600" />
-                                <span className="text-sm font-medium">Schedule for later</span>
+                                <Send className="h-4 w-4 text-purple-600" />
+                                <span className="text-sm font-medium">Send Now</span>
                             </div>
-                            <Switch checked={scheduleEnabled} onCheckedChange={setScheduleEnabled} />
+                            <Switch checked={sendNowEnabled} onCheckedChange={setSendNowEnabled} />
                         </div>
+                        {!sendNowEnabled && (
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4 text-purple-600" />
+                                    <span className="text-sm font-medium">Schedule for later</span>
+                                </div>
+                                <Switch checked={scheduleEnabled} onCheckedChange={setScheduleEnabled} />
+                            </div>
+                        )}
 
-                        {scheduleEnabled && (
+                        {!sendNowEnabled && scheduleEnabled && (
                             <div>
                                 <label className="text-sm font-medium mb-2 block">Schedule Time</label>
                                 <Input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} />
@@ -200,7 +211,7 @@ const NotificationComposer = () => {
                                 ) : (
                                     <>
                                         <Send className="h-4 w-4 mr-2" />
-                                        Send Now
+                                        {sendNowEnabled ? "Send Now" : "Create Draft"}
                                     </>
                                 )}
                             </Button>

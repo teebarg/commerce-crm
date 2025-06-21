@@ -66,18 +66,15 @@ enum NotificationStatus {
   @@map("notification_statuses")
 }
 
-model PushSubscription {
-  id       String  @id @default(cuid())
-  endpoint String  @unique
-  p256dh   String
-  auth     String
-  group    String?
+enum NotificationEventType {
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  DISMISSED
+  FAILED
 
-  createdAt             DateTime?               @default(now()) @map("created_at")
-  updatedAt             DateTime?               @updatedAt @map("updated_at")
-  NotificationRecipient NotificationRecipient[]
-
-  @@map("push_subscriptions")
+  @@map("notification_event_types")
 }
 
 model Tenant {
@@ -146,8 +143,9 @@ model User {
   sessions      Session[]
   posts         Post[]
 
-  createdAt DateTime? @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  createdAt        DateTime?          @default(now()) @map("created_at")
+  updatedAt        DateTime?          @updatedAt @map("updated_at")
+  PushSubscription PushSubscription[]
 
   @@index([firstName, lastName])
   @@map("users")
@@ -186,7 +184,7 @@ model Platform {
   id        String         @id @default(uuid())
   name      String         @unique
   posts     PlatformPost[]
-  createdAt DateTime       @default(now())
+  createdAt DateTime       @default(now()) @map("created_at")
 
   @@map("platforms")
 }
@@ -194,16 +192,16 @@ model Platform {
 model PlatformPost {
   id             String     @id @default(uuid())
   post           Post       @relation(fields: [postId], references: [id])
-  postId         String
+  postId         String     @map("post_id")
   platform       Platform   @relation(fields: [platformId], references: [id])
-  platformId     String
-  platformPostId String? // ID returned from the platform (e.g. tweet ID)
+  platformId     String     @map("platform_id")
+  platformPostId String?    @map("platform_post_id")
   status         PostStatus @default(SCHEDULED) // Independent of parent post
-  scheduledAt    DateTime?
-  publishedAt    DateTime?
-  errorMessage   String? // If failed
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  scheduledAt    DateTime?  @map("scheduled_at")
+  publishedAt    DateTime?  @map("published_at")
+  errorMessage   String?    @map("error_message")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
 
   @@map("platform_posts")
 }
@@ -213,8 +211,8 @@ model Media {
   url       String
   type      MediaType
   post      Post      @relation(fields: [postId], references: [id])
-  postId    String
-  createdAt DateTime  @default(now())
+  postId    String    @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   @@map("media")
 }
@@ -226,25 +224,28 @@ model NotificationTemplate {
   body      String
   data      Json?
   category  NotificationCategory @default(GENERIC)
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
+  createdAt DateTime             @default(now()) @map("created_at")
+  updatedAt DateTime             @updatedAt @map("updated_at")
 
   notifications Notification[]
 }
 
 model Notification {
-  id          String                  @id @default(uuid())
+  id          String                @id @default(uuid())
   title       String
   body        String
   icon        String?
   imageUrl    String?
   data        Json?
-  status      NotificationStatus @default(DRAFT)
-  sentAt      DateTime?
-  scheduledAt DateTime?
-  template    NotificationTemplate?   @relation(fields: [templateId], references: [id])
-  templateId  String?
-  recipients  NotificationRecipient[]
+  status      NotificationStatus    @default(DRAFT)
+  sentAt      DateTime?             @map("sent_at")
+  scheduledAt DateTime?             @map("scheduled_at")
+  template    NotificationTemplate? @relation(fields: [templateId], references: [id])
+  templateId  String?               @map("template_id")
+  recipients  NotificationEvent[]
+
+  sentCount   Int @default(0) @map("sent_count")
+  failedCount Int @default(0) @map("failed_count")
 
   createdAt DateTime? @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -252,14 +253,37 @@ model Notification {
   @@map("notifications")
 }
 
-model NotificationRecipient {
-  id             String           @id @default(uuid())
-  notification   Notification     @relation(fields: [notificationId], references: [id])
-  notificationId String
-  subscriber     PushSubscription @relation(fields: [subscriberId], references: [id])
-  subscriberId   String
-  deliveredAt    DateTime?
-  readAt         DateTime?
+model PushSubscription {
+  id       String  @id @default(cuid())
+  endpoint String  @unique
+  p256dh   String
+  auth     String
+  group    String?
 
-  @@map("notification_recipients")
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  createdAt         DateTime?           @default(now()) @map("created_at")
+  updatedAt         DateTime?           @updatedAt @map("updated_at")
+  NotificationEvent NotificationEvent[]
+
+  @@map("push_subscriptions")
+}
+
+model NotificationEvent {
+  id             String                @id @default(cuid())
+  notification   Notification          @relation(fields: [notificationId], references: [id])
+  notificationId String                @map("notification_id")
+  subscriber     PushSubscription      @relation(fields: [subscriberId], references: [id])
+  subscriberId   String                @map("subscriber_id")
+  deliveredAt    DateTime?             @map("delivered_at")
+  readAt         DateTime?             @map("read_at")
+  eventType      NotificationEventType @map("event_type")
+  deviceType     DeviceType?           @map("device_type")
+  platform       String?
+  userAgent      String?               @map("user_agent")
+  occurredAt     DateTime              @default(now()) @map("occurred_at")
+
+  @@index([notificationId, subscriberId, eventType])
+  @@map("notification_events")
 }

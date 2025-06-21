@@ -5,13 +5,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NotificationComposer from "./NotificationComposer";
 import SubscriberManager from "./SubscriberManager";
 import NotificationTemplates from "./NotificationTemplates";
+import NotificationHistory from "./push/NotificationHistory";
 
 const PushNotificationManager = () => {
     const [activeSubTab, setActiveSubTab] = useState("compose");
 
     return (
         <div className="space-y-6">
-            {/* Header Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -101,8 +101,8 @@ const PushNotificationManager = () => {
                         </TabsContent>
 
                         <TabsContent value="history">
-              <NotificationHistory />
-            </TabsContent>
+                            <NotificationHistory />
+                        </TabsContent>
                     </Tabs>
                 </CardContent>
             </Card>
