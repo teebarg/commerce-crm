@@ -36,8 +36,8 @@ const UpdatePost: React.FC<Props> = ({ current }) => {
             toast.error(`Error - ${error as string}`);
         },
     });
-    const [scheduledFor, setScheduledFor] = useState<Date | undefined>(current?.scheduledTime ? new Date(current.scheduledTime) : undefined);
-    const [isScheduling, setIsScheduling] = useState<boolean>(!!current?.scheduledTime);
+    const [scheduledFor, setScheduledFor] = useState<Date | undefined>(current?.scheduledAt ? new Date(current.scheduledAt) : undefined);
+    const [isScheduling, setIsScheduling] = useState<boolean>(!!current?.scheduledAt);
 
     const formRef = useRef<HTMLFormElement>(null);
 
@@ -57,7 +57,7 @@ const UpdatePost: React.FC<Props> = ({ current }) => {
 
     interface UpdateData extends Form {
         id: Post["id"];
-        scheduledAt: Date | null;
+        scheduledAt: Date | undefined;
     }
 
     const onSubmit = (data: Form): void => {

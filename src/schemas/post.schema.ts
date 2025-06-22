@@ -24,8 +24,8 @@ export const PlatformPostSchema = z.object({
     platformId: z.string().uuid(),
     platformPostId: z.string().nullable().optional(),
     status: PostStatusEnum,
-    scheduledAt: z.string().datetime().nullable().optional(),
-    publishedAt: z.string().datetime().nullable().optional(),
+    scheduledAt: z.date().optional(),
+    publishedAt: z.date().optional(),
     errorMessage: z.string().nullable().optional(),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
@@ -37,8 +37,8 @@ export const PostSchema = z.object({
     title: z.string().nullable().optional(),
     content: z.string().nullable().optional(),
     status: PostStatusEnum,
-    scheduledAt: z.string().datetime().nullable().optional(),
-    publishedAt: z.string().datetime().nullable().optional(),
+    scheduledAt: z.date().optional(),
+    publishedAt: z.date().optional(),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
     media: z.array(MediaSchema),
@@ -59,7 +59,7 @@ export const CreatePostInput = z.object({
     title: z.string().optional(),
     content: z.string().optional(),
     status: PostStatusEnum.default("DRAFT"),
-    scheduledAt: z.string().datetime().optional(),
+    scheduledAt: z.date().optional(),
     media: z
         .array(
             z.object({
@@ -73,7 +73,7 @@ export const CreatePostInput = z.object({
             z.object({
                 platformId: z.string().uuid(),
                 status: PostStatusEnum.default("SCHEDULED"),
-                scheduledAt: z.string().datetime().optional(),
+                scheduledAt: z.date().optional(),
             })
         )
         .optional(),
@@ -93,6 +93,33 @@ export const UpdatePlatformPostInput = z.object({
     platformPostPlatformId: z.string().optional(),
 });
 
+// New schemas for enhanced post creation
+export const AIGenerationInput = z.object({
+    prompt: z.string().optional(),
+    platforms: z.array(z.string()),
+    tone: z.enum(["professional", "casual", "friendly", "enthusiastic", "formal"]).optional(),
+    industry: z.string().optional(),
+});
+
+export const EnhancedCreatePostInput = z.object({
+    content: z.string().min(1, "Content is required"),
+    platforms: z.array(z.string()).min(1, "At least one platform must be selected"),
+    scheduledAt: z.date().optional(),
+    media: z
+        .array(
+            z.object({
+                url: z.string().url(),
+                type: MediaTypeEnum,
+            })
+        )
+        .optional(),
+    publishNow: z.boolean().default(false),
+});
+
+export const PlatformSelectionInput = z.object({
+    platforms: z.array(z.string()).min(1, "At least one platform must be selected"),
+});
+
 export type Platform = z.infer<typeof PlatformSchema>;
 export type Media = z.infer<typeof MediaSchema>;
 export type PlatformPost = z.infer<typeof PlatformPostSchema>;
@@ -102,4 +129,7 @@ export type User = z.infer<typeof UserSchema>;
 export type CreatePostInput = z.infer<typeof CreatePostInput>;
 export type UpdatePostStatusInput = z.infer<typeof UpdatePostStatusInput>;
 export type UpdatePlatformPostInput = z.infer<typeof UpdatePlatformPostInput>;
+export type AIGenerationInput = z.infer<typeof AIGenerationInput>;
+export type EnhancedCreatePostInput = z.infer<typeof EnhancedCreatePostInput>;
+export type PlatformSelectionInput = z.infer<typeof PlatformSelectionInput>;
 

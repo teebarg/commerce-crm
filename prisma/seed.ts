@@ -16,6 +16,16 @@ async function main() {
         skipDuplicates: true,
     });
 
+    // Create default platforms
+    await prisma.platform.createMany({
+        data: [
+            { name: "instagram" },
+            { name: "twitter" },
+            { name: "facebook" },
+        ],
+        skipDuplicates: true,
+    });
+
     console.log("✅ Seeding complete!");
 }
 

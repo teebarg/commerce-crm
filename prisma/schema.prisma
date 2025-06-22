@@ -168,7 +168,7 @@ model Post {
   content       String?
   link          String?
   status        PostStatus     @default(DRAFT) // Draft, Scheduled, etc.
-  scheduledAt   DateTime?      @map("scheduled_at") @db.Timestamp(6)
+  scheduledAt   DateTime?      @map("scheduled_at")
   isPublished   Boolean?       @default(false) @map("is_published")
   publishedAt   DateTime?      @map("published_at") @db.Timestamp(6)
   platformPosts PlatformPost[] // One per platform

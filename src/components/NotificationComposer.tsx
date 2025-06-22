@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";
+import Image from "next/image";
 
 const NotificationComposer: React.FC = () => {
     const utils = api.useUtils();
@@ -72,7 +73,7 @@ const NotificationComposer: React.FC = () => {
                         <div className="flex items-start gap-3">
                             {iconUrl && (
                                 <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <img src={iconUrl} alt="Icon" className="w-6 h-6 rounded" />
+                                    <Image src={iconUrl} alt="Icon" className="w-6 h-6 rounded" />
                                 </div>
                             )}
                             <div className="flex-1 min-w-0">

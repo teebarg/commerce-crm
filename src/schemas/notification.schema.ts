@@ -17,10 +17,10 @@ export const NotificationSchema = z.object({
     data: z.record(z.any()).optional(),
     status: NotificationStatusEnum,
     group: z.string().default("bot"),
-    sentAt: z.string().datetime().nullable().optional(),
-    scheduledAt: z.string().datetime().nullable().optional(),
-    createdAt: z.string().datetime().nullable().optional(),
-    updatedAt: z.string().datetime().nullable().optional(),
+    sentAt: z.date().nullable().optional(),
+    scheduledAt: z.date().optional(),
+    createdAt: z.date().nullable().optional(),
+    updatedAt: z.date().nullable().optional(),
 });
 
 export const CreateNotificationSchema = z.object({
