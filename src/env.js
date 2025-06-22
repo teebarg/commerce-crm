@@ -30,6 +30,12 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     GEMINI_API_KEY: z.string(),
+
+    TWITTER_CONSUMER_KEY: z.string().optional(),
+    TWITTER_CONSUMER_SECRET: z.string().optional(),
+    TWITTER_ACCESS_TOKEN: z.string().optional(),
+    TWITTER_BEARER_TOKEN: z.string().optional(),
+    TWITTER_ACCESS_TOKEN_SECRET: z.string().optional(),
   },
 
   /**
@@ -64,6 +70,12 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+
+    TWITTER_CONSUMER_KEY: process.env.TWITTER_CONSUMER_KEY,
+    TWITTER_CONSUMER_SECRET: process.env.TWITTER_CONSUMER_SECRET,
+    TWITTER_ACCESS_TOKEN: process.env.TWITTER_ACCESS_TOKEN,
+    TWITTER_BEARER_TOKEN: process.env.TWITTER_BEARER_TOKEN,
+    TWITTER_ACCESS_TOKEN_SECRET: process.env.TWITTER_ACCESS_TOKEN_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

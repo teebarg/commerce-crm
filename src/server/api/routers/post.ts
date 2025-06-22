@@ -1,12 +1,9 @@
 import { z } from "zod";
-// import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { PostSchema, AIGenerationInput, EnhancedCreatePostInput } from "@/schemas/post.schema";
 import { env } from "@/env";
-
-// Initialize Gemini AI
-// const genAI = env.GEMINI_API_KEY ? new GoogleGenerativeAI(env.GEMINI_API_KEY) : null;
 
 export const postRouter = createTRPCRouter({
     all: protectedProcedure
@@ -107,21 +104,18 @@ export const postRouter = createTRPCRouter({
     }),
 
     generateAIContent: protectedProcedure.input(AIGenerationInput).mutation(async ({ input }) => {
-        // Temporarily return mock content until Gemini package is installed
         const { platforms, tone = "friendly", industry } = input;
+        const prompt = `Generate a social media post for the following industry: ${industry ?? "business"}.\nTone: ${tone}.\nPlatforms: ${platforms.join(", ")}.`;
 
-        const mockContent = `🚀 Ready to level up your ${industry ?? "business"} game!
-
-Here's a powerful reminder: Success isn't about having all the answers—it's about asking the right questions and taking consistent action.
-
-💡 Pro tip: Start each day with a clear intention and end it with reflection. Small steps, big impact!
-
-What's your biggest win this week? Share below! 👇
-
-#${industry?.toLowerCase().replace(/\s+/g, "") ?? "business"} #growth #motivation #success #${platforms[0]?.toLowerCase() ?? "socialmedia"}`;
+        const genAI = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+        const response = await genAI.models.generateContent({
+            model: "gemini-2.0-flash-001",
+            contents: prompt,
+        });
+        const content = response.text;
 
         return {
-            content: mockContent,
+            content,
             platforms,
             generatedAt: new Date().toISOString(),
         };
@@ -201,6 +195,11 @@ What's your biggest win this week? Share below! 👇
     deleteMedia: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
         return await ctx.db.media.delete({
             where: { id: input },
+        });
+    }),
+    getPlatforms: publicProcedure.query(async ({ ctx }) => {
+        return await ctx.db.platform.findMany({
+            orderBy: { name: "asc" },
         });
     }),
 });

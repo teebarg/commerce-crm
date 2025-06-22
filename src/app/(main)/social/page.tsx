@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, PlusCircle, BarChart3, Settings, Sparkles, Clock, Users, TrendingUp } from "lucide-react";
+import { PlusCircle, BarChart3, Settings, Sparkles, Clock, Users, TrendingUp, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import PostCreator from "@/components/PostCreator";
-import ContentCalendar from "@/components/ContentCalendar";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PostManager from "@/components/PostManager";
 
 const Index = () => {
     const [activeTab, setActiveTab] = useState("dashboard");
@@ -50,9 +50,9 @@ const Index = () => {
                             <PlusCircle className="h-4 w-4" />
                             <span className="hidden sm:inline">Create</span>
                         </TabsTrigger>
-                        <TabsTrigger value="calendar" className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            <span className="hidden sm:inline">Calendar</span>
+                        <TabsTrigger value="manage" className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            <span className="hidden sm:inline">Manage</span>
                         </TabsTrigger>
                         <TabsTrigger value="analytics" className="flex items-center gap-2">
                             <TrendingUp className="h-4 w-4" />
@@ -151,17 +151,14 @@ const Index = () => {
                         </Card>
                     </TabsContent>
 
-                    {/* Post Creation */}
                     <TabsContent value="create">
                         <PostCreator />
                     </TabsContent>
 
-                    {/* Calendar View */}
-                    <TabsContent value="calendar">
-                        <ContentCalendar />
+                    <TabsContent value="manage">
+                        <PostManager />
                     </TabsContent>
 
-                    {/* Analytics */}
                     <TabsContent value="analytics">
                         <AnalyticsDashboard />
                     </TabsContent>

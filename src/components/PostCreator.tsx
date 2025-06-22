@@ -30,7 +30,6 @@ interface MediaFile {
 const PostCreator = () => {
     const router = useRouter();
     const utils = api.useUtils();
-    const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
     const [aiPrompt, setAiPrompt] = useState<string>("");
     const [aiTone, setAiTone] = useState<string>("friendly");
@@ -80,7 +79,7 @@ const PostCreator = () => {
 
     const generateAIMutation = api.post.generateAIContent.useMutation({
         onSuccess: (data) => {
-            setValue("content", data.content);
+            setValue("content", data.content!);
             toast.success("AI Content Generated!", {
                 description: "Your post has been generated successfully.",
             });
@@ -89,6 +88,8 @@ const PostCreator = () => {
             toast.error(`AI generation failed: ${error.message}`);
         },
     });
+
+    const { isPending: isGenerating } = generateAIMutation;
 
     const platformOptions = [
         { id: "instagram", name: "Instagram", icon: Instagram, color: "bg-pink-500" },
@@ -107,19 +108,13 @@ const PostCreator = () => {
             toast.error("Please select at least one platform first");
             return;
         }
-
-        setIsGenerating(true);
-        try {
-            const input: AIGenerationInput = {
-                prompt: aiPrompt,
-                platforms: selectedPlatforms,
-                tone: aiTone as any,
-                industry: aiIndustry,
-            };
-            await generateAIMutation.mutateAsync(input);
-        } finally {
-            setIsGenerating(false);
-        }
+        const input: AIGenerationInput = {
+            prompt: aiPrompt,
+            platforms: selectedPlatforms,
+            tone: aiTone as any,
+            industry: aiIndustry,
+        };
+        await generateAIMutation.mutateAsync(input);
     };
 
     const handleMediaChange = (media: MediaFile[]) => {
@@ -172,7 +167,6 @@ const PostCreator = () => {
                         <CardDescription>Write your content or let AI help you create engaging posts</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {/* AI Generation Section */}
                         <div className="space-y-3 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-100">
                             <div className="flex items-center gap-2 mb-3">
                                 <Wand2 className="h-4 w-4 text-purple-600" />
@@ -180,20 +174,16 @@ const PostCreator = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div className="space-y-2">
-                                    <Label htmlFor="ai-prompt" className="text-sm">
-                                        Custom Prompt (Optional)
-                                    </Label>
-                                    <Input
-                                        id="ai-prompt"
-                                        placeholder="e.g., Share tips about productivity"
-                                        value={aiPrompt}
-                                        onChange={(e) => setAiPrompt(e.target.value)}
-                                    />
-                                </div>
+                                <Input
+                                    label="Custom Prompt (Optional)"
+                                    id="ai-prompt"
+                                    placeholder="e.g., Share tips about productivity"
+                                    value={aiPrompt}
+                                    onChange={(e) => setAiPrompt(e.target.value)}
+                                />
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="ai-tone" className="text-sm">
+                                    <Label htmlFor="ai-tone" className="text-sm mb-0.5 text-default-500">
                                         Tone
                                     </Label>
                                     <Select value={aiTone} onValueChange={setAiTone}>
@@ -276,7 +266,6 @@ const PostCreator = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-                {/* Platform Selection */}
                 <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                     <CardHeader>
                         <CardTitle>Select Platforms</CardTitle>
@@ -308,7 +297,6 @@ const PostCreator = () => {
                     </CardContent>
                 </Card>
 
-                {/* Action Buttons */}
                 <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                     <CardContent className="pt-6 space-y-3">
                         <Button onClick={handlePublishNow} className="w-full gradient-blue" size="lg" disabled={createPostMutation.isPending}>
@@ -322,7 +310,6 @@ const PostCreator = () => {
                     </CardContent>
                 </Card>
 
-                {/* Quick Stats */}
                 <Card className="gradient-blue">
                     <CardHeader>
                         <CardTitle className="text-sm opacity-90">Best Time to Post</CardTitle>
@@ -333,7 +320,6 @@ const PostCreator = () => {
                     </CardContent>
                 </Card>
 
-                {/* Media Preview */}
                 {mediaFiles.length > 0 && (
                     <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                         <CardHeader>
