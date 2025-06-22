@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Send, Users, BarChart3, FileText, Settings, History } from "lucide-react";
+import { Bell, Send, Users, BarChart3, FileText, History } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NotificationComposer from "./NotificationComposer";
