@@ -81,8 +81,8 @@ export const postRouter = createTRPCRouter({
     }),
 
     update: protectedProcedure.input(UpdatePostSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
-        const { id, media, ...updateData } = input
-        console.log("🚀 ~ file: post.ts:85 ~ media:", media)
+        const { id, media, ...updateData } = input;
+        console.log("🚀 ~ file: post.ts:85 ~ media:", media);
         return await ctx.db.post.update({
             where: { id },
             data: updateData,
@@ -93,77 +93,85 @@ export const postRouter = createTRPCRouter({
         return await ctx.db.post.delete({ where: { id: input } });
     }),
 
-    publish: protectedProcedure.input(z.object({
-        postId: z.string(),
-        platforms: z.array(z.string()),
-    })).mutation(async ({ ctx, input }) => {
-        const { postId, platforms } = input;
-        const post = await ctx.db.post.findUnique({
-            where: { id: postId },
-            include: {
-                media: true,
-                platformPosts: true,
-                user: {
-                    include: {
-                        settings: true,
+    publish: protectedProcedure
+        .input(
+            z.object({
+                postId: z.string(),
+                platforms: z.array(z.string()),
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            const { postId, platforms } = input;
+            const post = await ctx.db.post.findUnique({
+                where: { id: postId },
+                include: {
+                    media: true,
+                    platformPosts: true,
+                    user: {
+                        include: {
+                            settings: true,
+                        },
                     },
                 },
-            },
-        });
-        if (!post) throw new Error("Post not found");
-
-        const credentials = {
-            twitter: env.TWITTER_CONSUMER_KEY ? {} : undefined,
-            facebook: env.FACEBOOK_PAGE_ACCESS_TOKEN && env.FACEBOOK_PAGE_ID
-                ? { pageAccessToken: env.FACEBOOK_PAGE_ACCESS_TOKEN, pageId: env.FACEBOOK_PAGE_ID }
-                : undefined,
-            instagram: env.INSTAGRAM_USER_ID && env.INSTAGRAM_ACCESS_TOKEN
-                ? { igUserId: env.INSTAGRAM_USER_ID, accessToken: env.INSTAGRAM_ACCESS_TOKEN }
-                : undefined,
-        };
-
-        // Use the first media file as the main media (if any)
-        const mediaUrl = post?.media?.[0]?.url;
-        let text = post.content ?? "";
-        // Append default hashtags from user settings if present
-        const userSettings = post?.user?.settings;
-        if (userSettings?.defaultHashtags) {
-            text += `\n${userSettings.defaultHashtags}`;
-        }
-        // Pass handles and other settings to the posting service
-        const settings = userSettings ? {
-            instagram: userSettings.instagram,
-            twitter: userSettings.twitter,
-            facebook: userSettings.facebook,
-            timezone: userSettings.timezone,
-            defaultPostTime: userSettings.defaultPostTime,
-            notifications: userSettings.notifications,
-        } : undefined;
-        const results = await postToPlatforms({ text, mediaUrl, platforms, credentials, settings });
-
-        // Update platform post statuses
-        for (const platform of platforms) {
-            const platformRecord = await ctx.db.platform.findFirst({ where: { name: platform } });
-            if (!platformRecord) continue;
-            await ctx.db.platformPost.updateMany({
-                where: {
-                    postId: post.id,
-                    platformId: platformRecord.id,
-                },
-                data: {
-                    status: results[platform]?.error ? "FAILED" : "PUBLISHED",
-                    publishedAt: results[platform]?.error ? null : new Date(),
-                },
             });
-        }
-        // Update post status to PUBLISHED if all succeeded
-        const allSuccess = platforms.every((p) => !results[p]?.error);
-        await ctx.db.post.update({
-            where: { id: post.id },
-            data: { status: allSuccess ? "PUBLISHED" : "FAILED", publishedAt: allSuccess ? new Date() : null, isPublished: allSuccess },
-        });
-        return { success: true, results };
-    }),
+            if (!post) throw new Error("Post not found");
+
+            const credentials = {
+                twitter: env.TWITTER_CONSUMER_KEY ? {} : undefined,
+                facebook:
+                    env.FACEBOOK_PAGE_ACCESS_TOKEN && env.FACEBOOK_PAGE_ID
+                        ? { pageAccessToken: env.FACEBOOK_PAGE_ACCESS_TOKEN, pageId: env.FACEBOOK_PAGE_ID }
+                        : undefined,
+                instagram:
+                    env.INSTAGRAM_USER_ID && env.INSTAGRAM_ACCESS_TOKEN
+                        ? { igUserId: env.INSTAGRAM_USER_ID, accessToken: env.INSTAGRAM_ACCESS_TOKEN }
+                        : undefined,
+            };
+
+            // Use the first media file as the main media (if any)
+            const mediaUrl = post?.media?.[0]?.url;
+            let text = post.content ?? "";
+            // Append default hashtags from user settings if present
+            const userSettings = post?.user?.settings;
+            if (userSettings?.defaultHashtags) {
+                text += `\n${userSettings.defaultHashtags}`;
+            }
+            // Pass handles and other settings to the posting service
+            const settings = userSettings
+                ? {
+                      instagram: userSettings.instagram,
+                      twitter: userSettings.twitter,
+                      facebook: userSettings.facebook,
+                      timezone: userSettings.timezone,
+                      defaultPostTime: userSettings.defaultPostTime,
+                      notifications: userSettings.notifications,
+                  }
+                : undefined;
+            const results = await postToPlatforms({ text, mediaUrl, platforms, credentials, settings });
+
+            // Update platform post statuses
+            for (const platform of platforms) {
+                const platformRecord = await ctx.db.platform.findFirst({ where: { name: platform } });
+                if (!platformRecord) continue;
+                await ctx.db.platformPost.updateMany({
+                    where: {
+                        postId: post.id,
+                        platformId: platformRecord.id,
+                    },
+                    data: {
+                        status: results[platform]?.error ? "FAILED" : "PUBLISHED",
+                        publishedAt: results[platform]?.error ? null : new Date(),
+                    },
+                });
+            }
+            // Update post status to PUBLISHED if all succeeded
+            const allSuccess = platforms.every((p) => !results[p]?.error);
+            await ctx.db.post.update({
+                where: { id: post.id },
+                data: { status: allSuccess ? "PUBLISHED" : "FAILED", publishedAt: allSuccess ? new Date() : null, isPublished: allSuccess },
+            });
+            return { success: true, results };
+        }),
 
     platforms: protectedProcedure.query(async ({ ctx }) => {
         const platforms = await ctx.db.platform.findMany({
@@ -263,5 +271,40 @@ export const postRouter = createTRPCRouter({
         return await ctx.db.platform.findMany({
             orderBy: { name: "asc" },
         });
+    }),
+    duplicate: protectedProcedure.input(z.object({ postId: z.string() })).mutation(async ({ ctx, input }) => {
+        const post = await ctx.db.post.findUnique({
+            where: { id: input.postId },
+            include: {
+                media: true,
+                platformPosts: true,
+            },
+        });
+        if (!post) throw new Error("Post not found");
+        const newPost = await ctx.db.post.create({
+            data: {
+                userId: ctx.session.user.id,
+                content: post.content ? post.content + " (Copy)" : null,
+                title: post.title ? post.title + " (Copy)" : null,
+                media: {
+                    create: post.media.map((m) => ({
+                        url: m.url,
+                        type: m.type,
+                    })),
+                },
+                platformPosts: {
+                    create: post.platformPosts.map((pp) => ({
+                        platformId: pp.platformId,
+                    })),
+                },
+            },
+            include: {
+                media: true,
+                platformPosts: {
+                    include: { platform: true },
+                },
+            },
+        });
+        return newPost;
     }),
 });

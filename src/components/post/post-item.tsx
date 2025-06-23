@@ -23,6 +23,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
     const editState = useOverlayTriggerState({});
     const viewState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
+    const utils = api.useUtils();
 
     const deletePost = api.post.delete.useMutation({
         onSuccess: () => {
@@ -32,12 +33,24 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
         },
     });
 
+    const duplicatePost = api.post.duplicate.useMutation({
+        onSuccess: () => {
+            utils.post.invalidate();
+            toast.success("Post duplicated", {
+                description: "A copy of this post has been created as a draft.",
+            });
+        },
+        onError: (err) => {
+            toast.error("Failed to duplicate post", { description: err.message });
+        },
+    });
+
     const handleDeletePost = () => {
         deletePost.mutate(post.id);
     };
 
     const handleDuplicatePost = () => {
-        // TODO: Implement duplicate post functionality
+        duplicatePost.mutate({ postId: post.id });
     };
 
     const publishPost = api.post.publish.useMutation({
@@ -50,15 +63,6 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
 
     const handlePublishPost = () => {
         publishPost.mutate({ postId: post.id, platforms: post.platformPosts.map((pp: EnhancedPlatformPost) => pp.platform.name) });
-    };
-
-    const getStatusVariant = (status: string | undefined): "blue" | "emerald" | "yellow" => {
-        const variantMap = {
-            published: "emerald" as const,
-            scheduled: "blue" as const,
-            draft: "yellow" as const,
-        };
-        return variantMap[status as keyof typeof variantMap] || variantMap.draft;
     };
 
     const getVariant = (platform: string | undefined): "blue" | "emerald" | "yellow" => {
@@ -111,7 +115,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
                 </div>
             </TableCell>
             <TableCell>
-                <Badge variant={getStatusVariant(post.status)}>{post.status}</Badge>
+                <Badge variant="outline">{post.status}</Badge>
             </TableCell>
             <TableCell>
                 {post.status === "SCHEDULED" && post.scheduledAt && (

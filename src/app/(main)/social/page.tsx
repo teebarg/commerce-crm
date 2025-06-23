@@ -38,7 +38,6 @@ const Index = () => {
                 </div>
             </header>
 
-            {/* Navigation */}
             <div className="container mx-auto px-4 py-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-4 mb-8 bg-white/80 backdrop-blur-md">
@@ -60,7 +59,6 @@ const Index = () => {
                         </TabsTrigger>
                     </TabsList>
 
-                    {/* Dashboard Overview */}
                     <TabsContent value="dashboard" className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
@@ -108,7 +106,6 @@ const Index = () => {
                             </Card>
                         </div>
 
-                        {/* Recent Activity */}
                         <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">

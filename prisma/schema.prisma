@@ -194,7 +194,7 @@ model PlatformPost {
   platform       Platform   @relation(fields: [platformId], references: [id])
   platformId     String     @map("platform_id")
   platformPostId String?    @map("platform_post_id")
-  status         PostStatus @default(SCHEDULED) // Independent of parent post
+  status         PostStatus @default(DRAFT)
   scheduledAt    DateTime?  @map("scheduled_at")
   publishedAt    DateTime?  @map("published_at")
   errorMessage   String?    @map("error_message")
