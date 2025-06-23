@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Media, Platform, PlatformPost, Post } from "@prisma/client";
+import { type Media, type Platform, type PlatformPost, type Post } from "@prisma/client";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
@@ -12,6 +12,7 @@ import PostForm from "./post-edit-form";
 import { useOverlayTriggerState } from "react-stately";
 import { Confirm } from "../ui/confirm";
 import PostView from "./post-view";
+import Image from "next/image";
 
 interface EnhancedPlatformPost extends PlatformPost {
     platform: Platform;
@@ -26,12 +27,6 @@ const PostItem: React.FC<{ post: EnhancedPost }> = ({ post }) => {
     const editState = useOverlayTriggerState({});
     const viewState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
-
-    const platforms = [
-        { id: "instagram", name: "Instagram", color: "bg-pink-500" },
-        { id: "twitter", name: "Twitter", color: "bg-blue-500" },
-        { id: "facebook", name: "Facebook", color: "bg-blue-600" },
-    ];
 
     const deletePost = api.post.delete.useMutation({
         onSuccess: () => {
@@ -58,16 +53,7 @@ const PostItem: React.FC<{ post: EnhancedPost }> = ({ post }) => {
     });
 
     const handlePublishPost = () => {
-        publishPost.mutate(post.id);
-    };
-
-    const getStatusBadge = (status: string) => {
-        const variants = {
-            published: "bg-green-100 text-green-700",
-            scheduled: "bg-blue-100 text-blue-700",
-            draft: "bg-gray-100 text-gray-700",
-        };
-        return variants[status as keyof typeof variants] || variants.draft;
+        publishPost.mutate({ postId: post.id, platforms: post.platformPosts.map((pp: EnhancedPlatformPost) => pp.platform.name) });
     };
 
     const getStatusVariant = (status: string | undefined): "blue" | "emerald" | "yellow" => {
@@ -100,7 +86,7 @@ const PostItem: React.FC<{ post: EnhancedPost }> = ({ post }) => {
                     <div className="flex items-center gap-2">
                         <div className="flex -space-x-2">
                             {post.media.slice(0, 2).map((image: Media, index: number) => (
-                                <img
+                                <Image
                                     key={index}
                                     src={image.url}
                                     alt="Post image"

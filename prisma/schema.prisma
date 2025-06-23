@@ -142,7 +142,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   posts         Post[]
-
+  settings      UserSettings?
   createdAt        DateTime?          @default(now()) @map("created_at")
   updatedAt        DateTime?          @updatedAt @map("updated_at")
   PushSubscription PushSubscription[]
@@ -286,4 +286,20 @@ model NotificationEvent {
 
   @@index([notificationId, subscriberId, eventType])
   @@map("notification_events")
+}
+
+model UserSettings {
+  id            String   @id @default(uuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String   @unique
+  instagram     String?
+  twitter       String?
+  facebook      String?
+  tiktok        String?
+  defaultHashtags String?
+  timezone      String?  // e.g. 'UTC', 'America/New_York'
+  defaultPostTime String? // e.g. '15:00'
+  notifications Json?    // JSON object for notification preferences
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

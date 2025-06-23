@@ -36,6 +36,14 @@ export const env = createEnv({
     TWITTER_ACCESS_TOKEN: z.string().optional(),
     TWITTER_BEARER_TOKEN: z.string().optional(),
     TWITTER_ACCESS_TOKEN_SECRET: z.string().optional(),
+
+    FACEBOOK_PAGE_ACCESS_TOKEN: z.string().optional(),
+    FACEBOOK_PAGE_ID: z.string().optional(),
+
+    INSTAGRAM_USER_ID: z.string().optional(),
+    INSTAGRAM_ACCESS_TOKEN: z.string().optional(),
+
+    TIKTOK_ACCESS_TOKEN: z.string().optional(),
   },
 
   /**
@@ -76,6 +84,14 @@ export const env = createEnv({
     TWITTER_ACCESS_TOKEN: process.env.TWITTER_ACCESS_TOKEN,
     TWITTER_BEARER_TOKEN: process.env.TWITTER_BEARER_TOKEN,
     TWITTER_ACCESS_TOKEN_SECRET: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+
+    FACEBOOK_PAGE_ACCESS_TOKEN: process.env.FACEBOOK_PAGE_ACCESS_TOKEN,
+    FACEBOOK_PAGE_ID: process.env.FACEBOOK_PAGE_ID,
+
+    INSTAGRAM_USER_ID: process.env.INSTAGRAM_USER_ID,
+    INSTAGRAM_ACCESS_TOKEN: process.env.INSTAGRAM_ACCESS_TOKEN,
+
+    TIKTOK_ACCESS_TOKEN: process.env.TIKTOK_ACCESS_TOKEN,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import SocialImageManager from "./media-post/social-image-manager";
 import { EnhancedCreatePostInput, type AIGenerationInput } from "@/schemas/post.schema";
 import type { z } from "zod";
+import { Switch } from "@/components/ui/switch";
 
 interface MediaFile {
     id: string;
@@ -35,6 +36,7 @@ const PostCreator = () => {
     const [aiTone, setAiTone] = useState<string>("friendly");
     const [aiIndustry, setAiIndustry] = useState<string>("");
     const [scheduleTime, setScheduleTime] = useState<string>("");
+    const [postLater, setPostLater] = useState(false);
 
     // Fetch platforms
     const { data: platforms = [] } = api.post.platforms.useQuery();
@@ -95,6 +97,7 @@ const PostCreator = () => {
         { id: "instagram", name: "Instagram", icon: Instagram, color: "bg-pink-500" },
         { id: "twitter", name: "Twitter", icon: Twitter, color: "bg-blue-500" },
         { id: "facebook", name: "Facebook", icon: Facebook, color: "bg-blue-600" },
+        { id: "tiktok", name: "TikTok", icon: ImageIcon, color: "bg-black" },
     ];
 
     const togglePlatform = (platformId: string) => {
@@ -141,7 +144,7 @@ const PostCreator = () => {
 
     const handlePublishNow = async () => {
         setValue("publishNow", true);
-        setValue("scheduledAt", new Date(scheduleTime));
+        setValue("scheduledAt", postLater ? new Date(scheduleTime) : undefined);
         await handleSubmit(onSubmit)();
     };
 
@@ -151,6 +154,7 @@ const PostCreator = () => {
             return;
         }
         setValue("publishNow", false);
+        setValue("scheduledAt", new Date(scheduleTime));
         await handleSubmit(onSubmit)();
     };
 
@@ -250,7 +254,7 @@ const PostCreator = () => {
                 </Card>
 
                 {/* Scheduling */}
-                <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+                {/* <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Calendar className="h-5 w-5 text-blue-600" />
@@ -258,10 +262,18 @@ const PostCreator = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <Input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} />
-                        {errors.scheduledAt && <p className="text-sm text-red-500">{errors.scheduledAt.message}</p>}
+                        <div className="flex items-center gap-3 mb-2">
+                            <Switch id="post-later" checked={postLater} onCheckedChange={setPostLater} />
+                            <Label htmlFor="post-later">Post Later?</Label>
+                        </div>
+                        {postLater && (
+                            <>
+                                <Input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} />
+                                {errors.scheduledAt && <p className="text-sm text-red-500">{errors.scheduledAt.message}</p>}
+                            </>
+                        )}
                     </CardContent>
-                </Card>
+                </Card> */}
             </div>
 
             {/* Sidebar */}
@@ -299,14 +311,30 @@ const PostCreator = () => {
 
                 <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                     <CardContent className="pt-6 space-y-3">
-                        <Button onClick={handlePublishNow} className="w-full gradient-blue" size="lg" disabled={createPostMutation.isPending}>
-                            <Send className="h-4 w-4 mr-2" />
-                            {createPostMutation.isPending ? "Publishing..." : "Publish Now"}
-                        </Button>
-                        <Button variant="outline" onClick={handleSchedulePost} className="w-full" disabled={createPostMutation.isPending}>
-                            <Clock className="h-4 w-4 mr-2" />
-                            {createPostMutation.isPending ? "Scheduling..." : "Schedule Post"}
-                        </Button>
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 mb-2">
+                                <Switch id="post-later" checked={postLater} onCheckedChange={setPostLater} />
+                                <Label htmlFor="post-later">Post Later?</Label>
+                            </div>
+                            {postLater && (
+                                <>
+                                    <Input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} />
+                                    {errors.scheduledAt && <p className="text-sm text-red-500">{errors.scheduledAt.message}</p>}
+                                </>
+                            )}
+                        </div>
+                        {postLater && (
+                            <Button variant="outline" onClick={handleSchedulePost} className="w-full" disabled={createPostMutation.isPending}>
+                                <Clock className="h-4 w-4 mr-2" />
+                                {createPostMutation.isPending ? "Scheduling..." : "Schedule Post"}
+                            </Button>
+                        )}
+                        {!postLater && (
+                            <Button onClick={handlePublishNow} className="w-full gradient-blue" size="lg" disabled={createPostMutation.isPending}>
+                                <Send className="h-4 w-4 mr-2" />
+                                {createPostMutation.isPending ? "Publishing..." : "Publish Now"}
+                            </Button>
+                        )}
                     </CardContent>
                 </Card>
 

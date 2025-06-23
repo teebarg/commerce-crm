@@ -22,6 +22,7 @@ async function main() {
             { name: "instagram" },
             { name: "twitter" },
             { name: "facebook" },
+            { name: "tiktok" },
         ],
         skipDuplicates: true,
     });
