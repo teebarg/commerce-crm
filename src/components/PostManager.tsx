@@ -4,18 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Media, Platform, PlatformPost, Post } from "@prisma/client";
+import { Post } from "@prisma/client";
 import { api } from "@/trpc/react";
 import PostItem from "./post/post-item";
-
-interface EnhancedPlatformPost extends PlatformPost {
-    platform: Platform;
-}
-
-interface EnhancedPost extends Post {
-    media: Media[];
-    platformPosts: EnhancedPlatformPost[];
-}
+import { EnhancedPost, EnhancedPlatformPost } from "@/schemas/post.schema";
 
 const PostManager: React.FC = () => {
     const { data } = api.post.all.useQuery({});
@@ -26,9 +18,8 @@ const PostManager: React.FC = () => {
 
     const filteredPosts = posts?.filter((post: EnhancedPost) => {
         const statusMatch = filterStatus === "all" || post.status === filterStatus;
-        // const platformMatch = filterPlatform === "all" || post.platformPosts.some((pp: PlatformPost) => pp.platform.name.toLowerCase() === filterPlatform);
-        // return statusMatch && platformMatch;
-        return statusMatch;
+        const platformMatch = filterPlatform === "all" || post.platformPosts.some((pp: EnhancedPlatformPost) => pp.platform.name.toLowerCase() === filterPlatform);
+        return statusMatch && platformMatch;
     });
 
     return (
@@ -114,7 +105,6 @@ const PostManager: React.FC = () => {
                 </CardContent>
             </Card>
 
-            {/* Posts Table */}
             <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">

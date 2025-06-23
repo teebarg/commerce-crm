@@ -1,3 +1,4 @@
+import { Media, Platform, PlatformPost, Post } from "@prisma/client";
 import { z } from "zod";
 
 export const PostStatusEnum = z.enum(["DRAFT", "SCHEDULED", "PUBLISHED", "FAILED", "DELETED"]);
@@ -7,7 +8,7 @@ export const MediaTypeEnum = z.enum(["IMAGE", "VIDEO", "GIF"]);
 export const PlatformSchema = z.object({
     id: z.string().uuid(),
     name: z.string(),
-    createdAt: z.string().datetime(),
+    createdAt: z.date(),
 });
 
 export const MediaSchema = z.object({
@@ -15,7 +16,7 @@ export const MediaSchema = z.object({
     url: z.string().url(),
     type: MediaTypeEnum,
     postId: z.string().uuid(),
-    createdAt: z.string().datetime(),
+    createdAt: z.date(),
 });
 
 export const PlatformPostSchema = z.object({
@@ -27,8 +28,8 @@ export const PlatformPostSchema = z.object({
     scheduledAt: z.date().optional(),
     publishedAt: z.date().optional(),
     errorMessage: z.string().nullable().optional(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
 });
 
 export const PostSchema = z.object({
@@ -39,18 +40,28 @@ export const PostSchema = z.object({
     status: PostStatusEnum,
     scheduledAt: z.date().optional(),
     publishedAt: z.date().optional(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     media: z.array(MediaSchema),
     platformPosts: z.array(PlatformPostSchema),
+});
+
+export const UpdatePostSchema = z.object({
+    id: z.string().uuid(),
+    title: z.string().nullable().optional(),
+    content: z.string().nullable().optional(),
+    status: PostStatusEnum,
+    scheduledAt: z.date().nullable().optional(),
+    publishedAt: z.date().nullable().optional(),
+    media: z.array(MediaSchema),
 });
 
 export const UserSchema = z.object({
     id: z.string().uuid(),
     email: z.string().email(),
     name: z.string().nullable().optional(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     posts: z.array(PostSchema).optional(), // optional to avoid circular explosion
 });
 
@@ -113,17 +124,26 @@ export const EnhancedCreatePostInput = z.object({
             })
         )
         .optional(),
-    publishNow: z.boolean().default(false),
+    // publishNow: z.boolean().default(false),
+    status: PostStatusEnum.default("DRAFT"),
 });
+
+export interface EnhancedPlatformPost extends PlatformPost {
+    platform: Platform;
+}
+
+export interface EnhancedPost extends Post {
+    media: Media[];
+    platformPosts: EnhancedPlatformPost[];
+}
 
 export const PlatformSelectionInput = z.object({
     platforms: z.array(z.string()).min(1, "At least one platform must be selected"),
 });
 
-export type Platform = z.infer<typeof PlatformSchema>;
-export type Media = z.infer<typeof MediaSchema>;
-export type PlatformPost = z.infer<typeof PlatformPostSchema>;
-export type Post = z.infer<typeof PostSchema>;
+// export type Platform = z.infer<typeof PlatformSchema>;
+// export type Media = z.infer<typeof MediaSchema>;
+// export type PlatformPost = z.infer<typeof PlatformPostSchema>;
 export type User = z.infer<typeof UserSchema>;
 
 export type CreatePostInput = z.infer<typeof CreatePostInput>;

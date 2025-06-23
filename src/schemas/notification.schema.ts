@@ -55,8 +55,8 @@ export const NotificationTemplateSchema = z.object({
     imageUrl: z.string().optional(),
     data: z.record(z.any()).optional(),
     category: z.enum(["GENERIC", "ONBOARDING", "ENGAGEMENT", "REMINDER", "ANALYTICS"]),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
 });
 
 export const CreateNotificationTemplateSchema = z.object({

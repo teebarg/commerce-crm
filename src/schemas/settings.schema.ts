@@ -12,7 +12,6 @@ export const UserSettingsSchema = z.object({
   instagram: z.string().optional(),
   twitter: z.string().optional(),
   facebook: z.string().optional(),
-  tiktok: z.string().optional(),
   defaultHashtags: z.string().optional(),
   timezone: z.string().optional(),
   defaultPostTime: z.string().optional(),

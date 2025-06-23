@@ -2,7 +2,7 @@ import { z } from "zod";
 import { GoogleGenAI } from "@google/genai";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { PostSchema, AIGenerationInput, EnhancedCreatePostInput } from "@/schemas/post.schema";
+import { PostSchema, AIGenerationInput, EnhancedCreatePostInput, UpdatePostSchema } from "@/schemas/post.schema";
 import { env } from "@/env";
 import { postToPlatforms } from "@/server/services/platformPoster";
 
@@ -80,10 +80,9 @@ export const postRouter = createTRPCRouter({
         });
     }),
 
-    update: protectedProcedure.input(PostSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
-        const { id, media, platformPosts, ...updateData } = input;
-        console.log("🚀 ~ update:protectedProcedure.input ~ platformPosts:", platformPosts)
-        console.log("🚀 ~ update:protectedProcedure.input ~ media:", media)
+    update: protectedProcedure.input(UpdatePostSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
+        const { id, media, ...updateData } = input
+        console.log("🚀 ~ file: post.ts:85 ~ media:", media)
         return await ctx.db.post.update({
             where: { id },
             data: updateData,
@@ -113,7 +112,6 @@ export const postRouter = createTRPCRouter({
         });
         if (!post) throw new Error("Post not found");
 
-        // Prepare credentials (in real app, fetch from secure config/db)
         const credentials = {
             twitter: env.TWITTER_CONSUMER_KEY ? {} : undefined,
             facebook: env.FACEBOOK_PAGE_ACCESS_TOKEN && env.FACEBOOK_PAGE_ID
@@ -122,14 +120,13 @@ export const postRouter = createTRPCRouter({
             instagram: env.INSTAGRAM_USER_ID && env.INSTAGRAM_ACCESS_TOKEN
                 ? { igUserId: env.INSTAGRAM_USER_ID, accessToken: env.INSTAGRAM_ACCESS_TOKEN }
                 : undefined,
-            tiktok: env.TIKTOK_ACCESS_TOKEN ? { accessToken: env.TIKTOK_ACCESS_TOKEN } : undefined,
         };
 
         // Use the first media file as the main media (if any)
-        const mediaUrl = post.media[0]?.url;
+        const mediaUrl = post?.media?.[0]?.url;
         let text = post.content ?? "";
         // Append default hashtags from user settings if present
-        const userSettings = post.user?.settings;
+        const userSettings = post?.user?.settings;
         if (userSettings?.defaultHashtags) {
             text += `\n${userSettings.defaultHashtags}`;
         }
@@ -138,7 +135,6 @@ export const postRouter = createTRPCRouter({
             instagram: userSettings.instagram,
             twitter: userSettings.twitter,
             facebook: userSettings.facebook,
-            tiktok: userSettings.tiktok,
             timezone: userSettings.timezone,
             defaultPostTime: userSettings.defaultPostTime,
             notifications: userSettings.notifications,
@@ -169,7 +165,6 @@ export const postRouter = createTRPCRouter({
         return { success: true, results };
     }),
 
-    // New endpoints for enhanced functionality
     platforms: protectedProcedure.query(async ({ ctx }) => {
         const platforms = await ctx.db.platform.findMany({
             orderBy: { name: "asc" },
@@ -196,7 +191,7 @@ export const postRouter = createTRPCRouter({
     }),
 
     createEnhancedPost: protectedProcedure.input(EnhancedCreatePostInput).mutation(async ({ ctx, input }) => {
-        const { content, platforms, scheduledAt, media, publishNow } = input;
+        const { content, platforms, scheduledAt, media, status } = input;
         const userId = ctx.session.user.id;
         const platformRecords = await ctx.db.platform.findMany({
             where: { name: { in: platforms } },
@@ -205,16 +200,15 @@ export const postRouter = createTRPCRouter({
             throw new Error("Some platforms not found");
         }
         // If scheduling, set status to DRAFT. If publishing now, set to PUBLISHED.
-        const status = publishNow ? "PUBLISHED" : "DRAFT";
-        const publishedAt = publishNow ? new Date() : null;
+        // const publishedAt = status === "PUBLISHED" ? new Date() : null;
         const post = await ctx.db.post.create({
             data: {
                 userId,
                 content,
                 status,
                 scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
-                publishedAt,
-                isPublished: publishNow,
+                // publishedAt,
+                isPublished: false,
                 media: media
                     ? {
                           create: media.map((m) => ({
@@ -226,9 +220,9 @@ export const postRouter = createTRPCRouter({
                 platformPosts: {
                     create: platformRecords.map((platform) => ({
                         platformId: platform.id,
-                        status: publishNow ? "PUBLISHED" : "DRAFT",
+                        status,
                         scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
-                        publishedAt,
+                        // publishedAt,
                     })),
                 },
             },

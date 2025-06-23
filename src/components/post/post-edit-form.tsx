@@ -3,20 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Media, Platform, PlatformPost, Post } from "@prisma/client";
+import { Media, Platform } from "@prisma/client";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import PostMediaManager from "./post-media-manager";
 import { Input } from "@/components/ui/input";
-
-interface EnhancedPlatformPost extends PlatformPost {
-    platform: Platform;
-}
-
-interface EnhancedPost extends Post {
-    media: Media[];
-    platformPosts: EnhancedPlatformPost[];
-}
+import { EnhancedPost } from "@/schemas/post.schema";
 
 const PostForm: React.FC<{ post: EnhancedPost; onClose: () => void }> = ({ post, onClose }) => {
     const { data: platforms } = api.post.getPlatforms.useQuery();
@@ -31,7 +23,6 @@ const PostForm: React.FC<{ post: EnhancedPost; onClose: () => void }> = ({ post,
 
     const handleSaveEdit = () => {
         if (!post) return;
-
         updatePost.mutate({ ...post });
     };
 

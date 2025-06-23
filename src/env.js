@@ -42,8 +42,6 @@ export const env = createEnv({
 
     INSTAGRAM_USER_ID: z.string().optional(),
     INSTAGRAM_ACCESS_TOKEN: z.string().optional(),
-
-    TIKTOK_ACCESS_TOKEN: z.string().optional(),
   },
 
   /**
@@ -90,8 +88,6 @@ export const env = createEnv({
 
     INSTAGRAM_USER_ID: process.env.INSTAGRAM_USER_ID,
     INSTAGRAM_ACCESS_TOKEN: process.env.INSTAGRAM_ACCESS_TOKEN,
-
-    TIKTOK_ACCESS_TOKEN: process.env.TIKTOK_ACCESS_TOKEN,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

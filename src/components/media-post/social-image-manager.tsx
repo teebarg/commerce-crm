@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { removeMediaFromSupabase, uploadMediaToSupabase } from "@/lib/supabase";
 
 interface MediaFile {
     id: string;
@@ -19,13 +20,13 @@ interface MediaFile {
 interface SocialImageManagerProps {
     onMediaChange?: (media: MediaFile[]) => void;
     maxFiles?: number;
-    maxSize?: number; // in MB
+    maxSize?: number;
 }
 
 const SocialImageManager: React.FC<SocialImageManagerProps> = ({
     onMediaChange,
     maxFiles = 5,
-    maxSize = 10, // 10MB
+    maxSize = 10,
 }) => {
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
@@ -36,24 +37,28 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
                 return;
             }
 
-            const newMediaFiles: MediaFile[] = acceptedFiles.map((file) => {
-                const fileType = getFileType(file);
-                const url = URL.createObjectURL(file);
+            (async () => {
+                const newMediaFiles: MediaFile[] = await Promise.all(
+                    acceptedFiles.map(async (file) => {
+                        const fileType = getFileType(file);
+                        const url = await uploadMediaToSupabase(file, "story");
 
-                return {
-                    id: Math.random().toString(36).substr(2, 9),
-                    file,
-                    url,
-                    type: fileType,
-                    name: file.name,
-                };
-            });
+                        return {
+                            id: Math.random().toString(36).substr(2, 9),
+                            file,
+                            url,
+                            type: fileType,
+                            name: file.name,
+                        };
+                    })
+                );
 
-            const updatedFiles = [...mediaFiles, ...newMediaFiles];
-            setMediaFiles(updatedFiles);
-            onMediaChange?.(updatedFiles);
+                const updatedFiles = [...mediaFiles, ...newMediaFiles];
+                setMediaFiles(updatedFiles);
+                onMediaChange?.(updatedFiles);
 
-            toast.success(`${acceptedFiles.length} file(s) uploaded successfully`);
+                toast.success(`${acceptedFiles.length} file(s) uploaded successfully`);
+            })();
         },
         [mediaFiles, maxFiles, onMediaChange]
     );
@@ -64,7 +69,7 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
             "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"],
             "video/*": [".mp4", ".mov", ".avi", ".webm"],
         },
-        maxSize: maxSize * 1024 * 1024, // Convert to bytes
+        maxSize: maxSize * 1024 * 1024,
         multiple: true,
     });
 
@@ -75,7 +80,16 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
         return "VIDEO";
     };
 
-    const removeFile = (id: string) => {
+    const removeFile = async (id: string) => {
+        const fileToRemove = mediaFiles.find((file) => file.id === id);
+        if (fileToRemove && fileToRemove.url && fileToRemove.url.includes("supabase.co")) {
+            const success = await removeMediaFromSupabase(fileToRemove.url);
+            if (success) {
+                toast.success("File removed from Supabase");
+            } else {
+                toast.error("Failed to remove file from Supabase");
+            }
+        }
         const updatedFiles = mediaFiles.filter((file) => file.id !== id);
         setMediaFiles(updatedFiles);
         onMediaChange?.(updatedFiles);
@@ -92,13 +106,10 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
 
     return (
         <div className="space-y-4">
-            {/* Upload Area */}
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                    isDragActive
-                        ? "border-purple-400 bg-purple-50"
-                        : "border-gray-300 hover:border-gray-400"
+                    isDragActive ? "border-purple-400 bg-purple-50" : "border-gray-300 hover:border-gray-400"
                 }`}
             >
                 <input {...getInputProps()} />
@@ -107,17 +118,12 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
                     <p className="text-purple-600 font-medium">Drop the files here...</p>
                 ) : (
                     <div>
-                        <p className="text-gray-600 font-medium mb-2">
-                            Drag & drop files here, or click to select
-                        </p>
-                        <p className="text-sm text-gray-500">
-                            Supports: JPG, PNG, GIF, MP4, MOV (Max {maxSize}MB per file)
-                        </p>
+                        <p className="text-gray-600 font-medium mb-2">Drag & drop files here, or click to select</p>
+                        <p className="text-sm text-gray-500">Supports: JPG, PNG, GIF, MP4, MOV (Max {maxSize}MB per file)</p>
                     </div>
                 )}
             </div>
 
-            {/* File List */}
             {mediaFiles.length > 0 && (
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -133,20 +139,11 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
                                 <CardContent className="p-3">
                                     <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
                                         {file.type === "IMAGE" || file.type === "GIF" ? (
-                                            <img
-                                                src={file.url}
-                                                alt={file.name}
-                                                className="w-full h-full object-cover"
-                                            />
+                                            <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <video
-                                                src={file.url}
-                                                className="w-full h-full object-cover"
-                                                muted
-                                            />
+                                            <video src={file.url} className="w-full h-full object-cover" muted />
                                         )}
 
-                                        {/* Remove Button */}
                                         <Button
                                             variant="destructive"
                                             size="sm"
@@ -156,22 +153,14 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
                                             <X className="h-4 w-4" />
                                         </Button>
 
-                                        {/* File Type Badge */}
-                                        <Badge
-                                            variant="secondary"
-                                            className="absolute bottom-2 left-2 text-xs"
-                                        >
+                                        <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs">
                                             {file.type}
                                         </Badge>
                                     </div>
 
                                     <div className="mt-2">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
-                                            {file.name}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                            {formatFileSize(file.file.size)}
-                                        </p>
+                                        <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
+                                        <p className="text-xs text-gray-500">{formatFileSize(file.file.size)}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -180,7 +169,6 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
                 </div>
             )}
 
-            {/* Upload Progress (can be extended) */}
             {mediaFiles.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
                     <FileImage className="mx-auto h-12 w-12 mb-4 opacity-50" />

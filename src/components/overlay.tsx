@@ -31,7 +31,7 @@ const Overlay: React.FC<OverlayProps> = ({
 
     if (isDesktop) {
         return (
-            <Sheet open={open} onOpenChange={onOpenChange}>
+            <Sheet open={open} onOpenChange={onOpenChange} aria-describedby={undefined}>
                 <SheetTrigger asChild>{trigger}</SheetTrigger>
                 <SheetContent className={sheetClassName}>
                     <SheetHeader className={showHeader ? "" : "sr-only"}>
@@ -44,7 +44,7 @@ const Overlay: React.FC<OverlayProps> = ({
     }
 
     return (
-        <Drawer open={open} onOpenChange={onOpenChange}>
+        <Drawer open={open} onOpenChange={onOpenChange} aria-describedby={undefined}>
             <DrawerTrigger asChild>{trigger}</DrawerTrigger>
             <DrawerContent>
                 <DrawerHeader className={showHeader ? "" : "sr-only"}>

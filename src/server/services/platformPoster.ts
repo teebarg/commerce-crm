@@ -1,6 +1,5 @@
 import { env } from "@/env";
 
-// --- Twitter ---
 export async function postToTwitter({ text, mediaUrl, bearerToken, ...settings }: {
     text: string;
     mediaUrl?: string;
@@ -25,7 +24,6 @@ export async function postToTwitter({ text, mediaUrl, bearerToken, ...settings }
     return { success: true, message: "Twitter post published successfully", data };
 }
 
-// --- Facebook ---
 export async function postToFacebook({
     text,
     mediaUrl,
@@ -49,7 +47,6 @@ export async function postToFacebook({
     return { success: true, message: "Facebook post published successfully" };
 }
 
-// --- Instagram ---
 export async function postToInstagram({
     text,
     mediaUrl,
@@ -61,8 +58,7 @@ export async function postToInstagram({
     igUserId: string;
     accessToken: string;
 }) {
-    // Instagram Graph API: first create a media object, then publish it
-    // 1. Create media object
+
     const createMediaUrl = `https://graph.facebook.com/v19.0/${igUserId}/media`;
     const createRes = await fetch(
         createMediaUrl + `?image_url=${encodeURIComponent(mediaUrl)}&caption=${encodeURIComponent(text)}&access_token=${accessToken}`,
@@ -70,7 +66,7 @@ export async function postToInstagram({
     );
     const createData = await createRes.json();
     if (!createRes.ok) throw new Error(`${createData.error?.message ?? "Instagram media creation failed"}`);
-    // 2. Publish media object
+    
     const publishUrl = `https://graph.facebook.com/v19.0/${igUserId}/media_publish`;
     const publishRes = await fetch(publishUrl + `?creation_id=${createData.id}&access_token=${accessToken}`, { method: "POST" });
     const publishData = await publishRes.json();
@@ -78,19 +74,6 @@ export async function postToInstagram({
     return { success: true, message: "Instagram post published successfully" };
 }
 
-// --- TikTok ---
-export async function postToTikTok({ text, mediaUrl, accessToken }: { text: string; mediaUrl: string; accessToken: string }) {
-    console.log("🚀 ~ postToTikTok ~ mediaUrl:", mediaUrl)
-    console.log("🚀 ~ postToTikTok ~ text:", text)
-    // TikTok API: https://developers.tiktok.com/doc/login-kit-manage-videos/
-    // This is a placeholder; actual implementation requires OAuth and video upload
-    // For now, throw if no credentials
-    if (!accessToken) throw new Error("TikTok access token not set");
-    // ... implement TikTok upload logic here ...
-    return { success: true, message: "TikTok posting not fully implemented in this demo." };
-}
-
-// --- Main orchestrator ---
 export async function postToPlatforms({
     text,
     mediaUrl,
@@ -105,13 +88,11 @@ export async function postToPlatforms({
         twitter?: {};
         facebook?: { pageAccessToken: string; pageId: string };
         instagram?: { igUserId: string; accessToken: string };
-        tiktok?: { accessToken: string };
     };
     settings?: {
         instagram?: string;
         twitter?: string;
         facebook?: string;
-        tiktok?: string;
         timezone?: string;
         defaultPostTime?: string;
         notifications?: any;
@@ -128,9 +109,6 @@ export async function postToPlatforms({
             } else if (platform === "instagram") {
                 if (!credentials.instagram) throw new Error("Instagram credentials missing");
                 results.instagram = await postToInstagram({ text, mediaUrl: mediaUrl!, ...credentials.instagram, ...settings });
-            } else if (platform === "tiktok") {
-                if (!credentials.tiktok) throw new Error("TikTok credentials missing");
-                results.tiktok = await postToTikTok({ text, mediaUrl: mediaUrl!, ...credentials.tiktok, ...settings });
             }
         } catch (err: any) {
             results[platform] = { error: err.message };

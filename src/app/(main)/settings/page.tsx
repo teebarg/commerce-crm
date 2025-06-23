@@ -18,7 +18,6 @@ const defaultValues: UserSettingsInput = {
     instagram: "",
     twitter: "",
     facebook: "",
-    tiktok: "",
     defaultHashtags: "",
     timezone: "UTC",
     defaultPostTime: "09:00",
@@ -45,7 +44,6 @@ const Settings = () => {
             setValue("instagram", settings.instagram ?? "");
             setValue("twitter", settings.twitter ?? "");
             setValue("facebook", settings.facebook ?? "");
-            setValue("tiktok", settings.tiktok ?? "");
             setValue("defaultHashtags", settings.defaultHashtags ?? "");
             setValue("timezone", settings.timezone ?? "UTC");
             setValue("defaultPostTime", settings.defaultPostTime ?? "09:00");
@@ -89,7 +87,6 @@ const Settings = () => {
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="space-y-6">
-                        {/* Platform Handles */}
                         <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
@@ -123,17 +120,6 @@ const Settings = () => {
                                     />
 
                                     <Input label="Facebook Page" placeholder="Your Facebook Page Name" {...register("facebook")} />
-
-                                    <Input
-                                        label="TikTok Handle"
-                                        placeholder="your_tiktok_handle"
-                                        {...register("tiktok")}
-                                        startContent={
-                                            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                                                @
-                                            </span>
-                                        }
-                                    />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <Input label="Default Hashtags" placeholder="#marketing #growth" {...register("defaultHashtags")} startContent={<Hash className="h-4 w-4 text-gray-400" />} />
@@ -141,7 +127,6 @@ const Settings = () => {
                             </CardContent>
                         </Card>
 
-                        {/* Notification Settings */}
                         <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
@@ -211,7 +196,6 @@ const Settings = () => {
                             </CardContent>
                         </Card>
 
-                        {/* General Settings */}
                         <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">

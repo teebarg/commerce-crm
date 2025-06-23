@@ -27,8 +27,6 @@ enum PostStatus {
   DRAFT
   SCHEDULED
   PUBLISHED
-  FAILED
-  DELETED
 
   @@map("post_statuses")
 }
@@ -295,7 +293,6 @@ model UserSettings {
   instagram     String?
   twitter       String?
   facebook      String?
-  tiktok        String?
   defaultHashtags String?
   timezone      String?  // e.g. 'UTC', 'America/New_York'
   defaultPostTime String? // e.g. '15:00'

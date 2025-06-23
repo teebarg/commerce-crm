@@ -1,27 +1,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, MessageCircle, Share, MoreHorizontal, Bookmark } from "lucide-react";
-import { Media, Platform, PlatformPost, Post } from "@prisma/client";
 import { formatDate } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
-
-interface EnhancedPlatformPost extends PlatformPost {
-    platform: Platform;
-}
-
-interface EnhancedPost extends Post {
-    media: Media[];
-    platformPosts: EnhancedPlatformPost[];
-}
+import { EnhancedPlatformPost, EnhancedPost } from "@/schemas/post.schema";
+import { Media } from "@prisma/client";
 
 interface PostViewModalProps {
-    post: EnhancedPost | null;
-    onClose: () => void;
+    post: EnhancedPost;
 }
 
-const PostView: React.FC<PostViewModalProps> = ({ post, onClose }) => {
-    if (!post) return null;
-
+const PostView: React.FC<PostViewModalProps> = ({ post }) => {
     const getVariant = (platform: string | undefined): "blue" | "emerald" | "yellow" => {
         const variantMap = {
             instagram: "blue" as const,
@@ -68,9 +57,9 @@ const PostView: React.FC<PostViewModalProps> = ({ post, onClose }) => {
                         </div>
                         <Bookmark className="h-6 w-6" />
                     </div>
-                    <p className="text-sm">
+                    <div className="text-sm">
                         <span className="font-semibold">brand</span> <ReactMarkdown>{post.content}</ReactMarkdown>
-                    </p>
+                    </div>
                 </div>
             </CardContent>
         </Card>
@@ -164,8 +153,10 @@ const PostView: React.FC<PostViewModalProps> = ({ post, onClose }) => {
             <div className="flex items-center justify-between py-6 sticky top-0 bg-background px-4">
                 <span>Post Details</span>
                 <div className="flex items-center space-x-2">
-                    {post.platformPosts.map((platformPost: EnhancedPlatformPost) => (
-                        <Badge variant={getVariant(platformPost.platform.name)}>{platformPost.platform.name}</Badge>
+                    {post.platformPosts.map((platformPost: EnhancedPlatformPost, idx: number) => (
+                        <Badge key={idx} variant={getVariant(platformPost.platform.name)}>
+                            {platformPost.platform.name}
+                        </Badge>
                     ))}
                     <Badge variant={getStatusVariant(post.status)}>{post.status}</Badge>
                 </div>
@@ -211,13 +202,19 @@ const PostView: React.FC<PostViewModalProps> = ({ post, onClose }) => {
                             {post.status === "SCHEDULED" && post.scheduledAt && (
                                 <div>
                                     <p className="text-sm font-medium text-gray-700">Scheduled for:</p>
-                                    <p className="text-sm">{formatDate(post.scheduledAt)}</p>
+                                    <p className="text-sm">{formatDate(new Date(post.scheduledAt))}</p>
                                 </div>
                             )}
                             {post.status === "PUBLISHED" && post.publishedAt && (
                                 <div>
                                     <p className="text-sm font-medium text-gray-700">Published on:</p>
-                                    <p className="text-sm">{formatDate(post.publishedAt)}</p>
+                                    <p className="text-sm">{formatDate(new Date(post.publishedAt))}</p>
+                                </div>
+                            )}
+                            {post.status === "DRAFT" && (
+                                <div>
+                                    <p className="text-sm font-medium text-gray-700">Draft created on:</p>
+                                    <p className="text-sm">{formatDate(post.createdAt ? new Date(post.createdAt) : undefined)}</p>
                                 </div>
                             )}
                         </CardContent>

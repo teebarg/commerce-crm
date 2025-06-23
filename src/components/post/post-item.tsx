@@ -3,27 +3,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { type Media, type Platform, type PlatformPost, type Post } from "@prisma/client";
+import { type Media } from "@prisma/client";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
-import Overlay from "../overlay";
-import PostForm from "./post-edit-form";
+import Overlay from "@/components/overlay";
+import PostForm from "@/components/post/post-edit-form";
 import { useOverlayTriggerState } from "react-stately";
-import { Confirm } from "../ui/confirm";
-import PostView from "./post-view";
+import { Confirm } from "@/components/ui/confirm";
+import PostView from "@/components/post/post-view";
 import Image from "next/image";
+import { EnhancedPlatformPost, EnhancedPost } from "@/schemas/post.schema";
 
-interface EnhancedPlatformPost extends PlatformPost {
-    platform: Platform;
+interface PostItemProps {
+    post: EnhancedPost;
 }
 
-interface EnhancedPost extends Post {
-    media: Media[];
-    platformPosts: EnhancedPlatformPost[];
-}
-
-const PostItem: React.FC<{ post: EnhancedPost }> = ({ post }) => {
+const PostItem: React.FC<PostItemProps> = ({ post }) => {
     const editState = useOverlayTriggerState({});
     const viewState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
@@ -91,6 +87,8 @@ const PostItem: React.FC<{ post: EnhancedPost }> = ({ post }) => {
                                     src={image.url}
                                     alt="Post image"
                                     className="w-8 h-8 rounded-full object-cover border-2 border-white"
+                                    width={100}
+                                    height={100}
                                 />
                             ))}
                         </div>
@@ -146,9 +144,11 @@ const PostItem: React.FC<{ post: EnhancedPost }> = ({ post }) => {
                             </Overlay>
                         </>
                     )}
-                    <Button variant="ghost" size="sm" onClick={handleDuplicatePost}>
-                        <Copy className="h-4 w-4" />
-                    </Button>
+                    {post.status === "PUBLISHED" && (
+                        <Button variant="ghost" size="sm" onClick={handleDuplicatePost}>
+                            <Copy className="h-4 w-4" />
+                        </Button>
+                    )}
                     <Overlay
                         open={viewState.isOpen}
                         title="View Post"
@@ -160,7 +160,7 @@ const PostItem: React.FC<{ post: EnhancedPost }> = ({ post }) => {
                         onOpenChange={viewState.setOpen}
                         sheetClassName="min-w-[70vw]"
                     >
-                        <PostView onClose={viewState.close} post={post} />
+                        <PostView post={post} />
                     </Overlay>
 
                     <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Sparkles, Image as ImageIcon, Calendar, Send, Wand2, Instagram, Twitter, Facebook, Clock, Upload } from "lucide-react";
+import { Sparkles, Image as ImageIcon, Send, Wand2, Instagram, Twitter, Facebook, Clock, Upload } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,7 +14,6 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";
-import { useRouter } from "next/navigation";
 import SocialImageManager from "./media-post/social-image-manager";
 import { EnhancedCreatePostInput, type AIGenerationInput } from "@/schemas/post.schema";
 import type { z } from "zod";
@@ -29,7 +28,6 @@ interface MediaFile {
 }
 
 const PostCreator = () => {
-    const router = useRouter();
     const utils = api.useUtils();
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
     const [aiPrompt, setAiPrompt] = useState<string>("");
@@ -37,19 +35,13 @@ const PostCreator = () => {
     const [aiIndustry, setAiIndustry] = useState<string>("");
     const [scheduleTime, setScheduleTime] = useState<string>("");
     const [postLater, setPostLater] = useState(false);
-
-    // Fetch platforms
-    const { data: platforms = [] } = api.post.platforms.useQuery();
-
-    console.log("🚀 ~ PostCreator ~ platforms:", platforms);
-    // Form setup
     const form = useForm<z.infer<typeof EnhancedCreatePostInput>>({
         resolver: zodResolver(EnhancedCreatePostInput),
         defaultValues: {
             content: "",
             platforms: ["instagram"],
             scheduledAt: new Date(),
-            publishNow: false,
+            status: "DRAFT",
         },
     });
 
@@ -67,8 +59,7 @@ const PostCreator = () => {
         onSuccess: async () => {
             toast.success("Post created successfully!");
             await utils.post.invalidate();
-            router.refresh();
-            // Reset form
+ 
             form.reset();
             setMediaFiles([]);
             setAiPrompt("");
@@ -97,7 +88,6 @@ const PostCreator = () => {
         { id: "instagram", name: "Instagram", icon: Instagram, color: "bg-pink-500" },
         { id: "twitter", name: "Twitter", icon: Twitter, color: "bg-blue-500" },
         { id: "facebook", name: "Facebook", icon: Facebook, color: "bg-blue-600" },
-        { id: "tiktok", name: "TikTok", icon: ImageIcon, color: "bg-black" },
     ];
 
     const togglePlatform = (platformId: string) => {
@@ -126,15 +116,13 @@ const PostCreator = () => {
 
     const onSubmit = async (data: z.infer<typeof EnhancedCreatePostInput>) => {
         try {
-            // Convert media files to the expected format
             const media = mediaFiles.map((file) => ({
-                url: file.url, // In a real app, you'd upload to a CDN first
+                url: file.url,
                 type: file.type,
             }));
 
             await createPostMutation.mutateAsync({
                 ...data,
-                scheduledAt: new Date(scheduleTime),
                 media: media.length > 0 ? media : undefined,
             });
         } catch (error) {
@@ -142,9 +130,8 @@ const PostCreator = () => {
         }
     };
 
-    const handlePublishNow = async () => {
-        setValue("publishNow", true);
-        setValue("scheduledAt", postLater ? new Date(scheduleTime) : undefined);
+    const handleCreateDraft = async () => {
+        setValue("status", "DRAFT");
         await handleSubmit(onSubmit)();
     };
 
@@ -153,14 +140,13 @@ const PostCreator = () => {
             toast.error("Please select both date and time for scheduling");
             return;
         }
-        setValue("publishNow", false);
+        setValue("status", "SCHEDULED");
         setValue("scheduledAt", new Date(scheduleTime));
         await handleSubmit(onSubmit)();
     };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Content Creation */}
             <div className="lg:col-span-2 space-y-6">
                 <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
                     <CardHeader>
@@ -252,28 +238,6 @@ const PostCreator = () => {
                         </div>
                     </CardContent>
                 </Card>
-
-                {/* Scheduling */}
-                {/* <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Calendar className="h-5 w-5 text-blue-600" />
-                            Schedule Post
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="flex items-center gap-3 mb-2">
-                            <Switch id="post-later" checked={postLater} onCheckedChange={setPostLater} />
-                            <Label htmlFor="post-later">Post Later?</Label>
-                        </div>
-                        {postLater && (
-                            <>
-                                <Input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} />
-                                {errors.scheduledAt && <p className="text-sm text-red-500">{errors.scheduledAt.message}</p>}
-                            </>
-                        )}
-                    </CardContent>
-                </Card> */}
             </div>
 
             {/* Sidebar */}
@@ -284,12 +248,12 @@ const PostCreator = () => {
                         <CardDescription>Choose where to publish your post</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        {platformOptions.map((platform) => {
+                        {platformOptions.map((platform, idx: number) => {
                             const Icon = platform.icon;
                             const isSelected = selectedPlatforms?.includes(platform.id);
                             return (
                                 <div
-                                    key={platform.id}
+                                    key={idx}
                                     className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${
                                         isSelected ? "border-purple-300 bg-purple-50" : "border-gray-200 hover:border-gray-300"
                                     }`}
@@ -330,9 +294,9 @@ const PostCreator = () => {
                             </Button>
                         )}
                         {!postLater && (
-                            <Button onClick={handlePublishNow} className="w-full gradient-blue" size="lg" disabled={createPostMutation.isPending}>
+                            <Button onClick={handleCreateDraft} className="w-full gradient-blue" size="lg" disabled={createPostMutation.isPending}>
                                 <Send className="h-4 w-4 mr-2" />
-                                {createPostMutation.isPending ? "Publishing..." : "Publish Now"}
+                                {createPostMutation.isPending ? "Creating..." : "Create Draft"}
                             </Button>
                         )}
                     </CardContent>
@@ -355,8 +319,8 @@ const PostCreator = () => {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-2">
-                                {mediaFiles.map((file) => (
-                                    <div key={file.id} className="flex items-center gap-2 text-sm">
+                                {mediaFiles.map((file, idx: number) => (
+                                    <div key={idx} className="flex items-center gap-2 text-sm">
                                         <ImageIcon className="h-4 w-4 text-gray-500" />
                                         <span className="truncate">{file.name}</span>
                                         <Badge variant="outline" className="text-xs">
