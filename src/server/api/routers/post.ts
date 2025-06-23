@@ -82,10 +82,28 @@ export const postRouter = createTRPCRouter({
 
     update: protectedProcedure.input(UpdatePostSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
         const { id, media, ...updateData } = input;
-        console.log("🚀 ~ file: post.ts:85 ~ media:", media);
+        if (media) {
+            await ctx.db.media.deleteMany({
+                where: { postId: id },
+            });
+        }
+        const data = {
+            ...updateData,
+            media: media
+                ? {
+                      create: media.map((m) => ({
+                          url: m.url,
+                          type: m.type,
+                      })),
+                  }
+                : undefined,
+        };
         return await ctx.db.post.update({
             where: { id },
-            data: updateData,
+            data,
+            include: {
+                media: true,
+            },
         });
     }),
 

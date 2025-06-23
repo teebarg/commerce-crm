@@ -16,7 +16,7 @@ export const MediaSchema = z.object({
     url: z.string().url(),
     type: MediaTypeEnum,
     postId: z.string().uuid(),
-    createdAt: z.date(),
+    createdAt: z.date().nullable().optional(),
 });
 
 export const PlatformPostSchema = z.object({
@@ -28,8 +28,8 @@ export const PlatformPostSchema = z.object({
     scheduledAt: z.date().optional(),
     publishedAt: z.date().optional(),
     errorMessage: z.string().nullable().optional(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.date().nullable().optional(),
+    updatedAt: z.date().nullable().optional(),
 });
 
 export const PostSchema = z.object({
@@ -40,8 +40,8 @@ export const PostSchema = z.object({
     status: PostStatusEnum,
     scheduledAt: z.date().optional(),
     publishedAt: z.date().optional(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.date().nullable().optional(),
+    updatedAt: z.date().nullable().optional(),
     media: z.array(MediaSchema),
     platformPosts: z.array(PlatformPostSchema),
 });

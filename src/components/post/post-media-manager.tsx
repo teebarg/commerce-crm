@@ -2,11 +2,12 @@
 
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import {  X, Upload, FileImage } from "lucide-react";
+import { X, Upload, FileImage } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { uploadMediaToSupabase, removeMediaFromSupabase } from "@/lib/supabase";
 
 interface MediaFile {
     id: string;
@@ -19,41 +20,45 @@ interface MediaFile {
 interface PostMediaManagerProps {
     onMediaChange?: (media: MediaFile[]) => void;
     maxFiles?: number;
-    maxSize?: number; // in MB
+    maxSize?: number;
 }
 
 const PostMediaManager: React.FC<PostMediaManagerProps> = ({
     onMediaChange,
     maxFiles = 5,
-    maxSize = 10, // 10MB
+    maxSize = 10,
 }) => {
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
     const onDrop = useCallback(
-        (acceptedFiles: File[]) => {
+        async (acceptedFiles: File[]) => {
             if (mediaFiles.length + acceptedFiles.length > maxFiles) {
                 toast.error(`Maximum ${maxFiles} files allowed`);
                 return;
             }
 
-            const newMediaFiles: MediaFile[] = acceptedFiles.map((file) => {
-                const fileType = getFileType(file);
-                const url = URL.createObjectURL(file);
+            (async () => {
+                const toastId = toast.loading("Uploading media to Supabase...");
+                const newMediaFiles: MediaFile[] = await Promise.all(
+                    acceptedFiles.map(async (file) => {
+                        const fileType = getFileType(file);
+                        const url = await uploadMediaToSupabase(file, "story");
 
-                return {
-                    id: Math.random().toString(36).substr(2, 9),
-                    file,
-                    url,
-                    type: fileType,
-                    name: file.name,
-                };
-            });
+                        return {
+                            id: Math.random().toString(36).substr(2, 9),
+                            file,
+                            url,
+                            type: fileType,
+                            name: file.name,
+                        };
+                    })
+                );
 
-            const updatedFiles = [...mediaFiles, ...newMediaFiles];
-            setMediaFiles(updatedFiles);
-            onMediaChange?.(updatedFiles);
-
-            toast.success(`${acceptedFiles.length} file(s) uploaded successfully`);
+                const updatedFiles = [...mediaFiles, ...newMediaFiles];
+                setMediaFiles(updatedFiles);
+                onMediaChange?.(updatedFiles);
+                toast.success(`${acceptedFiles.length} file(s) uploaded successfully`, { id: toastId });
+            })();
         },
         [mediaFiles, maxFiles, onMediaChange]
     );
@@ -64,7 +69,7 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
             "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"],
             "video/*": [".mp4", ".mov", ".avi", ".webm"],
         },
-        maxSize: maxSize * 1024 * 1024, // Convert to bytes
+        maxSize: maxSize * 1024 * 1024,
         multiple: true,
     });
 
@@ -75,7 +80,15 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
         return "VIDEO";
     };
 
-    const removeFile = (id: string) => {
+    const removeFile = async (id: string, url?: string) => {
+        if (url && url.includes("supabase.co")) {
+            const success = await removeMediaFromSupabase(url);
+            if (success) {
+                toast.success("File removed from Supabase");
+            } else {
+                toast.error("Failed to remove file from Supabase");
+            }
+        }
         const updatedFiles = mediaFiles.filter((file) => file.id !== id);
         setMediaFiles(updatedFiles);
         onMediaChange?.(updatedFiles);
@@ -92,7 +105,6 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
 
     return (
         <div className="space-y-4">
-            {/* Upload Area */}
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
@@ -132,17 +144,15 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
                                             <video src={file.url} className="w-full h-full object-cover" muted />
                                         )}
 
-                                        {/* Remove Button */}
                                         <Button
                                             variant="destructive"
                                             size="sm"
                                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={() => removeFile(file.id)}
+                                            onClick={() => removeFile(file.id, file.url)}
                                         >
                                             <X className="h-4 w-4" />
                                         </Button>
 
-                                        {/* File Type Badge */}
                                         <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs">
                                             {file.type}
                                         </Badge>
@@ -159,7 +169,6 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
                 </div>
             )}
 
-            {/* Upload Progress (can be extended) */}
             {mediaFiles.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
                     <FileImage className="mx-auto h-12 w-12 mb-4 opacity-50" />
