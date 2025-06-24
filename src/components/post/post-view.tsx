@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, MessageCircle, Share, MoreHorizontal, Bookmark } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
-import { EnhancedPlatformPost, EnhancedPost } from "@/schemas/post.schema";
-import { Media } from "@prisma/client";
+import { type EnhancedPlatformPost, type EnhancedPost } from "@/schemas/post.schema";
+import { type Media } from "@prisma/client";
 
 interface PostViewModalProps {
     post: EnhancedPost;

@@ -4,10 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Post } from "@prisma/client";
+import { type Post } from "@prisma/client";
 import { api } from "@/trpc/react";
 import PostItem from "./post/post-item";
-import { EnhancedPost, EnhancedPlatformPost } from "@/schemas/post.schema";
+import { type EnhancedPost, type EnhancedPlatformPost } from "@/schemas/post.schema";
 
 const PostManager: React.FC = () => {
     const { data } = api.post.all.useQuery({});

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { api } from "@/trpc/react";
-import { NotificationTemplate } from "@prisma/client";
+import { type NotificationTemplate } from "@prisma/client";
 import { formatDate } from "@/lib/utils";
 import { Confirm } from "@/components/ui/confirm";
 import Overlay from "@/components/overlay";

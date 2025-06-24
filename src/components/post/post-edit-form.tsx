@@ -6,11 +6,11 @@ import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import PostMediaManager from "./post-media-manager";
 import { Input } from "@/components/ui/input";
-import { EnhancedPost } from "@/schemas/post.schema";
+import { type EnhancedPost } from "@/schemas/post.schema";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { type z } from "zod";
 import { UpdatePostSchema } from "@/schemas/post.schema";
 
 const PostForm: React.FC<{ post: EnhancedPost; onClose: () => void }> = ({ post, onClose }) => {

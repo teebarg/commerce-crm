@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { NotificationStatusEnum } from "@/schemas/notification.schema";
-import { Notification } from "@prisma/client";
+import { type Notification } from "@prisma/client";
 import { formatDate } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import NotificationActions from "./NotificationActions";

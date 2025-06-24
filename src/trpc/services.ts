@@ -1,6 +1,6 @@
 import webpush from "web-push";
-import { PushSubscription } from "@prisma/client";
-import { Notify } from "@/schemas/notification.schema";
+import { type PushSubscription } from "@prisma/client";
+import { type Notify } from "@/schemas/notification.schema";
 
 export const sendNotificationsToSubscribers = async (subscriptions: PushSubscription[], notification: Notify) => {
     const failedSubscriptions: any[] = [];

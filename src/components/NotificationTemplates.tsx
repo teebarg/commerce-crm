@@ -8,7 +8,7 @@ import { TemplateForm } from "./notification/template-form";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import Overlay from "./overlay";
 import { api } from "@/trpc/react";
-import { NotificationTemplate } from "@prisma/client";
+import { type NotificationTemplate } from "@prisma/client";
 import NotificationTemplateItem from "./notification/notification-template-item";
 
 const NotificationTemplates: React.FC = () => {

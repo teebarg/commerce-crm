@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { CreateNotificationTemplateSchema, NotificationTemplateSchema } from "@/schemas/notification.schema";
+import { CreateNotificationTemplateSchema } from "@/schemas/notification.schema";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { NotificationTemplate } from "@prisma/client";
+import { type NotificationTemplate } from "@prisma/client";
 
 const NOTIFICATION_CATEGORIES = ["GENERIC", "ONBOARDING", "ENGAGEMENT", "REMINDER", "ANALYTICS"];
 
@@ -63,10 +63,10 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ onClose, template, mode }, _
         defaultValues: mode === "update" && template ? template : {},
     });
 
-    const title = watch("title") || "";
-    const body = watch("body") || "";
-    const code = watch("code") || "";
-    const data = watch("data") || "";
+    const title = watch("title") ?? "";
+    const body = watch("body") ?? "";
+    const code = watch("code") ?? "";
+    const data = watch("data") ?? "";
 
     const onSubmit = (data: any): void => {
         if (mode === "update" && template) {

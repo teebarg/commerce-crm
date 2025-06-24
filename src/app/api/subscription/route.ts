@@ -20,7 +20,7 @@ export async function GET(req: Request) {
             const httpCode = getHTTPStatusCodeFromError(cause);
             return NextResponse.json({ error: cause.message }, { status: httpCode });
         }
-        return NextResponse.json({ message: "Internal server error" + cause }, { status: 500 });
+        return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }
 
@@ -40,6 +40,6 @@ export async function POST(req: Request) {
             const httpCode = getHTTPStatusCodeFromError(cause);
             return NextResponse.json({ error: cause.message }, { status: httpCode });
         }
-        return NextResponse.json({ message: "Internal server error" + cause }, { status: 500 });
+        return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }

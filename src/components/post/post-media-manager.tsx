@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { uploadMediaToSupabase, removeMediaFromSupabase } from "@/lib/supabase";
+import Image from "next/image";
 
 interface MediaFile {
     id: string;
@@ -37,7 +38,7 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
                 return;
             }
 
-            (async () => {
+            void (async () => {
                 const toastId = toast.loading("Uploading media to Supabase...");
                 const newMediaFiles: MediaFile[] = await Promise.all(
                     acceptedFiles.map(async (file) => {
@@ -64,6 +65,7 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
     );
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onDrop,
         accept: {
             "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"],
@@ -81,7 +83,7 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
     };
 
     const removeFile = async (id: string, url?: string) => {
-        if (url && url.includes("supabase.co")) {
+        if (url?.includes("supabase.co")) {
             const success = await removeMediaFromSupabase(url);
             if (success) {
                 toast.success("File removed from Supabase");
@@ -139,7 +141,7 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
                                 <CardContent className="p-3">
                                     <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
                                         {file.type === "IMAGE" || file.type === "GIF" ? (
-                                            <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
+                                            <Image src={file.url} alt={file.name} className="w-full h-full object-cover" width={100} height={100} />
                                         ) : (
                                             <video src={file.url} className="w-full h-full object-cover" muted />
                                         )}

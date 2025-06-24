@@ -82,7 +82,7 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
 
     const removeFile = async (id: string) => {
         const fileToRemove = mediaFiles.find((file) => file.id === id);
-        if (fileToRemove && fileToRemove.url && fileToRemove.url.includes("supabase.co")) {
+        if (fileToRemove?.url?.includes("supabase.co")) {
             const success = await removeMediaFromSupabase(fileToRemove.url);
             if (success) {
                 toast.success("File removed from Supabase");

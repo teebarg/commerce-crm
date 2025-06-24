@@ -1,4 +1,4 @@
-import { Media, Platform, PlatformPost, Post } from "@prisma/client";
+import { type Media, type Platform, type PlatformPost, type Post } from "@prisma/client";
 import { z } from "zod";
 
 export const PostStatusEnum = z.enum(["DRAFT", "SCHEDULED", "PUBLISHED", "FAILED", "DELETED"]);

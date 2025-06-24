@@ -18,7 +18,7 @@ export async function uploadMediaToSupabase(file: File, folder = "media") {
 }
 
 export function getSupabasePathFromUrl(url: string): string | undefined {
-    const match = url.match(/media\/([^?]+)/);
+    const match = /media\/([^?]+)/.exec(url);
     return match ? `media/${match[1]}` : undefined;
 }
 

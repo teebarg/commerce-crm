@@ -2,7 +2,7 @@ import { Edit, Trash2, Play, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { NotificationStatusEnum } from "@/schemas/notification.schema";
-import { Notification } from "@prisma/client";
+import { type Notification } from "@prisma/client";
 import { api } from "@/trpc/react";
 import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "@react-stately/overlays";

@@ -13,7 +13,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { Confirm } from "@/components/ui/confirm";
 import PostView from "@/components/post/post-view";
 import Image from "next/image";
-import { EnhancedPlatformPost, EnhancedPost } from "@/schemas/post.schema";
+import { type EnhancedPlatformPost, type EnhancedPost } from "@/schemas/post.schema";
 
 interface PostItemProps {
     post: EnhancedPost;
@@ -35,7 +35,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
 
     const duplicatePost = api.post.duplicate.useMutation({
         onSuccess: () => {
-            utils.post.invalidate();
+            void utils.post.invalidate();
             toast.success("Post duplicated", {
                 description: "A copy of this post has been created as a draft.",
             });

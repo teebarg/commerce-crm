@@ -4,7 +4,7 @@ import React, { forwardRef, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 
-import { Notification } from "@prisma/client";
+import { type Notification } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { type z } from "zod";
