@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 import React, { forwardRef, useRef } from "react";
 import { api } from "@/trpc/react";

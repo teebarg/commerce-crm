@@ -148,7 +148,7 @@ const PostCreator = () => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-                <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+                <Card className="bg-default-100 backdrop-blur-md border-0 shadow-lg">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Sparkles className="h-5 w-5 text-purple-600" />
@@ -157,7 +157,7 @@ const PostCreator = () => {
                         <CardDescription>Write your content or let AI help you create engaging posts</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="space-y-3 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-100">
+                        <div className="space-y-3 p-4 bg-card rounded-lg">
                             <div className="flex items-center gap-2 mb-3">
                                 <Wand2 className="h-4 w-4 text-purple-600" />
                                 <Label className="font-medium">AI Content Generator</Label>

@@ -17,7 +17,7 @@ const PostForm: React.FC<{ post: EnhancedPost; onClose: () => void }> = ({ post,
     const utils = api.useUtils();
     const updatePost = api.post.update.useMutation({
         onSuccess: () => {
-            utils.post.invalidate();
+            void utils.post.invalidate();
             toast.success("Post Updated", {
                 description: "The post has been successfully updated.",
             });

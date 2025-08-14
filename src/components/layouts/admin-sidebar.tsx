@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, Network, BarChart3, Send, History, FileText } from "lucide-react";
+import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, Network, BarChart3, Send, History, FileText, PlusCircle, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -46,15 +46,25 @@ const AdminItems = [
 
 const Socials = [
     {
-        title: "Socials",
+        title: "Dashboard",
         url: "/social",
-        icon: Network,
+        icon: BarChart3,
     },
-    // {
-    //     title: "Posts",
-    //     url: "/posts",
-    //     icon: MessageSquare,
-    // },
+    {
+        title: "Create",
+        url: "/social/create",
+        icon: PlusCircle,
+    },
+    {
+        title: "Manage",
+        url: "/social/manage",
+        icon: FileText,
+    },
+    {
+        title: "Analytics",
+        url: "/social/analytics",
+        icon: TrendingUp,
+    },
 ];
 
 const PushNotification = [
@@ -129,7 +139,7 @@ export function AdminSidebar({ session }: { session: any | null }) {
                         <SidebarMenu>
                             {Socials.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
-                                    <SidebarMenuButton asChild isActive={path === item.url}>
+                                    <SidebarMenuButton asChild isActive={path === item.url || (item.url !== "/social" && path.startsWith(item.url))}>
                                         <Link href={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>
