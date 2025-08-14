@@ -58,20 +58,20 @@ const NotificationActions: React.FC<NotificationActionsProps> = ({ notification 
     return (
         <div className="flex items-center gap-2">
             {notification.status === NotificationStatusEnum.Values.PUBLISHED && (
-                <Button size="sm" variant="outline" onClick={handleSendNow} className="h-8 px-2">
+                <Button size="icon" onClick={handleSendNow} variant="outline">
                     <RefreshCw className="h-3 w-3" />
                 </Button>
             )}
             {notification.status !== NotificationStatusEnum.Values.PUBLISHED && (
                 <>
-                    <Button size="sm" variant="outline" onClick={handleSendNow} className="h-8 px-2">
+                    <Button size="icon" variant="outline" onClick={handleSendNow}>
                         <Play className="h-3 w-3" />
                     </Button>
                     <Overlay
                         open={editState.isOpen}
                         title={`Edit ${notification.title}`}
                         trigger={
-                            <Button size="sm" variant="outline" className="h-8 px-2">
+                            <Button size="icon" variant="outline">
                                 <Edit className="h-3 w-3" />
                             </Button>
                         }
@@ -83,7 +83,7 @@ const NotificationActions: React.FC<NotificationActionsProps> = ({ notification 
             )}
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="h-8 px-2 text-red-600 hover:text-red-700">
+                    <Button size="icon" variant="outline" className="text-red-600 hover:text-red-700">
                         <Trash2 className="h-3 w-3" />
                     </Button>
                 </DialogTrigger>

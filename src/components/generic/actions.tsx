@@ -7,13 +7,13 @@ import { Edit, Eye } from "nui-react-icons";
 import React, { cloneElement, isValidElement } from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { useRouter } from "next/navigation";
-import { Tooltip } from "@/components/ui/tooltip";
 import { Confirm } from "@/components/ui/confirm";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
     label?: string;
@@ -42,10 +42,13 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
     return (
         <div className="relative flex items-center gap-2">
             {showDetails && (
-                <Tooltip content="Details">
-                    <span className="text-lg text-gray-500 cursor-pointer active:opacity-50">
-                        <Eye />
-                    </span>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Eye className="text-gray-500 cursor-pointer active:opacity-50" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Details</p>
+                    </TooltipContent>
                 </Tooltip>
             )}
             <Overlay

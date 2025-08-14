@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:20
 
 WORKDIR /app
 
@@ -6,7 +6,6 @@ RUN apt-get update && apt-get install -y \
     python3 \
     make \
     g++ \
-    git \
     libssl-dev \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*

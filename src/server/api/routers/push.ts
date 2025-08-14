@@ -33,6 +33,7 @@ export const pushNotificationRouter = createTRPCRouter({
         return ctx.db.notification.create({
             data: {
                 ...input,
+                sentAt: input.status === "PUBLISHED" ? new Date() : undefined,
             },
         });
     }),
@@ -83,7 +84,7 @@ export const pushNotificationRouter = createTRPCRouter({
         // update notification status to published
         await ctx.db.notification.update({
             where: { id: input.id },
-            data: { status: "PUBLISHED", sentCount: sentSubscriptions.length, failedCount: failedSubscriptions.length },
+            data: { status: "PUBLISHED", sentCount: sentSubscriptions.length, failedCount: failedSubscriptions.length, sentAt: new Date() },
         });
         return { message: "Notification sent successfully" };
     }),

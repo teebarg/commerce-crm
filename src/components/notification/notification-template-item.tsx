@@ -60,17 +60,17 @@ const NotificationTemplateItem: React.FC<NotificationTemplateItemProps> = ({ tem
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-3">
+                <div className="bg-default-50 rounded-lg p-3">
                     <h4 className="font-medium text-sm mb-1">{template.title}</h4>
-                    <p className="text-sm text-gray-600">{template.body}</p>
+                    <p className="text-sm text-default-500">{template.body}</p>
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center justify-between text-xs text-default-500">
                     <span>Created {formatDate(template.createdAt)}</span>
                 </div>
 
                 <div className="flex gap-2">
-                    <Button size="sm" className="flex-1" onClick={() => handleUseTemplate(template)}>
+                    <Button className="flex-1" onClick={() => handleUseTemplate(template)}>
                         Use Template
                     </Button>
                     <Button variant="outline" size="icon" onClick={() => handleCopyTemplate(template)}>
@@ -80,7 +80,7 @@ const NotificationTemplateItem: React.FC<NotificationTemplateItemProps> = ({ tem
                         open={editState.isOpen}
                         title={`Edit ${template.title}`}
                         trigger={
-                            <Button size="icon" variant="outline" className="px-2">
+                            <Button size="icon" variant="outline">
                                 <Edit className="h-4 w-4" />
                             </Button>
                         }
@@ -90,7 +90,7 @@ const NotificationTemplateItem: React.FC<NotificationTemplateItemProps> = ({ tem
                     </Overlay>
                     <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                         <DialogTrigger asChild>
-                            <Button size="icon" variant="outline" className="px-2 text-red-600 hover:text-red-700">
+                            <Button size="icon" variant="outline" className="text-red-600 hover:text-red-700">
                                 <Trash2 className="h-4 w-4" />
                             </Button>
                         </DialogTrigger>

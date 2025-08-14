@@ -186,6 +186,7 @@ export const authConfig = {
                 session.user.id = token.sub;
                 session.user.firstName = (token.user as User).firstName!;
                 session.user.lastName = (token.user as User).lastName!;
+                session.user.name = (token.user as User).firstName! + " " + (token.user as User).lastName!;
             }
             return session;
         },

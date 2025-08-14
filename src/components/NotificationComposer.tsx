@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Send, Link, Clock, Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -59,17 +61,21 @@ const NotificationComposer: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
-            <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+        <div className="space-y-6 px-4 py-2">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Compose Notification</h1>
+                <p className="text-muted-foreground">Create and send push notifications to your subscribers</p>
+            </div>
+            <Card className="bg-gradient-to-r from-purple-300 to-blue-400">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-purple-700">
                         <Sparkles className="h-5 w-5" />
                         Notification Preview
                     </CardTitle>
-                    <CardDescription>See how your notification will appear to users</CardDescription>
+                    <CardDescription className="text-purple-500">See how your notification will appear to users</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="bg-white rounded-lg p-4 shadow-sm border">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
                         <div className="flex items-start gap-3">
                             {iconUrl && (
                                 <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -162,7 +168,7 @@ const NotificationComposer: React.FC = () => {
                         {!sendNowEnabled && scheduleEnabled && (
                             <div>
                                 <label className="text-sm font-medium mb-2 block">Schedule Time</label>
-                                <Input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} />
+                                <Input type="date" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} />
                             </div>
                         )}
 
