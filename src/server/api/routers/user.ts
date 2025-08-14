@@ -84,7 +84,7 @@ export const userRouter = createTRPCRouter({
                 where: { userId },
                 data: {
                     ...input,
-                    notifications: input.notifications ?? existing.notifications,
+                    notifications: input.notifications ?? existing.notifications ?? {},
                 },
             });
         } else {
@@ -92,6 +92,7 @@ export const userRouter = createTRPCRouter({
                 data: {
                     userId,
                     ...input,
+                    notifications: input.notifications ?? {},
                 },
             });
         }
