@@ -10,9 +10,3 @@ export interface SearchParams {
     page?: number;
     limit?: number;
 }
-
-export interface NotificationPreview {
-    title: string
-    body: string
-    icon?: string | null
-}
