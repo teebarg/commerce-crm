@@ -177,7 +177,7 @@ export const postRouter = createTRPCRouter({
                         platformId: platformRecord.id,
                     },
                     data: {
-                        status: results[platform]?.error ? "FAILED" : "PUBLISHED",
+                        status: results[platform]?.error ? "DRAFT" : "PUBLISHED",
                         publishedAt: results[platform]?.error ? null : new Date(),
                     },
                 });
@@ -186,7 +186,7 @@ export const postRouter = createTRPCRouter({
             const allSuccess = platforms.every((p) => !results[p]?.error);
             await ctx.db.post.update({
                 where: { id: post.id },
-                data: { status: allSuccess ? "PUBLISHED" : "FAILED", publishedAt: allSuccess ? new Date() : null, isPublished: allSuccess },
+                data: { status: allSuccess ? "PUBLISHED" : "DRAFT", publishedAt: allSuccess ? new Date() : null, isPublished: allSuccess },
             });
             return { success: true, results };
         }),

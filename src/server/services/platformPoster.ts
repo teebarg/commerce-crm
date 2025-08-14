@@ -90,12 +90,12 @@ export async function postToPlatforms({
         instagram?: { igUserId: string; accessToken: string };
     };
     settings?: {
-        instagram?: string;
-        twitter?: string;
-        facebook?: string;
-        timezone?: string;
-        defaultPostTime?: string;
-        notifications?: any;
+        instagram?: string | null;
+        twitter?: string | null;
+        facebook?: string | null;
+        timezone?: string | null;
+        defaultPostTime?: string | null;
+        notifications?: any | null;
     };
 }) {
     const results: Record<string, any> = {};
