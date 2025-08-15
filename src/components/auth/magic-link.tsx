@@ -22,7 +22,7 @@ const MagicLink: React.FC<Props> = ({ onBack }) => {
         e.preventDefault();
         setLoading(true);
 
-        await signIn("email", {
+        await signIn("http-email", {
             email,
             callbackUrl,
         });

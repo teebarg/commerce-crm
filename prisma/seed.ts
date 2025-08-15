@@ -1,12 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import argon2 from "argon2";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
     console.log("🌱 Seeding database...");
 
-    const hash = await argon2.hash("password");
+    const hash = await bcrypt.hash("password", 10);
 
     await prisma.user.createMany({
         data: [
