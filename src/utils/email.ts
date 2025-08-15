@@ -1,11 +1,8 @@
-export const runtime = "nodejs";
-
 // import nodemailer from "nodemailer";
 import fs from "fs";
 import path from "path";
 import handlebars from "handlebars";
 import { env } from "@/env";
-import { createTransport } from "nodemailer";
 
 // interface EmailOptions {
 //     to: string;
@@ -58,33 +55,5 @@ export async function renderEmail(templateName: string, data: Record<string, str
         app_name: env.APP_NAME,
         contact_email: env.CONTACT_EMAIL,
         base_url: env.BASE_URL,
-    });
-}
-
-export async function handleSendVerificationRequest({ email, url, provider }: { email: string; url: string; provider: any }) {
-    const transport = createTransport(provider.server);
-    const emailHtml = await renderEmail("magic-link", { magic_link_url: url });
-
-    // Text version
-    const textTemplate = handlebars.compile(`
-        Sign in to your account
-
-        Click this link to sign in:
-        {{url}}
-
-        This link will expire in 24 hours and can only be used once.
-        If you didn't request this email, you can safely ignore it.
-
-        ---
-        {{env.NEXT_PUBLIC_NAME}} Team
-    `);
-    const emailText = textTemplate({ url });
-
-    await transport.sendMail({
-        to: email,
-        from: provider.from,
-        subject: "Sign in to your account",
-        text: emailText,
-        html: emailHtml,
     });
 }

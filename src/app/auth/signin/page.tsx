@@ -47,13 +47,13 @@ const AuthUI = () => {
                         <div className="space-y-3">
                             <Google />
 
-                            <button
+                            {/* <button
                                 onClick={() => setAuthMode("email")}
                                 className="w-full flex items-center justify-center py-3 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-750 transition-all duration-200 group shadow-sm hover:shadow-md"
                             >
                                 <Send className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
                                 <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">Continue with Magic Link</span>
-                            </button>
+                            </button> */}
                         </div>
                     )}
                 </div>

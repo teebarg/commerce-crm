@@ -1,5 +1,3 @@
-export const runtime = "nodejs";
-
 import { NextResponse } from "next/server";
 import { env } from "@/env";
 import { createTransport } from "nodemailer";
@@ -7,7 +5,6 @@ import { renderEmail } from "@/utils/email";
 import handlebars from "handlebars";
 
 export async function POST(req: Request) {
-	console.log("🚀 ~ file: send-verification.ts:10 ~ req:", req)
 	try {
 		const secret = req.headers.get("x-auth-secret");
 		if (!secret || secret !== env.AUTH_SECRET) {

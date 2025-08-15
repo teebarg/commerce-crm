@@ -1,16 +1,11 @@
-export const runtime = "nodejs";
-
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type User, type DefaultSession, type NextAuthConfig } from "next-auth";
-// import CredentialsProvider from "next-auth/providers/credentials";
-// import argon2 from "argon2";
-// import EmailProvider from "next-auth/providers/email";
+import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import bcrypt from "bcryptjs";
 
 import { db } from "@/server/db";
-// import { env } from "@/env";
-import { handleSendVerificationRequest } from "@/utils/email";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -51,56 +46,51 @@ declare module "next-auth" {
  */
 export const authConfig = {
     providers: [
-        // CredentialsProvider({
-        //     id: "next-auth",
-        //     name: "email",
-        //     async authorize(credentials) {
-        //         try {
-        //             const user = await db.user.findUnique({
-        //                 where: {
-        //                     email: credentials.email as string,
-        //                 },
-        //             });
+        CredentialsProvider({
+            id: "next-auth",
+            name: "email",
+            async authorize(credentials) {
+                try {
+                    const user = await db.user.findUnique({
+                        where: {
+                            email: credentials.email as string,
+                        },
+                    });
 
-        //             if (user?.password && credentials?.password) {
-        //                 const validPassword = await argon2.verify(user.password, credentials?.password as string);
+                    if (user?.password && credentials?.password) {
+                        const validPassword = await bcrypt.compare(credentials?.password as string, user.password);
 
-        //                 if (validPassword) {
-        //                     return {
-        //                         id: user.id,
-        //                         email: user.email,
-        //                         firstName: user.firstName,
-        //                         lastName: user.lastName,
-        //                     };
-        //                 }
-        //             }
-        //         } catch (error) {
-        //             console.log(error);
-        //         }
-        //         return null;
-        //     },
-        //     credentials: {
-        //         email: {
-        //             label: "Email",
-        //             type: "text",
-        //             placeholder: "example@email.com",
-        //         },
-        //         password: {
-        //             label: "Password",
-        //             type: "password",
-        //         },
-        //     },
-        // }),
-        // EmailProvider({
-        //     server: {
-        //         host: env.EMAIL_SERVER,
-        //         port: env.EMAIL_SERVER_PORT,
-        //         auth: {
-        //             user: env.EMAIL_SERVER_USER,
-        //             pass: env.EMAIL_SERVER_PASSWORD,
-        //         },
-        //     },
-        //     from: env.EMAIL_FROM,
+                        if (validPassword) {
+                            return {
+                                id: user.id,
+                                email: user.email,
+                                firstName: user.firstName,
+                                lastName: user.lastName,
+                            };
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+                return null;
+            },
+            credentials: {
+                email: {
+                    label: "Email",
+                    type: "text",
+                    placeholder: "example@email.com",
+                },
+                password: {
+                    label: "Password",
+                    type: "password",
+                },
+            },
+        }),
+        // {
+        //     id: "http-email",
+        //     name: "Email",
+        //     type: "email",
+        //     maxAge: 60 * 60,
         //     async sendVerificationRequest({ identifier: email, url }) {
         //         try {
         //             const endpoint = `${env.BASE_URL}/api/auth/send-verification`;
@@ -113,60 +103,11 @@ export const authConfig = {
         //                 body: JSON.stringify({ email, url }),
         //             });
         //         } catch (error) {
+        //             console.log("🚀 ~ file: config.ts:134 ~ error:", error);
         //             throw new Error(error as string);
         //         }
         //     },
-        // }),
-        {
-            id: "http-email",
-            name: "Email",
-            type: "email",
-            maxAge: 60 * 60,
-            // async sendVerificationRequest({ identifier: email, url }) {
-            //     try {
-            //         const endpoint = `${env.BASE_URL}/api/auth/send-verification`;
-            //         await fetch(endpoint, {
-            //             method: "POST",
-            //             headers: {
-            //                 "content-type": "application/json",
-            //                 "x-auth-secret": env.AUTH_SECRET ?? "",
-            //             },
-            //             body: JSON.stringify({ email, url }),
-            //         });
-            //     } catch (error) {
-            //         console.log("🚀 ~ file: config.ts:134 ~ error:", error);
-            //         // throw new Error(error as string);
-            //     }
-            // },
-            async sendVerificationRequest({ identifier: email, url, provider }) {
-                handleSendVerificationRequest({ email, url, provider });
-                // const transport = createTransport(provider.server);
-                // const emailHtml = await renderEmail("magic-link", { magic_link_url: url });
-
-                // // Text version
-                // const textTemplate = handlebars.compile(`
-                //     Sign in to your account
-
-                //     Click this link to sign in:
-                //     {{url}}
-
-                //     This link will expire in 24 hours and can only be used once.
-                //     If you didn't request this email, you can safely ignore it.
-
-                //     ---
-                //     {{env.NEXT_PUBLIC_NAME}} Team
-                // `);
-                // const emailText = textTemplate({ url });
-
-                // await transport.sendMail({
-                //     to: email,
-                //     from: provider.from,
-                //     subject: "Sign in to your account",
-                //     text: emailText,
-                //     html: emailHtml,
-                // });
-            },
-        },
+        // },
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -185,13 +126,13 @@ export const authConfig = {
     },
     callbacks: {
         async signIn({ user, account }) {
-            if (account?.provider === "email" || account?.provider === "google") {
+            if (account?.provider === "email") {
                 const existingUser = await db.user.findUnique({
                     where: { email: user.email! },
                 });
 
-                // const uuid = crypto.randomUUID();
-                // const hash = await argon2.hash(uuid);
+                const uuid = crypto.randomUUID();
+                const hash = await bcrypt.hash(uuid, 10);
 
                 if (!existingUser) {
                     await db.user.create({
@@ -200,20 +141,45 @@ export const authConfig = {
                             firstName: "User",
                             lastName: "User",
                             status: "PENDING",
-                            password: "random",
+                            password: hash,
                         },
                     });
                 }
             }
             return true;
         },
-        jwt({ token, user }) {
-            if (user) {
+        async jwt({ token, user, account, profile }) {
+            if (!account) {
+                return token;
+            }
+            if (account?.provider === "google" && profile) {
+                await db.user.upsert({
+                    where: { email: user.email! },
+                    create: {
+                        firstName: profile.given_name,
+                        lastName: profile.family_name,
+                        image: profile.picture,
+                        email: user.email!,
+                        status: "ACTIVE",
+                        password: "",
+                    },
+                    update: {
+                        firstName: profile.given_name,
+                        lastName: profile.family_name,
+                        image: profile.picture,
+                    },
+                });
+            }
+            const existingUser = await db.user.findUnique({
+                where: { email: user.email! },
+            });
+            if (existingUser) {
                 token.user = {
-                    id: user.id,
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
+                    id: existingUser.id,
+                    email: existingUser.email,
+                    firstName: existingUser.firstName,
+                    lastName: existingUser.lastName,
+                    image: existingUser.image,
                 };
             }
 
