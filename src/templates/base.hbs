@@ -1,0 +1,287 @@
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Crm Email Template</title>
+        <style>
+            /* Reset styles for email clients */
+            body,
+            table,
+            td,
+            p,
+            a,
+            li,
+            blockquote {
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+            }
+
+            table,
+            td {
+                mso-table-lspace: 0pt;
+                mso-table-rspace: 0pt;
+            }
+
+            img {
+                -ms-interpolation-mode: bicubic;
+                border: 0;
+                height: auto;
+                line-height: 100%;
+                outline: none;
+                text-decoration: none;
+            }
+
+            /* Base styles */
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: #f8fdf9;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            }
+
+            .email-container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #16a085 0%, #27ae60 100%) !important;
+                padding: 40px 20px;
+                text-align: center;
+            }
+
+            .logo {
+                color: #ffffff;
+                font-size: 32px;
+                font-weight: bold;
+                margin: 0;
+                text-decoration: none;
+            }
+
+            .tagline {
+                color: #e8f8f5;
+                font-size: 14px;
+                margin: 8px 0 0 0;
+            }
+
+            .content {
+                padding: 40px 30px;
+            }
+
+            .greeting {
+                font-size: 18px;
+                color: #2c3e50;
+                margin: 0 0 20px 0;
+                font-weight: 600;
+            }
+
+            .message {
+                font-size: 16px;
+                color: #34495e;
+                line-height: 1.6;
+                margin: 0 0 30px 0;
+            }
+
+            .cta-button {
+                display: inline-block;
+                background: linear-gradient(135deg, #27ae60 0%, #16a085 100%) !important;
+                color: #ffffff !important;
+                padding: 16px 32px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 16px;
+                margin: 20px 0;
+                box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            .cta-button:hover {
+                box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+                transform: translateY(-2px);
+            }
+
+            .info-box {
+                background-color: #e8f8f5;
+                border-left: 4px solid #27ae60;
+                padding: 20px;
+                margin: 25px 0;
+                border-radius: 0 8px 8px 0;
+            }
+
+            .info-box p {
+                margin: 0;
+                color: #2c3e50;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .form-details {
+                background-color: #f7fcf9;
+                border: 1px solid #d5e8d4;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 25px 0;
+            }
+
+            .form-details h3 {
+                color: #27ae60;
+                margin: 0 0 15px 0;
+                font-size: 16px;
+                font-weight: 600;
+            }
+
+            .form-field {
+                margin-bottom: 12px;
+                font-size: 14px;
+            }
+
+            .form-field label {
+                color: #7f8c8d;
+                font-weight: 500;
+                display: block;
+                margin-bottom: 2px;
+            }
+
+            .form-field .value {
+                color: #2c3e50;
+                word-wrap: break-word;
+            }
+
+            .message-text {
+                background-color: #ffffff;
+                border: 1px solid #e1e8e6;
+                padding: 12px;
+                border-radius: 4px;
+                font-style: italic;
+                line-height: 1.4;
+            }
+
+            .footer {
+                background-color: #2c3e50;
+                padding: 30px 20px;
+                text-align: center;
+            }
+
+            .footer-content {
+                color: #bdc3c7;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .footer-links {
+                margin: 20px 0;
+            }
+
+            .footer-links a {
+                color: #27ae60;
+                text-decoration: none;
+                margin: 0 15px;
+                font-weight: 500;
+            }
+
+            .social-links {
+                margin: 20px 0;
+            }
+
+            .social-links a {
+                display: inline-block;
+                width: 40px;
+                height: 40px;
+                background-color: #27ae60;
+                border-radius: 50%;
+                margin: 0 8px;
+                line-height: 40px;
+                text-align: center;
+                color: #ffffff !important;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+            .divider {
+                height: 1px;
+                background: linear-gradient(to right, transparent, #27ae60, transparent);
+                margin: 30px 0;
+            }
+
+            /* Mobile responsive */
+            @media only screen and (max-width: 600px) {
+                .email-container {
+                    width: 100% !important;
+                }
+
+                .content {
+                    padding: 30px 20px !important;
+                }
+
+                .header {
+                    padding: 30px 20px !important;
+                }
+
+                .logo {
+                    font-size: 28px !important;
+                }
+
+                .cta-button {
+                    display: block !important;
+                    text-align: center !important;
+                    margin: 20px 0 !important;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div>
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                    <td style="padding: 20px 0;">
+                        <div class="email-container">
+                            <!-- Header -->
+                            <div class="header" style="background: linear-gradient(135deg, #16a085 0%, #27ae60 100%) !important;">
+                                <h1 class="logo">{{app_name}}</h1>
+                                <p class="tagline">Sustainable Merchandise Solutions</p>
+                            </div>
+
+                            {{{body}}}
+
+                            <!-- Footer -->
+                            <div class="footer">
+                                <div class="footer-content">
+                                    <strong style="color: #27ae60;">{{app_name}}</strong><br />
+                                    Creating sustainable merchandise solutions for a better tomorrow
+                                </div>
+
+                                <div class="footer-links">
+                                    <a href="{{base_url}}">Website</a>
+                                    <a href="{{base_url}}/about">About</a>
+                                    <a href="{{base_url}}/contact">Contact</a>
+                                    <a href="{{base_url}}/sustainability">Sustainability</a>
+                                </div>
+
+                                <div class="social-links">
+                                    <a href="https://web.facebook.com/profile/teebarg">f</a>
+                                    <a href="https://twitter.com/teebarg">t</a>
+                                    <a href="https://www.instagram.com/teebarg">ig</a>
+                                    <a href="https://www.x.com/teebarg">X</a>
+                                </div>
+
+                                <div style="font-size: 12px; color: #95a5a6; margin-top: 20px;">
+                                    ©
+                                    {{year}}
+                                    {{app_name}}. All rights reserved.<br />
+                                    <a href="mailto:{{contact_email}}" style="color: #27ae60;">Unsubscribe</a>
+                                    |
+                                    <a href="{{base_url}}/privacy-policy" style="color: #27ae60;">Privacy Policy</a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+
+</html>

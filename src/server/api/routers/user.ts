@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { userSchema } from "@/trpc/schema";
+import { UserSettingsSchema } from "@/schemas/settings.schema";
 
 export const userRouter = createTRPCRouter({
     users: protectedProcedure
@@ -67,5 +68,33 @@ export const userRouter = createTRPCRouter({
 
     delete: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
         return await ctx.db.user.delete({ where: { id: input } });
+    }),
+
+    getUserSettings: protectedProcedure.query(async ({ ctx }) => {
+        const userId = ctx.session.user.id;
+        const settings = await ctx.db.userSettings.findUnique({ where: { userId } });
+        return settings;
+    }),
+
+    updateUserSettings: protectedProcedure.input(UserSettingsSchema).mutation(async ({ ctx, input }) => {
+        const userId = ctx.session.user.id;
+        const existing = await ctx.db.userSettings.findUnique({ where: { userId } });
+        if (existing) {
+            return await ctx.db.userSettings.update({
+                where: { userId },
+                data: {
+                    ...input,
+                    notifications: input.notifications ?? existing.notifications ?? {},
+                },
+            });
+        } else {
+            return await ctx.db.userSettings.create({
+                data: {
+                    userId,
+                    ...input,
+                    notifications: input.notifications ?? {},
+                },
+            });
+        }
     }),
 });

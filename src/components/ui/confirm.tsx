@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "./button";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     title?: string;
@@ -17,31 +17,27 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onCl
     };
 
     return (
-        <React.Fragment>
-            <div className="mx-auto w-full p-8">
-                <div>
-                    <div className="pb-4 flex items-center justify-between border-b border-black/10 dark:border-white/10">
-                        <div className="flex">
-                            <h2 className="text-xl font-semibold leading-6 text-gray-100">{title}</h2>
-                        </div>
-                    </div>
-                    <div>
-                        <p className="text-sm text-gray-300 mt-6 font-medium">
-                            {content ??
-                                "Are you sure you want to delete this item? All of your data will be permanently removed from our servers forever. This action cannot be undone."}
-                        </p>
-                    </div>
-                    <div className="flex justify-end gap-2 mt-8">
-                        <Button variant="outline" onClick={onClose}>
-                            Close
-                        </Button>
-                        <Button isLoading={isPending} variant="danger" type="submit" onClick={onSubmit}>
-                            Delete
-                        </Button>
-                    </div>
+        <div className="mx-auto w-full">
+            <div className="pb-4 flex items-center justify-between border-b border-input bg-card">
+                <div className="flex">
+                    <h2 className="text-xl font-semibold leading-6 text-default-900">{title}</h2>
                 </div>
             </div>
-        </React.Fragment>
+            <div>
+                <p className="text-sm text-default-700 mt-6 font-medium">
+                    {content ??
+                        "Are you sure you want to delete this item? All of your data will be permanently removed from our servers forever. This action cannot be undone."}
+                </p>
+            </div>
+            <div className="flex justify-end gap-2 mt-8">
+                <Button variant="outline" onClick={onClose}>
+                    Close
+                </Button>
+                <Button isLoading={isPending} variant="destructive" type="submit" onClick={onSubmit}>
+                    Delete
+                </Button>
+            </div>
+        </div>
     );
 };
 

@@ -1,76 +1,11 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-model Draft {
-  id             String    @id @default(cuid())
-  title          String
-  content        String
-  image          String?
-  link           String?
-  platform       String?
-  isPublished    Boolean? @map("is_published")
-  scheduledTime  DateTime? @db.Timestamp(6) @map("scheduled_time")
-  userId         String @map("user_id")
-  user           User     @relation(fields: [userId], references: [id], onDelete: NoAction)
-
-  createdAt     DateTime? @default(now()) @map("created_at")
-  updatedAt     DateTime? @updatedAt @map("updated_at")
-
-  @@map("drafts")
-}
-
-model NotificationTemplate {
-  id         String   @id @default(cuid())
-  title      String   @unique
-  icon       String?
-  body       String
-  excerpt    String?
-
-  createdAt     DateTime? @default(now()) @map("created_at")
-  updatedAt     DateTime? @updatedAt @map("updated_at")
-
-  @@map("notification_templates")
-}
-
-model PushSubscription {
-  id         String   @id @default(cuid())
-  endpoint   String   @unique
-  p256dh     String
-  auth       String
-  group      String?
-
-  createdAt     DateTime? @default(now()) @map("created_at")
-  updatedAt     DateTime? @updatedAt @map("updated_at")
-
-  @@map("push_subscriptions")
-}
-
-model Tenant {
-  id         String   @id @default(cuid())
-  name       String   @unique
-  slug       String   @unique
-
-  createdAt     DateTime? @default(now()) @map("created_at")
-  updatedAt     DateTime? @updatedAt @map("updated_at")
-
-  @@map("tenants")
-}
-
-model Tweet {
-  id         String   @id @default(cuid())
-  content    String   @unique
-  twitterId  String   @unique @map("twitter_id")
-
-  createdAt     DateTime? @default(now()) @map("created_at")
-  updatedAt     DateTime? @updatedAt @map("updated_at")
-
-  @@map("tweets")
 }
 
 enum Role {
@@ -81,72 +16,287 @@ enum Role {
 }
 
 enum Status {
-    PENDING   @map("pending")
-    ACTIVE    @map("active")
-    INACTIVE  @map("inactive")
+  PENDING  @map("pending")
+  ACTIVE   @map("active")
+  INACTIVE @map("inactive")
 
-    @@map("statuses")
+  @@map("statuses")
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+
+  @@map("post_statuses")
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  GIF
+
+  @@map("media_types")
+}
+
+enum DeviceType {
+  WEB
+  IOS
+  ANDROID
+  DESKTOP
+
+  @@map("device_types")
+}
+
+enum NotificationCategory {
+  GENERIC
+  ONBOARDING
+  ENGAGEMENT
+  REMINDER
+  ANALYTICS
+}
+
+enum NotificationStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+
+  @@map("notification_statuses")
+}
+
+enum NotificationEventType {
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  DISMISSED
+  FAILED
+
+  @@map("notification_event_types")
+}
+
+model Tenant {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("tenants")
+}
+
+model Tweet {
+  id        String @id @default(cuid())
+  content   String @unique
+  twitterId String @unique @map("twitter_id")
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("tweets")
 }
 
 // Necessary for Next auth
 model Account {
-    id                       String  @id @default(cuid())
-    userId                   String
-    type                     String
-    provider                 String
-    providerAccountId        String
-    refresh_token            String? // @db.Text
-    access_token             String? // @db.Text
-    expires_at               Int?
-    token_type               String?
-    scope                    String?
-    id_token                 String? // @db.Text
-    session_state            String?
-    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-    refresh_token_expires_in Int?
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? // @db.Text
+  access_token             String? // @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? // @db.Text
+  session_state            String?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refresh_token_expires_in Int?
 
-    @@unique([provider, providerAccountId])
-
-    @@map("accounts")
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@map("sessions")
+  @@map("sessions")
 }
 
 model User {
-    id            String    @id @default(cuid())
-    firstName     String? @map("first_name")
-    lastName      String? @map("last_name")
-    email         String?   @unique
-    emailVerified DateTime?
-    status        Status    @default(PENDING)
-    password      String
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    drafts        Draft[]
+  id            String    @id @default(cuid())
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  email         String?   @unique
+  emailVerified DateTime?
+  status        Status    @default(PENDING)
+  password      String
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  posts         Post[]
+  settings      UserSettings?
+  createdAt        DateTime?          @default(now()) @map("created_at")
+  updatedAt        DateTime?          @updatedAt @map("updated_at")
+  PushSubscription PushSubscription[]
 
-    createdAt     DateTime? @default(now()) @map("created_at")
-    updatedAt     DateTime? @updatedAt @map("updated_at")
-
-    @@index([firstName, lastName])
-
-    @@map("users")
+  @@index([firstName, lastName])
+  @@map("users")
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
 
-    @@map("verification_tokens")
+model Post {
+  id            String         @id @default(uuid())
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String         @map("user_id")
+  title         String?
+  content       String?
+  link          String?
+  status        PostStatus     @default(DRAFT) // Draft, Scheduled, etc.
+  scheduledAt   DateTime?      @map("scheduled_at")
+  isPublished   Boolean?       @default(false) @map("is_published")
+  publishedAt   DateTime?      @map("published_at") @db.Timestamp(6)
+  platformPosts PlatformPost[] // One per platform
+  media         Media[]
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("posts")
+}
+
+model Platform {
+  id        String         @id @default(uuid())
+  name      String         @unique
+  posts     PlatformPost[]
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  @@map("platforms")
+}
+
+model PlatformPost {
+  id             String     @id @default(uuid())
+  post           Post       @relation(fields: [postId], references: [id])
+  postId         String     @map("post_id")
+  platform       Platform   @relation(fields: [platformId], references: [id])
+  platformId     String     @map("platform_id")
+  platformPostId String?    @map("platform_post_id")
+  status         PostStatus @default(DRAFT)
+  scheduledAt    DateTime?  @map("scheduled_at")
+  publishedAt    DateTime?  @map("published_at")
+  errorMessage   String?    @map("error_message")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  @@map("platform_posts")
+}
+
+model Media {
+  id        String    @id @default(uuid())
+  url       String
+  type      MediaType
+  post      Post      @relation(fields: [postId], references: [id])
+  postId    String    @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("media")
+}
+
+model NotificationTemplate {
+  id        String               @id @default(uuid())
+  code      String               @unique
+  title     String
+  body      String
+  data      Json?
+  category  NotificationCategory @default(GENERIC)
+  createdAt DateTime             @default(now()) @map("created_at")
+  updatedAt DateTime             @updatedAt @map("updated_at")
+
+  notifications Notification[]
+}
+
+model Notification {
+  id          String                @id @default(uuid())
+  title       String
+  body        String
+  icon        String?
+  imageUrl    String?
+  data        Json?
+  status      NotificationStatus    @default(DRAFT)
+  sentAt      DateTime?             @map("sent_at")
+  scheduledAt DateTime?             @map("scheduled_at")
+  template    NotificationTemplate? @relation(fields: [templateId], references: [id])
+  templateId  String?               @map("template_id")
+  recipients  NotificationEvent[]
+
+  sentCount   Int @default(0) @map("sent_count")
+  failedCount Int @default(0) @map("failed_count")
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("notifications")
+}
+
+model PushSubscription {
+  id       String  @id @default(cuid())
+  endpoint String  @unique
+  p256dh   String
+  auth     String
+  group    String?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  createdAt         DateTime?           @default(now()) @map("created_at")
+  updatedAt         DateTime?           @updatedAt @map("updated_at")
+  NotificationEvent NotificationEvent[]
+
+  @@map("push_subscriptions")
+}
+
+model NotificationEvent {
+  id             String                @id @default(cuid())
+  notification   Notification          @relation(fields: [notificationId], references: [id])
+  notificationId String                @map("notification_id")
+  subscriber     PushSubscription      @relation(fields: [subscriberId], references: [id])
+  subscriberId   String                @map("subscriber_id")
+  deliveredAt    DateTime?             @map("delivered_at")
+  readAt         DateTime?             @map("read_at")
+  eventType      NotificationEventType @map("event_type")
+  deviceType     DeviceType?           @map("device_type")
+  platform       String?
+  userAgent      String?               @map("user_agent")
+  occurredAt     DateTime              @default(now()) @map("occurred_at")
+
+  @@index([notificationId, subscriberId, eventType])
+  @@map("notification_events")
+}
+
+model UserSettings {
+  id            String   @id @default(uuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String   @unique
+  instagram     String?
+  twitter       String?
+  facebook      String?
+  defaultHashtags String?
+  timezone      String?  // e.g. 'UTC', 'America/New_York'
+  defaultPostTime String? // e.g. '15:00'
+  notifications Json?    // JSON object for notification preferences
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

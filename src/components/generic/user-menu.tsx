@@ -1,32 +1,60 @@
-import Dropdown from "@/components/ui/dropdown";
+"use client";
+
 import Link from "next/link";
-import { LogOut, User, UserCircleMini } from "nui-react-icons";
+import { LogOut } from "nui-react-icons";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Image from "next/image";
+import ProfileAvatar from "@/assets/profile.svg";
 
 const UserMenu = () => {
+    const links = [
+        {
+            dataKey: "admin",
+            child: (
+                <span className="flex-1 text-sm font-normal truncate">
+                    <Link href="/settings">Profile</Link>
+                </span>
+            ),
+        },
+        {
+            dataKey: "account",
+            child: (
+                <Link href="/api/auth/signout" className="flex w-full items-center text-rose-500 font-semibold no-underline gap-2">
+                    <LogOut viewBox="0 0 24 24" className="h-6 w-6" />
+                    Sign out
+                </Link>
+            ),
+        },
+    ];
     return (
-        <>
-            {/* Desktop */}
-            <div className="flex items-center">
-                <Dropdown align="end" trigger={<UserCircleMini viewBox="0 0 20 20" className="h-10 w-10" />}>
-                    <div>
-                        <div className="bg-default-100 rounded-lg shadow-md p-3 min-w-[100px] text-sm font-medium">
-                            <div className="mb-2">
-                                <Link className="flex w-full items-center" href="settings">
-                                    <span className="mr-2">
-                                        <User viewBox="0 0 24 24" className="h-6 w-6" />
-                                    </span>
-                                    <span>My profile</span>
-                                </Link>
-                            </div>
-                            <Link href="/api/auth/signout" className="flex w-full items-center text-rose-500 font-semibold no-underline gap-2">
-                                <LogOut viewBox="0 0 24 24" className="h-6 w-6" />
-                                Sign out
-                            </Link>
-                        </div>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-1 ring-default cursor-pointer">
+                    <Image fill alt="avatar" src={ProfileAvatar} />
+                </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                    <div key="user" className="flex gap-2">
+                        <p className="font-semibold">Signed in as</p>
+                        <p className="font-semibold">@Niyi</p>
                     </div>
-                </Dropdown>
-            </div>
-        </>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {links.map((item, index: number) => (
+                    <DropdownMenuItem key={index} className="px-2 py-1.5 cursor-pointer" data-key={item.dataKey}>
+                        {item.child}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 };
 

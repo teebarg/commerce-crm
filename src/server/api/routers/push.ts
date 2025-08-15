@@ -1,28 +1,60 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { notificationTemplateSchema, pushSubscriptionSchema } from "@/trpc/schema";
 import { sendNotificationsToSubscribers } from "@/trpc/services";
+import {
+    CreateNotificationSchema,
+    CreateNotificationTemplateSchema,
+    NotifySchema,
+    PushSubscriptionSchema,
+    UpdateNotificationSchema,
+} from "@/schemas/notification.schema";
+import { PushEventSchema } from "@/schemas/base.schema";
 
 export const pushNotificationRouter = createTRPCRouter({
-    templates: protectedProcedure
-        .query(async ({ ctx }) => {
-            const templates = await ctx.db.notificationTemplate.findMany({
-                orderBy: { createdAt: "desc" },
-            });
+    templates: protectedProcedure.query(async ({ ctx }) => {
+        const templates = await ctx.db.notificationTemplate.findMany({
+            orderBy: { createdAt: "desc" },
+        });
 
-            return {
-                templates,
-            };
-        }),
-    createTemplate: protectedProcedure.input(notificationTemplateSchema).mutation(async ({ ctx, input }) => {
+        return {
+            templates,
+        };
+    }),
+    notifications: protectedProcedure.query(async ({ ctx }) => {
+        const notifications = await ctx.db.notification.findMany({
+            orderBy: { createdAt: "desc" },
+        });
+
+        return {
+            notifications,
+        };
+    }),
+    createNotification: protectedProcedure.input(CreateNotificationSchema).mutation(async ({ ctx, input }) => {
+        return ctx.db.notification.create({
+            data: {
+                ...input,
+                sentAt: input.status === "PUBLISHED" ? new Date() : undefined,
+            },
+        });
+    }),
+    updateNotification: protectedProcedure.input(UpdateNotificationSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
+        return await ctx.db.notification.update({
+            where: { id: input.id },
+            data: { ...input },
+        });
+    }),
+    deleteNotification: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+        return await ctx.db.notification.delete({ where: { id: input } });
+    }),
+    createTemplate: protectedProcedure.input(CreateNotificationTemplateSchema).mutation(async ({ ctx, input }) => {
         return ctx.db.notificationTemplate.create({
             data: {
                 ...input,
             },
         });
     }),
-    updateTemplate: protectedProcedure.input(notificationTemplateSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
+    updateTemplate: protectedProcedure.input(CreateNotificationTemplateSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
         return await ctx.db.notificationTemplate.update({
             where: { id: input.id },
             data: { ...input },
@@ -33,7 +65,7 @@ export const pushNotificationRouter = createTRPCRouter({
     }),
 
     // subscriptions
-    createSubscription: publicProcedure.input(pushSubscriptionSchema).mutation(async ({ ctx, input }) => {
+    createSubscription: publicProcedure.input(PushSubscriptionSchema).mutation(async ({ ctx, input }) => {
         return ctx.db.pushSubscription.create({
             data: {
                 ...input,
@@ -47,17 +79,23 @@ export const pushNotificationRouter = createTRPCRouter({
         return await ctx.db.pushSubscription.delete({ where: { id: input } });
     }),
 
-    notify: publicProcedure
-        .input(
-            z.object({
-                title: z.string().min(1),
-                body: z.string().min(1),
-                group: z.string().default("bot")
-            })
-        )
-        .mutation(async ({ input, ctx }) => {
-            const subs = await ctx.db.pushSubscription.findMany({});
-            sendNotificationsToSubscribers(subs, input);
-            return { message: "Notification sent successfully" };
-        }),
+    notify: publicProcedure.input(NotifySchema).mutation(async ({ input, ctx }) => {
+        const subs = await ctx.db.pushSubscription.findMany({});
+        const { sentSubscriptions, failedSubscriptions } = await sendNotificationsToSubscribers(subs, input);
+        // update notification status to published
+        await ctx.db.notification.update({
+            where: { id: input.id },
+            data: { status: "PUBLISHED", sentCount: sentSubscriptions.length, failedCount: failedSubscriptions.length, sentAt: new Date() },
+        });
+        return { message: "Notification sent successfully" };
+    }),
+
+    createEvent: publicProcedure.input(PushEventSchema).mutation(async ({ input, ctx }) => {
+        return ctx.db.notificationEvent.create({
+            data: {
+                ...input,
+                occurredAt: new Date(),
+            },
+        });
+    }),
 });

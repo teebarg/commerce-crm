@@ -1,37 +1,40 @@
 "use client";
 
-import { cn } from "@/utils/utils";
 import * as React from "react";
-import { useId } from "react";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLTextAreaElement> {
+import { cn } from "@/lib/utils";
+
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
     error?: string;
     label?: string;
 }
 
-const TextArea = React.forwardRef<HTMLTextAreaElement, InputProps>(({ className, error, label, ...props }, ref) => {
-    const id = useId();
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, error, label, ...props }, ref) => {
+    const id = React.useId();
+
     return (
-        <div>
+        <>
             {label && (
-                <label htmlFor={id} className="text-sm font-medium text-gray-500 mb-0.5">
+                <label className="text-sm font-medium text-gray-500 mb-0.5" htmlFor={id}>
                     {label}
                 </label>
             )}
             <textarea
-                id={id}
                 ref={ref}
-                {...props}
-                placeholder="What's on your mind?"
                 className={cn(
-                    "w-full h-32 p-4 border border-default-200 rounded-lg focus:ring-1 focus:ring-blue-50 focus:border-transparent resize-none",
+                    "w-full min-h-[60px] border border-divider rounded-lg resize-none shadow-sm",
+                    "flex bg-content1 px-3 py-2 text-sm placeholder:text-muted-foreground",
+                    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
                     className
                 )}
+                id={id}
+                {...props}
             />
-            {error && <p className="text-xs text-rose-500 mt-0.5">{error}</p>}
-        </div>
+            {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+        </>
     );
 });
-TextArea.displayName = "TextArea";
 
-export { TextArea };
+Textarea.displayName = "Textarea";
+
+export { Textarea };

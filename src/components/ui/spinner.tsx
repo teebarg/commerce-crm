@@ -18,12 +18,12 @@ const Spinner: React.FC<Props> = ({ size = "sm", className }) => {
             >
                 <i
                     className={cn(
-                        "absolute inset-0 w-full h-full rounded-full animate-spinner-ease-spin border-solid border-t-transparent border-l-transparent border-r-transparent border-[3px] border-b-blue-500"
+                        "absolute inset-0 w-full h-full rounded-full animate-spinner-ease-spin border-solid border-t-transparent border-l-transparent border-r-transparent border-3 border-b-blue-500"
                     )}
                 />
                 <i
                     className={cn(
-                        "absolute inset-0 w-full h-full rounded-full opacity-75 animate-spinner-linear-spin border-dotted border-t-transparent border-l-transparent border-r-transparent border-[3px] border-b-blue-500"
+                        "absolute inset-0 w-full h-full rounded-full opacity-75 animate-spinner-linear-spin border-dotted border-t-transparent border-l-transparent border-r-transparent border-3 border-b-blue-500"
                     )}
                 />
             </div>

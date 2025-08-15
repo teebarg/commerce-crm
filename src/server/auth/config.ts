@@ -3,8 +3,14 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type User, type DefaultSession, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import argon2 from "argon2";
+import EmailProvider from "next-auth/providers/email";
+import GoogleProvider from "next-auth/providers/google";
 
 import { db } from "@/server/db";
+import { env } from "@/env";
+import { createTransport } from "nodemailer";
+import { renderEmail } from "@/utils/email";
+import handlebars from "handlebars";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -85,13 +91,84 @@ export const authConfig = {
                 },
             },
         }),
+        EmailProvider({
+            server: {
+                host: env.EMAIL_SERVER,
+                port: env.EMAIL_SERVER_PORT,
+                auth: {
+                    user: env.EMAIL_SERVER_USER,
+                    pass: env.EMAIL_SERVER_PASSWORD,
+                },
+            },
+            from: env.EMAIL_FROM,
+            async sendVerificationRequest({ identifier: email, url, provider }) {
+                const transport = createTransport(provider.server);
+                const emailHtml = await renderEmail("magic-link", { magic_link_url: url });
+
+                // Text version
+                const textTemplate = handlebars.compile(`
+                    Sign in to your account
+
+                    Click this link to sign in:
+                    {{url}}
+
+                    This link will expire in 24 hours and can only be used once.
+                    If you didn't request this email, you can safely ignore it.
+
+                    ---
+                    {{env.NEXT_PUBLIC_NAME}} Team
+                `);
+                const emailText = textTemplate({ url });
+
+                await transport.sendMail({
+                    to: email,
+                    from: provider.from,
+                    subject: "Sign in to your account",
+                    text: emailText,
+                    html: emailHtml,
+                });
+            },
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            allowDangerousEmailAccountLinking: true
+        }),
     ],
     adapter: PrismaAdapter(db),
     session: {
         strategy: "jwt",
         maxAge: 60 * 60 * 24,
     },
+    pages: {
+        signIn: "/auth/signin",
+        error: "/auth/error",
+        verifyRequest: "/auth/verify-request",
+    },
     callbacks: {
+        async signIn({ user, account }) {
+            if (account?.provider === "email" || account?.provider === "google") {
+                const existingUser = await db.user.findUnique({
+                    where: { email: user.email! },
+                });
+
+                const uuid = crypto.randomUUID();
+                const hash = await argon2.hash(uuid);
+
+                if (!existingUser) {
+                    await db.user.create({
+                        data: {
+                            email: user.email!,
+                            firstName: "User",
+                            lastName: "User",
+                            status: "PENDING",
+                            password: hash,
+                        },
+                    });
+                }
+            }
+            return true;
+        },
         jwt({ token, user }) {
             if (user) {
                 token.user = {
@@ -109,6 +186,7 @@ export const authConfig = {
                 session.user.id = token.sub;
                 session.user.firstName = (token.user as User).firstName!;
                 session.user.lastName = (token.user as User).lastName!;
+                session.user.name = (token.user as User).firstName! + " " + (token.user as User).lastName!;
             }
             return session;
         },

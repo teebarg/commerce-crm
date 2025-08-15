@@ -3,10 +3,10 @@ import { type Metadata } from "next";
 
 import { Outfit } from "next/font/google";
 import { cn } from "@/utils/utils";
-import NotificationProviders from "./notistack-providers";
 import { TRPCReactProvider } from "@/trpc/react";
-import OverlayClientProvider from "./overlay-providers";
 import { ThemeScript } from "@/theme/theme-script";
+import { Toaster } from "@/components/ui/sonner";
+import ProgressBar from "@/components/ui/progress-bar";
 
 const outfit = Outfit({
     subsets: ["latin"],
@@ -25,19 +25,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html suppressHydrationWarning className={cn("scroll-smooth antialiased", outfit.className)} lang="en">
             <head>
-              <ThemeScript />
+                <ThemeScript />
                 <link href="/favicon-96x96.png" rel="icon" sizes="96x96" type="image/png" />
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
                 <link href="/favicon.ico" rel="shortcut icon" />
                 <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
-                <meta content="Merch" name="apple-mobile-web-app-title" />
+                <meta content="Crm" name="apple-mobile-web-app-title" />
                 <link href="/site.webmanifest" rel="manifest" />
             </head>
             <body className="min-h-screen">
                 <TRPCReactProvider>
-                    <NotificationProviders>
-                        <OverlayClientProvider>{children}</OverlayClientProvider>
-                    </NotificationProviders>
+                    <ProgressBar className="">
+                        {children}
+                        <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
+                    </ProgressBar>
                 </TRPCReactProvider>
             </body>
         </html>

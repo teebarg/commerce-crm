@@ -3,15 +3,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 "use client";
 
-import { Delete, Edit, Eye } from "nui-react-icons";
-import React, { cloneElement, isValidElement, useState } from "react";
+import { Edit, Eye } from "nui-react-icons";
+import React, { cloneElement, isValidElement } from "react";
 import { useOverlayTriggerState } from "react-stately";
-import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
-import { Tooltip } from "@/components/ui/tooltip";
-import { Modal } from "@/components/ui/modal";
 import { Confirm } from "@/components/ui/confirm";
-import SlideOver from "@/components/ui/slideover";
+import Overlay from "@/components/overlay";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
     label?: string;
@@ -22,61 +24,57 @@ interface Props {
 }
 
 const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, deleteAction }) => {
-    const { enqueueSnackbar } = useSnackbar();
-    const [current, setCurrent] = useState<any>({ is_active: true });
-    const deleteModalState = useOverlayTriggerState({});
-    const slideOverState = useOverlayTriggerState({});
-    const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: slideOverState.close }) : form;
+    const editState = useOverlayTriggerState({});
+    const deleteState = useOverlayTriggerState({});
+    const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: editState.close }) : form;
     const router = useRouter();
-
-    const onDelete = (value: any) => {
-        setCurrent((prev: any) => ({ ...prev, ...value }));
-        deleteModalState.open();
-    };
 
     const onConfirmDelete = async () => {
         try {
-            await deleteAction?.(current.id);
+            await deleteAction?.((item as any).id);
             router.refresh();
-            deleteModalState.close();
+            deleteState.close();
         } catch (error) {
-            enqueueSnackbar(`Error deleting ${label} - ${error as string}`, { variant: "error" });
+            toast.error(`Error deleting ${label} - ${error as string}`);
         }
     };
 
     return (
-        <React.Fragment>
-            <div className="relative flex items-center gap-2">
-                {showDetails && (
-                    <Tooltip content="Details">
-                        <span className="text-lg text-gray-500 cursor-pointer active:opacity-50">
-                            <Eye />
-                        </span>
-                    </Tooltip>
-                )}
-                <Tooltip content={`Edit ${label}`}>
-                    <span className="text-lg text-gray-500 cursor-pointer active:opacity-50">
-                        <Edit onClick={() => slideOverState.open()} />
-                    </span>
+        <div className="relative flex items-center gap-2">
+            {showDetails && (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Eye className="text-gray-500 cursor-pointer active:opacity-50" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Details</p>
+                    </TooltipContent>
                 </Tooltip>
-                <Tooltip content={`Delete ${label}`}>
-                    <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                        <Delete onClick={() => onDelete(item)} />
-                    </span>
-                </Tooltip>
-            </div>
-            {/* Delete Modal */}
-            {deleteModalState.isOpen && (
-                <Modal isOpen={deleteModalState.isOpen} onClose={deleteModalState.close}>
-                    <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
-                </Modal>
             )}
-            {slideOverState.isOpen && (
-                <SlideOver isOpen={slideOverState.isOpen} title={`Edit ${label}`} onClose={slideOverState.close}>
-                    {slideOverState.isOpen && formWithHandler}
-                </SlideOver>
-            )}
-        </React.Fragment>
+            <Overlay
+                open={editState.isOpen}
+                title={`Edit ${label}`}
+                trigger={
+                    <Button size="iconOnly">
+                        <Edit />
+                    </Button>
+                }
+                onOpenChange={editState.setOpen}
+            >
+                {formWithHandler}
+            </Overlay>
+            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
+                <DialogTrigger>
+                    <Trash2 className="w-5 h-5 text-red-600" />
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>{`Delete ${label}`}</DialogTitle>
+                    </DialogHeader>
+                    <Confirm onClose={deleteState.close} onConfirm={onConfirmDelete} />
+                </DialogContent>
+            </Dialog>
+        </div>
     );
 };
 

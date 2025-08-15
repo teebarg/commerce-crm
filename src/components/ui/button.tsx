@@ -1,58 +1,84 @@
-import React from "react";
-import { cn } from "@/utils/utils";
+"use client";
+
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 import { Loader } from "nui-react-icons";
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
-    size?: "sm" | "md" | "lg";
+import { cn } from "@/lib/utils";
+
+const buttonVariants = cva(
+    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
+    {
+        variants: {
+            variant: {
+                default: "bg-default text-default-foreground hover:bg-default/90",
+                destructive: "bg-rose-500 text-white hover:bg-rose-600/90",
+                outline: "border border-divider bg-background hover:bg-content1",
+                primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+                secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                ghost: "hover:bg-accent hover:text-accent-foreground",
+                link: "text-primary underline-offset-4 hover:underline",
+                success: "bg-success text-white hover:bg-success/90",
+                emerald: "bg-emerald-700 text-white hover:bg-emerald-800",
+                bordered: "bg-transparent border-2 border-primary text-primary hover:bg-primary-500 hover:text-white",
+                borderedSecondary: "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary-500 hover:text-white",
+            },
+            size: {
+                default: "h-10 px-4 py-2 min-w-32",
+                xs: "h-7 rounded-md px-2",
+                sm: "h-9 rounded-md px-3",
+                lg: "h-11 rounded-md px-8 text-base font-normal min-w-32",
+                icon: "p-2",
+                iconOnly: "h-auto w-auto bg-transparent hover:bg-transparent",
+            },
+        },
+        defaultVariants: {
+            variant: "default",
+            size: "default",
+        },
+    }
+);
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+    asChild?: boolean;
     isLoading?: boolean;
-    leftIcon?: React.ReactNode;
-    rightIcon?: React.ReactNode;
+    startContent?: React.ReactNode;
+    endContent?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant = "primary", size = "md", isLoading = false, leftIcon, rightIcon, children, disabled, ...props }, ref) => {
-        const baseStyles =
-            "inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed min-w-32";
-
-        const variants = {
-            primary: "bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500",
-            secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500",
-            outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-indigo-500",
-            ghost: "text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:ring-gray-500",
-            danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
-        };
-
-        const sizes = {
-            sm: "px-3 py-2 text-sm",
-            md: "px-4 py-2.5 text-sm",
-            lg: "px-6 py-3 text-base",
-        };
+    ({ className, variant, size, asChild = false, isLoading = false, children, startContent, endContent, ...props }, ref) => {
+        const Comp = asChild ? Slot : "button";
 
         return (
-            <button
+            <Comp
                 ref={ref}
-                className={cn(baseStyles, variants[variant], sizes[size], isLoading && "cursor-not-allowed", className)}
-                disabled={disabled ?? isLoading}
+                className={cn(
+                    "relative flex items-center justify-center",
+                    isLoading && "opacity-50 cursor-not-allowed",
+                    buttonVariants({ variant, size, className })
+                )}
+                disabled={isLoading || props.disabled}
                 {...props}
             >
                 {isLoading ? (
                     <>
                         <Loader className="mr-2 h-4 w-4 animate-spin" />
-                        Loading...
+                        {size === "icon" || size === "iconOnly" ? "" : "Loading..."}
                     </>
                 ) : (
                     <>
-                        {leftIcon && <span className="mr-2">{leftIcon}</span>}
+                        {startContent && <span className="mr-2">{startContent}</span>}
                         {children}
-                        {rightIcon && <span className="ml-2">{rightIcon}</span>}
+                        {endContent && <span className="ml-2">{endContent}</span>}
                     </>
                 )}
-            </button>
+            </Comp>
         );
     }
 );
 
 Button.displayName = "Button";
 
-export { Button };
+export { Button, buttonVariants };
