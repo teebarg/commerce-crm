@@ -3,9 +3,10 @@ import { createCaller } from "@/server/api/root";
 import { createTRPCContext } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
+import { type PushEventInput } from "@/schemas/base.schema";
 
 export async function POST(req: Request) {
-    const body = await req.json();
+    const body: PushEventInput = await req.json();
 
     // Create context and caller
     const ctx = await createTRPCContext({ headers: req.headers });

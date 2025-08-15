@@ -1,12 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, Eye, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { useState } from "react";
-import { Notification } from "@prisma/client";
-// import NotificationActions from "./NotificationActions";
+import { type Notification } from "@prisma/client";
 import { NotificationStatusEnum } from "@/schemas/notification.schema";
 import NotificationActions from "../push/NotificationActions";
 

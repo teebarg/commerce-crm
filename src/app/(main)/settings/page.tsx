@@ -33,13 +33,13 @@ const defaultValues: UserSettingsInput = {
 };
 
 const Settings = () => {
-    const { data: settings, isLoading } = api.user.getUserSettings.useQuery();
+    const { data: settings } = api.user.getUserSettings.useQuery();
     const updateSettings = api.user.updateUserSettings.useMutation();
     const form = useForm<UserSettingsInput>({
         resolver: zodResolver(UserSettingsSchema),
         defaultValues,
     });
-    const { register, handleSubmit, control, setValue, watch, formState: { errors, isDirty } } = form;
+    const { register, handleSubmit, control, setValue, formState: { isDirty } } = form;
 
     useEffect(() => {
         if (settings) {

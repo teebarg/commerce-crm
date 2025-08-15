@@ -9,6 +9,7 @@ import {
     PushSubscriptionSchema,
     UpdateNotificationSchema,
 } from "@/schemas/notification.schema";
+import { PushEventSchema } from "@/schemas/base.schema";
 
 export const pushNotificationRouter = createTRPCRouter({
     templates: protectedProcedure.query(async ({ ctx }) => {
@@ -89,25 +90,12 @@ export const pushNotificationRouter = createTRPCRouter({
         return { message: "Notification sent successfully" };
     }),
 
-    createEvent: publicProcedure
-        .input(
-            z.object({
-                notificationId: z.string(),
-                subscriberId: z.string(),
-                eventType: z.enum(["DELIVERED", "OPENED", "CLICKED", "DISMISSED"]),
-                platform: z.string(),
-                deviceType: z.enum(["WEB", "IOS", "ANDROID", "DESKTOP"]),
-                userAgent: z.string().optional(),
-                deliveredAt: z.string().datetime().optional(),
-                readAt: z.string().datetime().optional(),
-            })
-        )
-        .mutation(async ({ input, ctx }) => {
-            return ctx.db.notificationEvent.create({
-                data: {
-                    ...input,
-                    occurredAt: new Date(),
-                },
-            });
-        }),
+    createEvent: publicProcedure.input(PushEventSchema).mutation(async ({ input, ctx }) => {
+        return ctx.db.notificationEvent.create({
+            data: {
+                ...input,
+                occurredAt: new Date(),
+            },
+        });
+    }),
 });

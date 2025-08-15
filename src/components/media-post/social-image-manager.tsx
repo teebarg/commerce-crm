@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { Image, X, Upload, FileImage } from "lucide-react";
+import { X, Upload, FileImage } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,11 +24,7 @@ interface SocialImageManagerProps {
     maxSize?: number;
 }
 
-const SocialImageManager: React.FC<SocialImageManagerProps> = ({
-    onMediaChange,
-    maxFiles = 5,
-    maxSize = 10,
-}) => {
+const SocialImageManager: React.FC<SocialImageManagerProps> = ({ onMediaChange, maxFiles = 5, maxSize = 10 }) => {
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
     const onDrop = useCallback(
@@ -37,7 +34,7 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
                 return;
             }
 
-            (async () => {
+            void (async () => {
                 const newMediaFiles: MediaFile[] = await Promise.all(
                     acceptedFiles.map(async (file) => {
                         const fileType = getFileType(file);
@@ -139,7 +136,13 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({
                                 <CardContent className="p-3">
                                     <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
                                         {file.type === "IMAGE" || file.type === "GIF" ? (
-                                            <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
+                                            <Image
+                                                src={file.url}
+                                                alt={file.name}
+                                                fill
+                                                className="object-cover"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            />
                                         ) : (
                                             <video src={file.url} className="w-full h-full object-cover" muted />
                                         )}

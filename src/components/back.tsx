@@ -27,7 +27,7 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
     };
 
     return (
-        <Button aria-label="back button" onClick={handleGoBack} size="lg" variant="primary">
+        <Button aria-label="back button" onClick={handleGoBack} size="lg" variant="primary" className={className}>
             <ArrowLongLeft className="h-6 w-6" viewBox="0 0 15 15" />
             <span className="hidden md:block">Go back</span>
         </Button>

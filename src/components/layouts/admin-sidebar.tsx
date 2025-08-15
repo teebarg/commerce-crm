@@ -20,6 +20,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { type Session } from "@/schemas/base.schema";
 
 const AdminItems = [
     {
@@ -100,7 +101,7 @@ const PushNotification = [
     },
 ];
 
-export function AdminSidebar({ session }: { session: any | null }) {
+export function AdminSidebar({ session }: { session: Session | null }) {
     const { toggleSidebar, state } = useSidebar();
     const path = usePathname();
 

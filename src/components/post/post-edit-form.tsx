@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import PostMediaManager from "./post-media-manager";
@@ -87,7 +88,15 @@ const PostForm: React.FC<{ post: EnhancedPost; onClose: () => void }> = ({ post,
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                 {media.map((m, index) => (
                                     <div key={index} className="relative group">
-                                        <img src={m.url} alt={`Post image ${index + 1}`} className="w-full h-24 object-cover rounded-lg" />
+                                        <div className="relative h-24">
+                                            <Image
+                                                src={m.url}
+                                                alt={`Post image ${index + 1}`}
+                                                fill
+                                                className="object-cover rounded-lg"
+                                                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 200px"
+                                            />
+                                        </div>
                                         <Button
                                             variant="destructive"
                                             size="sm"

@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, MessageCircle, Share, MoreHorizontal, Bookmark } from "lucide-react";
+import Image from "next/image";
 import { formatDate } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import { type EnhancedPlatformPost, type EnhancedPost } from "@/schemas/post.schema";
@@ -44,8 +45,14 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
             </CardHeader>
             <CardContent className="p-0">
                 {post.media && post.media.length > 0 && (
-                    <div className="aspect-square bg-gray-100">
-                        <img src={post?.media?.[0]?.url} alt="Post content" className="w-full h-full object-cover" />
+                    <div className="aspect-square bg-gray-100 relative">
+                        <Image
+                            src={post?.media?.[0]?.url ?? ""}
+                            alt="Post content"
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 400px"
+                        />
                     </div>
                 )}
                 <div className="p-4">
@@ -83,8 +90,14 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
                             <ReactMarkdown>{post.content}</ReactMarkdown>
                         </div>
                         {post.media && post.media.length > 0 && (
-                            <div className="rounded-2xl overflow-hidden mb-3">
-                                <img src={post?.media?.[0]?.url} alt="Post content" className="w-full h-48 object-cover" />
+                            <div className="rounded-2xl overflow-hidden mb-3 relative h-48">
+                                <Image
+                                    src={post?.media?.[0]?.url ?? ""}
+                                    alt="Post content"
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 400px"
+                                />
                             </div>
                         )}
                         <div className="flex items-center justify-between text-gray-500 max-w-md">
@@ -127,8 +140,14 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
                     <ReactMarkdown>{post.content}</ReactMarkdown>
                 </div>
                 {post.media && post.media.length > 0 && (
-                    <div className="rounded-lg overflow-hidden mb-3">
-                        <img src={post?.media?.[0]?.url} alt="Post content" className="w-full h-64 object-cover" />
+                    <div className="rounded-lg overflow-hidden mb-3 relative h-64">
+                        <Image
+                            src={post?.media?.[0]?.url ?? ""}
+                            alt="Post content"
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 400px"
+                        />
                     </div>
                 )}
             </CardContent>
@@ -182,12 +201,15 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
                             <CardContent>
                                 <div className="grid grid-cols-2 gap-3">
                                     {post.media.map((media: Media, index: number) => (
-                                        <img
-                                            key={index}
-                                            src={media.url}
-                                            alt={`Post image ${index + 1}`}
-                                            className="w-full h-24 object-cover rounded-lg"
-                                        />
+                                        <div key={index} className="relative h-24">
+                                            <Image
+                                                src={media.url}
+                                                alt={`Post image ${index + 1}`}
+                                                fill
+                                                className="object-cover rounded-lg"
+                                                sizes="(max-width: 768px) 50vw, 200px"
+                                            />
+                                        </div>
                                     ))}
                                 </div>
                             </CardContent>
