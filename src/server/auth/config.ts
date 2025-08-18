@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { type User, type DefaultSession, type NextAuthConfig } from "next-auth";
+import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
@@ -18,25 +18,10 @@ declare module "next-auth" {
         user: {
             id: string;
             firstName: string;
-            lastName: string;
+            lastName: string | undefined;
             email: string;
-            // ...other properties
-            // role: UserRole;
         } & DefaultSession["user"];
     }
-
-    interface User {
-        // ...other properties
-        id?: string;
-        firstName?: string | null | undefined;
-        lastName?: string | null | undefined;
-        email?: string | null | undefined;
-    }
-
-    // interface User {
-    //   // ...other properties
-    //   // role: UserRole;
-    // }
 }
 
 /**
@@ -130,7 +115,6 @@ export const authConfig = {
                 const existingUser = await db.user.findUnique({
                     where: { email: user.email! },
                 });
-
                 const uuid = crypto.randomUUID();
                 const hash = await bcrypt.hash(uuid, 10);
 
@@ -156,18 +140,15 @@ export const authConfig = {
                 await db.user.upsert({
                     where: { email: user.email! },
                     create: {
+                        name: profile.name,
                         firstName: profile.given_name,
                         lastName: profile.family_name,
                         image: profile.picture,
                         email: user.email!,
                         status: "ACTIVE",
-                        password: "",
+                        password: "hash",
                     },
-                    update: {
-                        firstName: profile.given_name,
-                        lastName: profile.family_name,
-                        image: profile.picture,
-                    },
+                    update: {},
                 });
             }
             const existingUser = await db.user.findUnique({
@@ -188,9 +169,9 @@ export const authConfig = {
         async session({ session, token }) {
             if (token?.sub) {
                 session.user.id = token.sub;
-                session.user.firstName = (token.user as User).firstName!;
-                session.user.lastName = (token.user as User).lastName!;
-                session.user.name = (token.user as User).firstName! + " " + (token.user as User).lastName!;
+                session.user.firstName = token.firstName as string;
+                session.user.lastName = token.lastName as string;
+                session.user.name = token.name!;
             }
             return session;
         },

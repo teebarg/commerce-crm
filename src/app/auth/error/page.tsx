@@ -135,7 +135,7 @@ export default function ErrorPage() {
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-500">
                             Still having trouble?{" "}
-                            <a href={`mailto:${env.CONTACT_EMAIL}`} className="text-emerald-600 hover:text-emerald-700 font-medium">
+                            <a href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`} className="text-emerald-600 hover:text-emerald-700 font-medium">
                                 Contact support
                             </a>
                         </p>

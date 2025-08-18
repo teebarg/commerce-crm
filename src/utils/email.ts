@@ -53,7 +53,7 @@ export async function renderEmail(templateName: string, data: Record<string, str
         body: bodyContent,
         year: new Date().getFullYear(),
         app_name: env.APP_NAME,
-        contact_email: env.CONTACT_EMAIL,
+        contact_email: env.NEXT_PUBLIC_CONTACT_EMAIL,
         base_url: env.BASE_URL,
     });
 }
