@@ -65,6 +65,7 @@ const NotificationForm = forwardRef<ChildRef, Props>(({ onClose, notification },
     const body = watch("body") || "";
     const data = (notification?.data as any) ?? {};
     const actionUrlDefault = typeof data?.actionUrl === "string" ? data.actionUrl : "";
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const [actionUrl, setActionUrl] = React.useState<string>(actionUrlDefault);
 
     const SMILEYS = [
