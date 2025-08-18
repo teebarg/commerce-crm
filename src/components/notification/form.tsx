@@ -14,6 +14,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { UpdateNotificationSchema } from "@/schemas/notification.schema";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Smile } from "lucide-react";
+import { Button as UIButton } from "@/components/ui/button";
 
 interface Props {
     notification?: Notification;
@@ -48,38 +51,107 @@ const NotificationForm = forwardRef<ChildRef, Props>(({ onClose, notification },
         handleSubmit,
         formState: { errors },
         watch,
+        setValue,
     } = useForm<Form>({
         resolver: zodResolver(UpdateNotificationSchema),
-        defaultValues: notification,
+        defaultValues: {
+            title: notification?.title ?? "",
+            body: notification?.body ?? "",
+            data: (notification?.data as any) ?? undefined,
+        },
     });
 
     const title = watch("title") || "";
     const body = watch("body") || "";
+    const data = (notification?.data as any) ?? {};
+    const actionUrlDefault = typeof data?.actionUrl === "string" ? data.actionUrl : "";
+    const [actionUrl, setActionUrl] = React.useState<string>(actionUrlDefault);
 
-    const onSubmit = (data: Form): void => {
+    const SMILEYS = [
+        "😀",
+        "😁",
+        "😂",
+        "🤣",
+        "😊",
+        "😍",
+        "🤩",
+        "😎",
+        "😉",
+        "🙂",
+        "😄",
+        "😅",
+        "😇",
+        "🤗",
+    ];
+
+    const onSubmit = (form: Form): void => {
         if (!notification) return;
-        update.mutate({ ...data, id: notification.id });
+        update.mutate({ ...form, id: notification.id, data: { ...(notification.data as any), actionUrl } });
     };
 
     return (
         <React.Fragment>
             <Card className="h-full">
                 <CardHeader>
-                    <CardTitle>Notification Content</CardTitle>
+                    <CardTitle>Notification Content Update</CardTitle>
                     <CardDescription>Create your push notification content</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                         <div>
-                            <Input label="Title" placeholder="Enter notification title" maxLength={50} {...register("title")} error={errors.title?.message} />
+                            <Input
+                                label="Title"
+                                placeholder="Enter notification title"
+                                maxLength={50}
+                                {...register("title")}
+                                error={errors.title?.message}
+                                endContent={
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <UIButton size="icon" variant="ghost" aria-label="Insert emoji">
+                                                <Smile className="h-4 w-4" />
+                                            </UIButton>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {SMILEYS.map((emoji) => (
+                                                <DropdownMenuItem key={emoji} onClick={() => setValue("title", `${title}${emoji}`, { shouldDirty: true })}>
+                                                    {emoji}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                }
+                            />
                             <p className="text-xs text-gray-500 mt-1">{title.length}/50 characters</p>
                         </div>
                         <div>
-                            <Textarea label="Message*" rows={4} placeholder="Enter your notification message" maxLength={200} {...register("body")} error={errors.body?.message} />
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-gray-500 mb-0.5">Message*</label>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <UIButton size="icon" variant="ghost" aria-label="Insert emoji">
+                                            <Smile className="h-4 w-4" />
+                                        </UIButton>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        {SMILEYS.map((emoji) => (
+                                            <DropdownMenuItem key={emoji} onClick={() => setValue("body", `${body}${emoji}`, { shouldDirty: true })}>
+                                                {emoji}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                            <Textarea rows={4} placeholder="Enter your notification message" maxLength={200} {...register("body")} error={errors.body?.message} />
                             <p className="text-xs text-gray-500 mt-1">{body.length}/200 characters</p>
                         </div>
                         <div>
-                            <Input label="Image URL" placeholder="https://example.com/image.png (optional)" {...register("imageUrl")} error={errors.imageUrl?.message} />
+                            <Input
+                                label="Action URL"
+                                placeholder="https://example.com (optional)"
+                                value={actionUrl}
+                                onChange={(e) => setActionUrl(e.target.value)}
+                            />
                         </div>
                         <div className="flex justify-end space-x-2">
                             <Button type="button" variant="destructive" onClick={onClose}>

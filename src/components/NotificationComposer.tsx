@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Send, Link, Clock, Users, Sparkles } from "lucide-react";
+import { Send, Link, Clock, Users, Sparkles, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,10 +9,27 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 // import Image from "next/image";
 
 const NotificationComposer: React.FC = () => {
     const utils = api.useUtils();
+    const SMILEYS = [
+        "😀",
+        "😁",
+        "😂",
+        "🤣",
+        "😊",
+        "😍",
+        "🤩",
+        "😎",
+        "😉",
+        "🙂",
+        "😄",
+        "😅",
+        "😇",
+        "🤗",
+    ];
     const [title, setTitle] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const [actionUrl, setActionUrl] = useState<string>("");
@@ -49,7 +66,7 @@ const NotificationComposer: React.FC = () => {
         }
 
         mutation.mutate({
-            title: `${title}`,
+            title,
             body: message,
             scheduledAt: scheduleEnabled ? new Date(scheduleTime) : undefined,
             status: scheduleEnabled ? "SCHEDULED" : sendNowEnabled ? "PUBLISHED" : "DRAFT",
@@ -101,12 +118,49 @@ const NotificationComposer: React.FC = () => {
                     <CardContent className="space-y-4">
                         <div>
                             <label className="text-sm font-medium mb-2 block">Title *</label>
-                            <Input placeholder="Enter notification title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={50} />
+                            <Input
+                                placeholder="Enter notification title"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                maxLength={50}
+                                endContent={
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button size="icon" variant="ghost" aria-label="Insert emoji">
+                                                <Smile className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {SMILEYS.map((emoji) => (
+                                                <DropdownMenuItem key={emoji} onClick={() => setTitle((t) => `${t}${emoji}`)}>
+                                                    {emoji}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                }
+                            />
                             <p className="text-xs text-gray-500 mt-1">{title.length}/50 characters</p>
                         </div>
 
                         <div>
-                            <label className="text-sm font-medium mb-2 block">Message *</label>
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="text-sm font-medium block">Message *</label>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button size="icon" variant="ghost" aria-label="Insert emoji">
+                                            <Smile className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        {SMILEYS.map((emoji) => (
+                                            <DropdownMenuItem key={emoji} onClick={() => setMessage((m) => `${m}${emoji}`)}>
+                                                {emoji}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                             <textarea
                                 className="w-full px-3 py-2 border border-input rounded-md text-sm resize-none"
                                 rows={4}

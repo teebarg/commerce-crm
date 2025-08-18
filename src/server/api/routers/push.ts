@@ -58,7 +58,10 @@ export const pushNotificationRouter = createTRPCRouter({
         });
     }),
     deleteNotification: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
-        return await ctx.db.notification.delete({ where: { id: input } });
+        return await ctx.db.$transaction(async (tx) => {
+            await tx.notificationEvent.deleteMany({ where: { notificationId: input } });
+            return await tx.notification.delete({ where: { id: input } });
+        });
     }),
     createTemplate: protectedProcedure.input(CreateNotificationTemplateSchema).mutation(async ({ ctx, input }) => {
         return ctx.db.notificationTemplate.create({

@@ -1,4 +1,4 @@
-import { Edit, Trash2, Play, RefreshCw } from "lucide-react";
+import { Edit, Trash2, Play, RefreshCw, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { NotificationStatusEnum } from "@/schemas/notification.schema";
@@ -44,14 +44,36 @@ const NotificationActions: React.FC<NotificationActionsProps> = ({ notification 
         },
     });
 
+    const duplicateMutation = api.push.createNotification.useMutation({
+        onSuccess: async () => {
+            toast.success("Notification duplicated", {
+                description: "A draft copy has been created.",
+            });
+            await utils.push.invalidate();
+        },
+        onError: (error: unknown) => {
+            toast.error(`Error - ${error as string}`);
+        },
+    });
+
     const handleSendNow = (): void => {
         mutation.mutate({
-            title: `${notification.icon} ${notification.title}`,
+            title: notification.title,
             body: notification.body,
             group: "bot",
             id: notification.id,
             imageUrl: notification.imageUrl,
             data: notification.data,
+        });
+    };
+
+    const handleDuplicate = (): void => {
+        duplicateMutation.mutate({
+            title: notification.title,
+            body: notification.body,
+            imageUrl: notification.imageUrl ?? undefined,
+            data: notification.data as any,
+            status: "DRAFT",
         });
     };
 
@@ -81,6 +103,9 @@ const NotificationActions: React.FC<NotificationActionsProps> = ({ notification 
                     </Overlay>
                 </>
             )}
+            <Button size="icon" variant="outline" onClick={handleDuplicate} disabled={duplicateMutation.isPending}>
+                <Copy className="h-3 w-3" />
+            </Button>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>
                     <Button size="icon" variant="outline" className="text-red-600 hover:text-red-700">

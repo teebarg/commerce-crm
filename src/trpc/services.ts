@@ -20,7 +20,7 @@ export const sendNotificationsToSubscribers = async (subscriptions: PushSubscrip
         const payload = JSON.stringify({
             title: notification.title,
             body: notification.body,
-            path: "/collections",
+            path: notification.data?.actionUrl || "/collections",
             data: notification.data,
             imageUrl: notification.imageUrl,
             subscriberId: subscriber.id,

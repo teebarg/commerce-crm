@@ -35,7 +35,8 @@ export const CreateNotificationSchema = z.object({
 export const UpdateNotificationSchema = z.object({
     title: z.string(),
     body: z.string(),
-    imageUrl: z.string().nullable().optional(),
+    // imageUrl: z.string().nullable().optional(),
+    data: z.record(z.any()).optional(),
 });
 
 export const NotifySchema = z.object({
