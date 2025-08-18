@@ -30,6 +30,19 @@ export const pushNotificationRouter = createTRPCRouter({
             notifications,
         };
     }),
+    subscriptions: protectedProcedure.query(async ({ ctx }) => {
+        const subscriptions = await ctx.db.pushSubscription.findMany({
+            orderBy: { createdAt: "desc" },
+            include: {
+                NotificationEvent: {
+                    orderBy: { occurredAt: "desc" },
+                    take: 1,
+                },
+            },
+        });
+
+        return { subscriptions };
+    }),
     createNotification: protectedProcedure.input(CreateNotificationSchema).mutation(async ({ ctx, input }) => {
         return ctx.db.notification.create({
             data: {
@@ -63,11 +76,20 @@ export const pushNotificationRouter = createTRPCRouter({
     deleteTemplate: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
         return await ctx.db.notificationTemplate.delete({ where: { id: input } });
     }),
-
-    // subscriptions
     createSubscription: publicProcedure.input(PushSubscriptionSchema).mutation(async ({ ctx, input }) => {
         return ctx.db.pushSubscription.create({
             data: {
+                ...input,
+            },
+        });
+    }),
+    syncSubscription: publicProcedure.input(PushSubscriptionSchema).mutation(async ({ ctx, input }) => {
+        return ctx.db.pushSubscription.upsert({
+            where: { endpoint: input.endpoint },
+            create: {
+                ...input,
+            },
+            update: {
                 ...input,
             },
         });

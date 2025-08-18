@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { auth } from "@/server/auth";
 
 const AUTH_PATHS = new Set<string>(["/auth/signin", "/auth/error", "/auth/verify-request"]);
-const PROTECTED_PATHS = new Set<string>(["/", "/dashboard"]);
+const PROTECTED_PATHS = new Set<string>(["/", "/dashboard", "/notifications", "/notifications/:id*"]);
 
 export default async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;

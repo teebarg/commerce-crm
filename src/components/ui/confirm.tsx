@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -6,13 +6,11 @@ interface Props {
     content?: string;
     onConfirm?: () => void;
     onClose?: () => void;
+    isLoading?: boolean;
 }
 
-const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onClose }) => {
-    const [isPending, setIsPending] = useState<boolean>(false);
-
+const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onClose, isLoading = false }) => {
     const onSubmit = async () => {
-        setIsPending(true);
         onConfirm?.();
     };
 
@@ -33,7 +31,7 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onCl
                 <Button variant="outline" onClick={onClose}>
                     Close
                 </Button>
-                <Button isLoading={isPending} variant="destructive" type="submit" onClick={onSubmit}>
+                <Button isLoading={isLoading} variant="destructive" type="submit" onClick={onSubmit}>
                     Delete
                 </Button>
             </div>

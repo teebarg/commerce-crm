@@ -9,14 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";
-import Image from "next/image";
+// import Image from "next/image";
 
 const NotificationComposer: React.FC = () => {
     const utils = api.useUtils();
     const [title, setTitle] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const [actionUrl, setActionUrl] = useState<string>("");
-    const [iconUrl, setIconUrl] = useState<string>("");
     const [scheduleEnabled, setScheduleEnabled] = useState<boolean>(false);
     const [sendNowEnabled, setSendNowEnabled] = useState<boolean>(false);
     const [scheduleTime, setScheduleTime] = useState<string>("");
@@ -32,7 +31,6 @@ const NotificationComposer: React.FC = () => {
             setTitle("");
             setMessage("");
             setActionUrl("");
-            setIconUrl("");
             setScheduleEnabled(false);
             setScheduleTime("");
             setTargetAll(true);
@@ -51,12 +49,11 @@ const NotificationComposer: React.FC = () => {
         }
 
         mutation.mutate({
-            title: `${iconUrl} ${title}`,
+            title: `${title}`,
             body: message,
             scheduledAt: scheduleEnabled ? new Date(scheduleTime) : undefined,
             status: scheduleEnabled ? "SCHEDULED" : sendNowEnabled ? "PUBLISHED" : "DRAFT",
             data: { actionUrl },
-            imageUrl: iconUrl,
         });
     };
 
@@ -77,19 +74,14 @@ const NotificationComposer: React.FC = () => {
                 <CardContent>
                     <div className="bg-white rounded-lg p-4 shadow-sm">
                         <div className="flex items-start gap-3">
-                            {iconUrl && (
-                                <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <Image src={iconUrl} alt="Icon" className="w-6 h-6 rounded" />
-                                </div>
-                            )}
                             <div className="flex-1 min-w-0">
                                 <h4 className="font-medium text-gray-900 truncate">{title || "Your notification title"}</h4>
                                 <p className="text-sm text-gray-600 mt-1">{message || "Your notification message will appear here"}</p>
                                 {actionUrl && (
                                     <div className="mt-2">
-                                        <Badge variant="outline" className="text-xs">
+                                        <Badge variant="yellow" className="text-xs">
                                             <Link className="h-3 w-3 mr-1" />
-                                            Action Available
+                                            {actionUrl}
                                         </Badge>
                                     </div>
                                 )}
@@ -129,15 +121,6 @@ const NotificationComposer: React.FC = () => {
                         <div>
                             <label className="text-sm font-medium mb-2 block">Action URL</label>
                             <Input placeholder="https://example.com (optional)" value={actionUrl} onChange={(e) => setActionUrl(e.target.value)} />
-                        </div>
-
-                        <div>
-                            <label className="text-sm font-medium mb-2 block">Icon URL</label>
-                            <Input
-                                placeholder="https://example.com/icon.png (optional)"
-                                value={iconUrl}
-                                onChange={(e) => setIconUrl(e.target.value)}
-                            />
                         </div>
                     </CardContent>
                 </Card>

@@ -4,7 +4,7 @@
 "use client";
 
 import { Edit, Eye } from "nui-react-icons";
-import React, { cloneElement, isValidElement } from "react";
+import React, { cloneElement, isValidElement, useState } from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { useRouter } from "next/navigation";
 import { Confirm } from "@/components/ui/confirm";
@@ -28,14 +28,18 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
     const deleteState = useOverlayTriggerState({});
     const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: editState.close }) : form;
     const router = useRouter();
+    const [isPending, setIsPending] = useState<boolean>(false);
 
     const onConfirmDelete = async () => {
         try {
+            setIsPending(true);
             await deleteAction?.((item as any).id);
             router.refresh();
             deleteState.close();
         } catch (error) {
             toast.error(`Error deleting ${label} - ${error as string}`);
+        } finally {
+            setIsPending(false);
         }
     };
 
@@ -71,7 +75,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                     <DialogHeader className="sr-only">
                         <DialogTitle>{`Delete ${label}`}</DialogTitle>
                     </DialogHeader>
-                    <Confirm onClose={deleteState.close} onConfirm={onConfirmDelete} />
+                    <Confirm onClose={deleteState.close} onConfirm={onConfirmDelete} isLoading={isPending} />
                 </DialogContent>
             </Dialog>
         </div>

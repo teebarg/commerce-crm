@@ -175,7 +175,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
                             <DialogHeader className="sr-only">
                                 <DialogTitle>Delete Post</DialogTitle>
                             </DialogHeader>
-                            <Confirm onClose={deleteState.close} onConfirm={handleDeletePost} />
+                            <Confirm onClose={deleteState.close} onConfirm={handleDeletePost} isLoading={deletePost.isPending} />
                         </DialogContent>
                     </Dialog>
                 </div>

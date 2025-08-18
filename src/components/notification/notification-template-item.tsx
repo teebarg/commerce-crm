@@ -98,7 +98,11 @@ const NotificationTemplateItem: React.FC<NotificationTemplateItemProps> = ({ tem
                             <DialogHeader className="sr-only">
                                 <DialogTitle>{`Delete ${template.title}`}</DialogTitle>
                             </DialogHeader>
-                            <Confirm onClose={deleteState.close} onConfirm={() => void deleteMutation.mutate(template.id)} />
+                            <Confirm
+                                onClose={deleteState.close}
+                                onConfirm={() => void deleteMutation.mutate(template.id)}
+                                isLoading={deleteMutation.isPending}
+                            />
                         </DialogContent>
                     </Dialog>
                 </div>

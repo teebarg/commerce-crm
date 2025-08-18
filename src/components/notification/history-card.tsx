@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { type Notification } from "@prisma/client";
 import { NotificationStatusEnum } from "@/schemas/notification.schema";
 import NotificationActions from "../push/NotificationActions";
+import { Link as LinkIcon } from "lucide-react";
 
 export const HistoryCard = ({ notification }: { notification: Notification }) => {
     const getStatusVariant = (status: NotificationStatusEnum) => {
@@ -30,6 +31,18 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
                         </div>
 
                         <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{notification.body}</p>
+
+                        {(() => {
+                            const data: any = notification.data as any;
+                            const actionUrl: string | undefined = data?.actionUrl;
+                            if (!actionUrl || typeof actionUrl !== "string") return null;
+                            return (
+                                <div className="mb-3 flex items-center gap-2 text-sm">
+                                    <LinkIcon className="h-4 w-4 text-blue-600" />
+                                    <p className="text-blue-600 break-all">{actionUrl}</p>
+                                </div>
+                            );
+                        })()}
 
                         {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             <div>
@@ -59,7 +72,9 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
                                     <div className="text-green-600">Sent: {formatDistanceToNow(notification.sentAt, { addSuffix: true })}</div>
                                 )}
                                 {notification.status === NotificationStatusEnum.Values.SCHEDULED && notification.scheduledAt && (
-                                    <div className="text-blue-600">Scheduled: {formatDistanceToNow(notification.scheduledAt, { addSuffix: true })}</div>
+                                    <div className="text-blue-600">
+                                        Scheduled: {formatDistanceToNow(notification.scheduledAt, { addSuffix: true })}
+                                    </div>
                                 )}
                                 {notification.status === NotificationStatusEnum.Values.DRAFT && <div className="text-gray-500">Draft</div>}
                             </div>

@@ -91,7 +91,11 @@ const NotificationActions: React.FC<NotificationActionsProps> = ({ notification 
                     <DialogHeader className="sr-only">
                         <DialogTitle>{`Delete ${notification.title}`}</DialogTitle>
                     </DialogHeader>
-                    <Confirm onClose={deleteState.close} onConfirm={() => void deleteMutation.mutate(notification.id)} />
+                    <Confirm
+                        onClose={deleteState.close}
+                        onConfirm={() => void deleteMutation.mutate(notification.id)}
+                        isLoading={deleteMutation.isPending}
+                    />
                 </DialogContent>
             </Dialog>
         </div>
