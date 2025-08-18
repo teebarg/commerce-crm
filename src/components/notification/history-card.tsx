@@ -5,8 +5,15 @@ import { type Notification } from "@prisma/client";
 import { NotificationStatusEnum } from "@/schemas/notification.schema";
 import NotificationActions from "../push/NotificationActions";
 import { Link as LinkIcon } from "lucide-react";
+import { api } from "@/trpc/react";
 
 export const HistoryCard = ({ notification }: { notification: Notification }) => {
+    const { data: metrics } = api.push.notificationMetrics.useQuery(notification.id);
+    const recipients = (notification.sentCount ?? 0) + (notification.failedCount ?? 0);
+    const delivered = metrics?.delivered ?? notification.sentCount ?? 0;
+    const opened = metrics?.opened ?? 0;
+    const deliveryRate = recipients > 0 ? Math.round((delivered / recipients) * 100) : 0;
+    const openRate = delivered > 0 ? Math.round((opened / delivered) * 100) : 0;
     const getStatusVariant = (status: NotificationStatusEnum) => {
         switch (status) {
             case "PUBLISHED":
@@ -44,27 +51,27 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
                             );
                         })()}
 
-                        {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             <div>
                                 <p className="text-muted-foreground">Audience</p>
-                                <p className="font-medium">{item.audience}</p>
+                                <p className="font-medium">All Subscribers</p>
                             </div>
 
                             <div>
                                 <p className="text-muted-foreground">Recipients</p>
-                                <p className="font-medium">{item.recipients.toLocaleString()}</p>
+                                <p className="font-medium">{recipients.toLocaleString()}</p>
                             </div>
 
                             <div>
                                 <p className="text-muted-foreground">Open Rate</p>
-                                <p className="font-medium">{item.status === "sent" ? `${item.openRate}%` : "-"}</p>
+                                <p className="font-medium">{notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${openRate}%` : "-"}</p>
                             </div>
 
                             <div>
-                                <p className="text-muted-foreground">Click Rate</p>
-                                <p className="font-medium">{item.status === "sent" ? `${item.clickRate}%` : "-"}</p>
+                                <p className="text-muted-foreground">Delivery Rate</p>
+                                <p className="font-medium">{notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${deliveryRate}%` : "-"}</p>
                             </div>
-                        </div> */}
+                        </div>
 
                         <div className="flex items-center justify-between mt-4 pt-4 border-t">
                             <div className="text-sm">

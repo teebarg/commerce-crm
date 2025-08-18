@@ -21,7 +21,7 @@ export const pushNotificationRouter = createTRPCRouter({
             templates,
         };
     }),
-    notifications: protectedProcedure.query(async ({ ctx }) => {
+    notifications: publicProcedure.query(async ({ ctx }) => {
         const notifications = await ctx.db.notification.findMany({
             orderBy: { createdAt: "desc" },
         });
@@ -29,6 +29,31 @@ export const pushNotificationRouter = createTRPCRouter({
         return {
             notifications,
         };
+    }),
+    analytics: protectedProcedure.query(async ({ ctx }) => {
+        const [totalSubscribers, notificationsSent, activeCampaigns, deliveredEvents, openedEvents] = await Promise.all([
+            ctx.db.pushSubscription.count(),
+            ctx.db.notification.count({ where: { status: "PUBLISHED" } }),
+            ctx.db.notification.count({ where: { status: "SCHEDULED" } }),
+            ctx.db.notificationEvent.count({ where: { eventType: "DELIVERED" } }),
+            ctx.db.notificationEvent.count({ where: { eventType: "OPENED" } }),
+        ]);
+
+        const openRate = deliveredEvents > 0 ? (openedEvents / deliveredEvents) * 100 : 0;
+
+        return {
+            totalSubscribers,
+            notificationsSent,
+            openRate,
+            activeCampaigns,
+        };
+    }),
+    notificationMetrics: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+        const [delivered, opened] = await Promise.all([
+            ctx.db.notificationEvent.count({ where: { notificationId: input, eventType: "DELIVERED" } }),
+            ctx.db.notificationEvent.count({ where: { notificationId: input, eventType: "OPENED" } }),
+        ]);
+        return { delivered, opened };
     }),
     subscriptions: protectedProcedure.query(async ({ ctx }) => {
         const subscriptions = await ctx.db.pushSubscription.findMany({
@@ -44,12 +69,36 @@ export const pushNotificationRouter = createTRPCRouter({
         return { subscriptions };
     }),
     createNotification: protectedProcedure.input(CreateNotificationSchema).mutation(async ({ ctx, input }) => {
-        return ctx.db.notification.create({
+        const created = await ctx.db.notification.create({
             data: {
                 ...input,
                 sentAt: input.status === "PUBLISHED" ? new Date() : undefined,
             },
         });
+
+        if (input.status === "PUBLISHED") {
+            const subs = await ctx.db.pushSubscription.findMany({});
+            const { sentSubscriptions, failedSubscriptions } = await sendNotificationsToSubscribers(subs, {
+                id: created.id,
+                title: created.title,
+                body: created.body,
+                group: "bot",
+                imageUrl: created.imageUrl,
+                data: created.data,
+            });
+
+            await ctx.db.notification.update({
+                where: { id: created.id },
+                data: {
+                    status: "PUBLISHED",
+                    sentCount: sentSubscriptions.length,
+                    failedCount: failedSubscriptions.length,
+                    sentAt: new Date(),
+                },
+            });
+        }
+
+        return created;
     }),
     updateNotification: protectedProcedure.input(UpdateNotificationSchema.extend({ id: z.string() })).mutation(async ({ input, ctx }) => {
         return await ctx.db.notification.update({

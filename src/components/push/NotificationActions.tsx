@@ -1,4 +1,4 @@
-import { Edit, Trash2, Play, RefreshCw, Copy } from "lucide-react";
+import { Edit, Trash2, Play, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { NotificationStatusEnum } from "@/schemas/notification.schema";
@@ -79,11 +79,6 @@ const NotificationActions: React.FC<NotificationActionsProps> = ({ notification 
 
     return (
         <div className="flex items-center gap-2">
-            {notification.status === NotificationStatusEnum.Values.PUBLISHED && (
-                <Button size="icon" onClick={handleSendNow} variant="outline">
-                    <RefreshCw className="h-3 w-3" />
-                </Button>
-            )}
             {notification.status !== NotificationStatusEnum.Values.PUBLISHED && (
                 <>
                     <Button size="icon" variant="outline" onClick={handleSendNow}>

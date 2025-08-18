@@ -13,7 +13,7 @@ const NotificationHistory: React.FC = () => {
     const [res] = api.push.notifications.useSuspenseQuery();
     const notifications = res.notifications;
 
-    const [filterStatus, setFilterStatus] = useState("all");
+    const [filterStatus, setFilterStatus] = useState<string>("all");
 
     const filteredNotifications = notifications.filter((notif) => filterStatus === "all" || notif.status === filterStatus);
 

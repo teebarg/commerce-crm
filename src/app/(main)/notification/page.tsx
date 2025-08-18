@@ -1,8 +1,17 @@
+"use client";
+
 import { RecentActivity } from "@/components/notification/recent-activity";
 import { StatsCard } from "@/components/notification/stats-card";
 import { Users, Send, TrendingUp, Bell } from "lucide-react";
+import { api } from "@/trpc/react";
 
 export default function Notification() {
+    const { data } = api.push.analytics.useQuery();
+    const totalSubscribers = data?.totalSubscribers ?? 0;
+    const notificationsSent = data?.notificationsSent ?? 0;
+    const openRate = data ? `${data.openRate.toFixed(1)}%` : "-";
+    const activeCampaigns = data?.activeCampaigns ?? 0;
+
     return (
         <div className="container mx-auto px-4 py-6">
             <div className="space-y-6">
@@ -12,17 +21,10 @@ export default function Notification() {
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <StatsCard
-                        title="Total Subscribers"
-                        value="2,453"
-                        change="+12.5%"
-                        changeType="positive"
-                        icon={Users}
-                        description="from last month"
-                    />
-                    <StatsCard title="Notifications Sent" value="8,432" change="+8.2%" changeType="positive" icon={Send} description="this month" />
-                    <StatsCard title="Open Rate" value="24.8%" change="+2.1%" changeType="positive" icon={TrendingUp} description="average" />
-                    <StatsCard title="Active Campaigns" value="12" change="3 new" changeType="neutral" icon={Bell} description="running" />
+                    <StatsCard title="Total Subscribers" value={String(totalSubscribers)} icon={Users} description="current total" />
+                    <StatsCard title="Notifications Sent" value={String(notificationsSent)} icon={Send} description="all time" />
+                    <StatsCard title="Open Rate" value={openRate} changeType="positive" icon={TrendingUp} description="based on delivered" />
+                    <StatsCard title="Active Campaigns" value={String(activeCampaigns)} icon={Bell} description="scheduled" />
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

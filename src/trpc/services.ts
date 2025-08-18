@@ -3,12 +3,12 @@ import { type PushSubscription } from "@prisma/client";
 import { type Notify } from "@/schemas/notification.schema";
 
 export const sendNotificationsToSubscribers = async (subscriptions: PushSubscription[], notification: Notify) => {
-    const failedSubscriptions: any[] = [];
-    const sentSubscriptions: any[] = [];
+    const failedSubscriptions: string[] = [];
+    const sentSubscriptions: string[] = [];
 
     webpush.setVapidDetails(`mailto:${process.env.ADMIN_EMAIL}`, process.env.VAPID_PUBLIC_KEY!, process.env.VAPID_PRIVATE_KEY!);
 
-    subscriptions.forEach((subscriber: PushSubscription) => {
+    for (const subscriber of subscriptions) {
         const subscription = {
             endpoint: subscriber.endpoint,
             keys: {
@@ -27,16 +27,14 @@ export const sendNotificationsToSubscribers = async (subscriptions: PushSubscrip
             notificationId: notification.id,
         });
 
-        webpush
-            .sendNotification(subscription, payload)
-            .then(() => {
-                sentSubscriptions.push(subscriber.id);
-            })
-            .catch((error: any) => {
-                console.error("WebPush Error:", error);
-                failedSubscriptions.push(subscriber.id);
-            });
-    });
+        try {
+            await webpush.sendNotification(subscription, payload);
+            sentSubscriptions.push(subscriber.id);
+        } catch (error) {
+            console.error("WebPush Error:", error);
+            failedSubscriptions.push(subscriber.id);
+        }
+    }
 
     if (failedSubscriptions.length > 0) {
         console.log(`Failed to send notifications to: ${JSON.stringify(failedSubscriptions)}`);
