@@ -11,6 +11,7 @@ import { formatDate } from "@/lib/utils";
 import { Confirm } from "@/components/ui/confirm";
 import Overlay from "@/components/overlay";
 import { TemplateForm } from "./template-form";
+import UseTemplateForm from "./use-template-form";
 
 interface NotificationTemplateItemProps {
     template: NotificationTemplate;
@@ -19,6 +20,7 @@ interface NotificationTemplateItemProps {
 const NotificationTemplateItem: React.FC<NotificationTemplateItemProps> = ({ template }) => {
     const deleteState = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
+    const useTemplateState = useOverlayTriggerState({});
     const utils = api.useUtils();
 
     const deleteMutation = api.push.deleteTemplate.useMutation({
@@ -34,11 +36,7 @@ const NotificationTemplateItem: React.FC<NotificationTemplateItemProps> = ({ tem
         },
     });
 
-    const handleUseTemplate = (template: NotificationTemplate) => {
-        toast.success("Template Applied", {
-            description: `"${template.title}" template has been loaded in the composer.`,
-        });
-    };
+
 
     const handleCopyTemplate = (template: NotificationTemplate) => {
         toast.success("Template Copied", {
@@ -70,9 +68,19 @@ const NotificationTemplateItem: React.FC<NotificationTemplateItemProps> = ({ tem
                 </div>
 
                 <div className="flex gap-2">
-                    <Button className="flex-1" onClick={() => handleUseTemplate(template)}>
-                        Use Template
-                    </Button>
+                    <Overlay
+                        open={useTemplateState.isOpen}
+                        title={`Use Template: ${template.title}`}
+                        trigger={
+                            <Button className="flex-1">
+                                Use Template
+                            </Button>
+                        }
+                        onOpenChange={useTemplateState.setOpen}
+                        sheetClassName="min-w-[40vw]"
+                    >
+                        <UseTemplateForm template={template} onClose={useTemplateState.close} />
+                    </Overlay>
                     <Button variant="outline" size="icon" onClick={() => handleCopyTemplate(template)}>
                         <Copy className="h-4 w-4" />
                     </Button>
