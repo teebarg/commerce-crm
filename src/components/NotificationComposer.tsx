@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { api } from "@/trpc/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { EMOJIS } from "@/utils/emoji";
+import { uploadMediaToSupabase } from "@/lib/supabase";
 // import Image from "next/image";
 
 const NotificationComposer: React.FC = () => {
@@ -18,6 +19,7 @@ const NotificationComposer: React.FC = () => {
     const [title, setTitle] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const [actionUrl, setActionUrl] = useState<string>("");
+    const [imageUrl, setImageUrl] = useState<string>("");
     const [scheduleEnabled, setScheduleEnabled] = useState<boolean>(false);
     const [sendNowEnabled, setSendNowEnabled] = useState<boolean>(false);
     const [scheduleTime, setScheduleTime] = useState<string>("");
@@ -36,6 +38,7 @@ const NotificationComposer: React.FC = () => {
             setScheduleEnabled(false);
             setScheduleTime("");
             setTargetAll(true);
+            setImageUrl("");
         },
         onError: (error: unknown) => {
             toast.error(`Error - ${error as string}`);
@@ -56,6 +59,7 @@ const NotificationComposer: React.FC = () => {
             scheduledAt: scheduleEnabled ? new Date(scheduleTime) : undefined,
             status: scheduleEnabled ? "SCHEDULED" : sendNowEnabled ? "PUBLISHED" : "DRAFT",
             data: { actionUrl },
+            imageUrl: imageUrl || undefined,
         });
     };
 
@@ -85,6 +89,11 @@ const NotificationComposer: React.FC = () => {
                                             <Link className="h-3 w-3 mr-1" />
                                             {actionUrl}
                                         </Badge>
+                                    </div>
+                                )}
+                                {imageUrl && (
+                                    <div className="mt-3">
+                                        <img src={imageUrl} alt="notification" className="max-h-32 rounded-md border" />
                                     </div>
                                 )}
                             </div>
@@ -160,6 +169,28 @@ const NotificationComposer: React.FC = () => {
                         <div>
                             <label className="text-sm font-medium mb-2 block">Action URL</label>
                             <Input placeholder="https://example.com (optional)" value={actionUrl} onChange={(e) => setActionUrl(e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium mb-2 block">Image URL</label>
+                            <Input placeholder="https://example.com/image.png (optional)" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium mb-2 block">Or Upload Image</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    try {
+                                        const url = await uploadMediaToSupabase(file, "notifications");
+                                        setImageUrl(url);
+                                        toast.success("Image uploaded", { description: "Image uploaded to Supabase." });
+                                    } catch (err) {
+                                        toast.error("Upload failed", { description: String(err) });
+                                    }
+                                }}
+                            />
                         </div>
                     </CardContent>
                 </Card>

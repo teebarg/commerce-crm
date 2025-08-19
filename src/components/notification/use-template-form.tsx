@@ -12,6 +12,7 @@ import { type NotificationTemplate } from "@prisma/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Smile } from "lucide-react";
 import { EMOJIS } from "@/utils/emoji";
+import { uploadMediaToSupabase } from "@/lib/supabase";
 
 interface UseTemplateFormProps {
     template: NotificationTemplate;
@@ -26,6 +27,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
     const [body, setBody] = useState<string>(template.body);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const [actionUrl, setActionUrl] = useState<string>((template.data as any)?.actionUrl ?? "");
+    const [imageUrl, setImageUrl] = useState<string>((template as any)?.imageUrl ?? "");
     const [scheduleEnabled, setScheduleEnabled] = useState<boolean>(false);
     const [sendNowEnabled, setSendNowEnabled] = useState<boolean>(true);
     const [scheduleTime, setScheduleTime] = useState<string>("");
@@ -57,6 +59,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
             scheduledAt: scheduleEnabled ? new Date(scheduleTime) : undefined,
             status: scheduleEnabled ? "SCHEDULED" : sendNowEnabled ? "PUBLISHED" : "DRAFT",
             data: { actionUrl },
+            imageUrl: imageUrl || undefined,
         });
     };
 
@@ -84,6 +87,11 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                             {actionUrl}
                                         </span>
+                                    </div>
+                                )}
+                                {imageUrl && (
+                                    <div className="mt-3">
+                                        <img src={imageUrl} alt="notification" className="max-h-32 rounded-md border" />
                                     </div>
                                 )}
                             </div>
@@ -162,6 +170,32 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
                                 placeholder="https://example.com (optional)"
                                 value={actionUrl}
                                 onChange={(e) => setActionUrl(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium mb-2 block">Image URL</label>
+                            <Input
+                                placeholder="https://example.com/image.png (optional)"
+                                value={imageUrl}
+                                onChange={(e) => setImageUrl(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium mb-2 block">Or Upload Image</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    try {
+                                        const url = await uploadMediaToSupabase(file, "notifications");
+                                        setImageUrl(url);
+                                    } catch (err) {
+                                        // no-op toast here to keep dependency minimal; composer shows toast
+                                        console.error("Upload failed", err);
+                                    }
+                                }}
                             />
                         </div>
                     </CardContent>

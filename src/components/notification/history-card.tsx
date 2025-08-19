@@ -51,6 +51,12 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
                             );
                         })()}
 
+                        {notification.imageUrl && (
+                            <div className="mb-3">
+                                <img src={notification.imageUrl} alt="notification" className="max-h-30 rounded-md border" />
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             <div>
                                 <p className="text-muted-foreground">Audience</p>
