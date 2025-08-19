@@ -301,3 +301,73 @@ model UserSettings {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+model EmailContact {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  memberships EmailGroupMember[]
+
+  @@map("email_contacts")
+}
+
+model EmailGroup {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  members       EmailGroupMember[]
+  EmailCampaign EmailCampaign[]
+
+  @@map("email_groups")
+}
+
+model EmailGroupMember {
+  id        String       @id @default(cuid())
+  contact   EmailContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId String       @map("contact_id")
+  group     EmailGroup   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId   String       @map("group_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  @@unique([contactId, groupId])
+  @@map("email_group_members")
+}
+
+model EmailCampaign {
+  id          String             @id @default(cuid())
+  subject     String
+  body        String
+  imageUrl    String?
+  data        Json?
+  status      NotificationStatus @default(DRAFT)
+  sentAt      DateTime?          @map("sent_at")
+  scheduledAt DateTime?          @map("scheduled_at")
+  group       EmailGroup?        @relation(fields: [groupId], references: [id])
+  groupId     String?            @map("group_id")
+
+  sentCount   Int @default(0) @map("sent_count")
+  failedCount Int @default(0) @map("failed_count")
+
+  events    EmailCampaignEvent[]
+  createdAt DateTime?            @default(now()) @map("created_at")
+  updatedAt DateTime?            @updatedAt @map("updated_at")
+
+  @@map("email_campaigns")
+}
+
+model EmailCampaignEvent {
+  id         String                @id @default(cuid())
+  campaign   EmailCampaign         @relation(fields: [campaignId], references: [id])
+  campaignId String                @map("campaign_id")
+  recipient  String
+  eventType  NotificationEventType @map("event_type")
+  occurredAt DateTime              @default(now()) @map("occurred_at")
+
+  @@index([campaignId, eventType])
+  @@map("email_campaign_events")
+}

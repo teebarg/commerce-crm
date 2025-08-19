@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, BarChart3, Send, History, FileText, PlusCircle, TrendingUp } from "lucide-react";
+import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, BarChart3, Send, History, FileText, PlusCircle, TrendingUp, Mail, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -37,6 +37,11 @@ const AdminItems = [
         title: "Settings",
         url: "/settings",
         icon: Settings,
+    },
+    {
+        title: "Worker Dashboard",
+        url: "/admin/worker",
+        icon: Settings2,
     },
     // {
     //     title: "Profile",
@@ -98,6 +103,11 @@ const PushNotification = [
         title: "Settings",
         url: "/notification/settings",
         icon: Settings,
+    },
+    {
+        title: "Email Campaigns",
+        url: "/notification/email",
+        icon: Mail,
     },
 ];
 

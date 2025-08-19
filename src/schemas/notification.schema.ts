@@ -60,6 +60,30 @@ export const NotificationTemplateSchema = z.object({
     updatedAt: z.date(),
 });
 
+export const CreateEmailCampaignSchema = z.object({
+    subject: z.string().min(1),
+    body: z.string().min(1),
+    actionUrl: z.string().url().optional(),
+    imageUrl: z.string().url().optional(),
+    recipients: z.array(z.string().email()).min(1).optional(),
+    groupSlug: z.string().optional(),
+});
+
+export type CreateEmailCampaign = z.infer<typeof CreateEmailCampaignSchema>;
+
+export const EmailCampaignAnalyticsSchema = z.object({
+    id: z.string(),
+    subject: z.string(),
+    body: z.string(),
+    status: NotificationStatusEnum,
+    recipients: z.number(),
+    openRate: z.number(),
+    clickRate: z.number(),
+    sentAt: z.date().nullable(),
+});
+
+export type EmailCampaignAnalytics = z.infer<typeof EmailCampaignAnalyticsSchema>;
+
 export const CreateNotificationTemplateSchema = z.object({
     title: z.string().min(1),
     body: z.string().min(1),
