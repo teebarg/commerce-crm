@@ -1,12 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Users, Search, Download, UserCheck, UserX, Globe, Smartphone } from "lucide-react";
+import { Users, Search, UserCheck, UserX, Globe, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { api } from "@/trpc/react";
 
 const SubscriberManager = () => {
@@ -41,26 +40,18 @@ const SubscriberManager = () => {
     const filteredSubscribers = useMemo(() => {
         const term = searchTerm.toLowerCase();
         return (subscribers ?? []).filter((subscriber) => {
-            const matchesSearch =
-                subscriber.endpoint.toLowerCase().includes(term) ||
-                subscriber.userAgent.toLowerCase().includes(term);
+            const matchesSearch = subscriber.endpoint.toLowerCase().includes(term) || subscriber.userAgent.toLowerCase().includes(term);
             const matchesFilter = filterStatus === "all" || subscriber.status === filterStatus;
             return matchesSearch && matchesFilter;
         });
     }, [subscribers, searchTerm, filterStatus]);
-
-    const handleExportSubscribers = () => {
-        console.log("Exporting subscribers...");
-        // Implement export functionality
-    };
 
     const handleUnsubscribe = async (subscriberId: string) => {
         await unsubscribeMutation.mutateAsync(subscriberId);
     };
 
     return (
-        <div className="space-y-6">
-            {/* Stats Overview */}
+        <div className="space-y-6 px-4 py-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardContent className="flex items-center p-6">
@@ -97,13 +88,14 @@ const SubscriberManager = () => {
                         <Globe className="h-8 w-8 text-purple-600" />
                         <div className="ml-4">
                             <p className="text-sm font-medium text-gray-600">Countries</p>
-                            <p className="text-2xl font-bold">{isLoading ? "-" : new Set(subscribers.map((s) => s.country).filter((c) => c && c !== "-")).size}</p>
+                            <p className="text-2xl font-bold">
+                                {isLoading ? "-" : new Set(subscribers.map((s) => s.country).filter((c) => c && c !== "-")).size}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Subscriber Management */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between">
@@ -111,15 +103,10 @@ const SubscriberManager = () => {
                             <Users className="h-5 w-5" />
                             Subscriber Management
                         </span>
-                        <Button onClick={handleExportSubscribers} variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-2" />
-                            Export
-                        </Button>
                     </CardTitle>
                     <CardDescription>Manage your push notification subscribers</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {/* Search and Filter */}
                     <div className="flex flex-col sm:flex-row gap-4 mb-6">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -147,61 +134,51 @@ const SubscriberManager = () => {
                         </div>
                     </div>
 
-                    {/* Subscribers Table */}
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Endpoint</TableHead>
-                                    <TableHead>Device/Browser</TableHead>
-                                    <TableHead>Location</TableHead>
-                                    <TableHead>Subscribed</TableHead>
-                                    <TableHead>Last Active</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={7}>Loading...</TableCell>
-                                    </TableRow>
-                                ) : filteredSubscribers.map((subscriber) => (
-                                    <TableRow key={subscriber.id}>
-                                        <TableCell className="font-mono text-xs max-w-xs truncate">{subscriber.endpoint}</TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                {(["ios", "android"].includes(subscriber.device)) ? (
-                                                    <Smartphone className="h-4 w-4 text-gray-500" />
-                                                ) : (
-                                                    <Globe className="h-4 w-4 text-gray-500" />
-                                                )}
-                                                <span className="text-sm">{subscriber.userAgent.split(" ")[0]}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>{subscriber.country}</TableCell>
-                                        <TableCell>{subscriber.subscribeDate}</TableCell>
-                                        <TableCell>{subscriber.lastActive}</TableCell>
-                                        <TableCell>
+                    <div className="space-y-4">
+                        {filteredSubscribers.map((subscriber, idx: number) => (
+                            <div key={idx} className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg hover:bg-muted/50">
+                                <div className="flex items-center gap-4">
+                                    <div>
+                                        <p className="font-medium overflow-hidden text-ellipsis line-clamp-1 max-w-[70vw]">{subscriber.endpoint}</p>
+                                        <div className="flex items-center gap-2">
+                                            {["ios", "android"].includes(subscriber.device) ? (
+                                                <Smartphone className="h-4 w-4 text-gray-500" />
+                                            ) : (
+                                                <Globe className="h-4 w-4 text-gray-500" />
+                                            )}
+                                            <span className="text-sm">{subscriber.userAgent.split(" ")[0]}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 mt-1">
                                             <Badge variant={subscriber.status === "active" ? "default" : "secondary"}>{subscriber.status}</Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleUnsubscribe(subscriber.id)}
-                                                className="text-red-600 hover:text-red-700"
-                                            >
-                                                <UserX className="h-4 w-4" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                    {filteredSubscribers.length === 0 && (
+                                <div className="flex items-center gap-4 flex-shrink-0 mt-4 md:mt-0">
+                                    <div className="text-sm">
+                                        <p className="text-muted-foreground">Subscribed: {subscriber.subscribeDate}</p>
+                                        <p className="text-muted-foreground">Last active: {subscriber.lastActive}</p>
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleUnsubscribe(subscriber.id)}
+                                        className="text-red-600 hover:text-red-700"
+                                    >
+                                        <UserX className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {isLoading && (
+                        <div className="text-center py-8 text-default-500">
+                            <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                            <p>Loading subscribers...</p>
+                        </div>
+                    )}
+
+                    {!isLoading && filteredSubscribers.length === 0 && (
                         <div className="text-center py-8 text-gray-500">
                             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
                             <p>No subscribers found matching your criteria.</p>

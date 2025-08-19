@@ -3,15 +3,16 @@ import ThemeToggle from "@/theme/theme-button";
 import { auth } from "@/server/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import MobileMenu from "./mobile-menu";
 
 const AdminNavbar = async () => {
     const session = await auth();
 
     return (
         <div className="flex items-center justify-between px-4 py-2.5 sticky top-0 z-50 bg-background">
-            <Link href="/">
-                <p className="font-semibold text-inherit">Crm</p>
-            </Link>
+            <div>
+                <MobileMenu session={session} />
+            </div>
 
             <div className="flex items-center gap-2">
                 <ThemeToggle />

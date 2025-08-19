@@ -25,6 +25,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
     const utils = api.useUtils();
     const [title, setTitle] = useState<string>(template.title);
     const [body, setBody] = useState<string>(template.body);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const [actionUrl, setActionUrl] = useState<string>((template.data as any)?.actionUrl ?? "");
     const [scheduleEnabled, setScheduleEnabled] = useState<boolean>(false);
     const [sendNowEnabled, setSendNowEnabled] = useState<boolean>(true);

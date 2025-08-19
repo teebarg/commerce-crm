@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, Network, BarChart3, Send, History, FileText, PlusCircle, TrendingUp } from "lucide-react";
+import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, BarChart3, Send, History, FileText, PlusCircle, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -179,15 +179,15 @@ export function AdminSidebar({ session }: { session: Session | null }) {
                                         <Avatar className="h-8 w-8 cursor-pointer">
                                             <AvatarImage alt={session?.user?.firstName ?? "User"} src={session?.user?.image ?? undefined} />
                                             <AvatarFallback className="bg-green-600 text-white text-xs">
-                                                {session?.user?.firstName
+                                                {session?.user?.name
                                                     ?.split(" ")
                                                     .map((n: string) => n[0])
                                                     .join("") ?? "ME"}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col">
-                                            <p className="font-semibold">{session?.user?.firstName ?? "User"}</p>
-                                            <p className="text-xs text-gray-600">{session?.user?.email ?? "User"}</p>
+                                            <p className="font-semibold">{session?.user?.name ?? "User"}</p>
+                                            <p className="text-xs text-default-500">{session?.user?.email ?? "User"}</p>
                                         </div>
                                     </div>
                                     <ChevronUp className="ml-auto" />
