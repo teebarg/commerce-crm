@@ -6,6 +6,7 @@ import { NotificationStatusEnum } from "@/schemas/notification.schema";
 import NotificationActions from "../push/NotificationActions";
 import { Link as LinkIcon } from "lucide-react";
 import { api } from "@/trpc/react";
+import Image from "next/image";
 
 export const HistoryCard = ({ notification }: { notification: Notification }) => {
     const { data: metrics } = api.push.notificationMetrics.useQuery(notification.id);
@@ -52,8 +53,15 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
                         })()}
 
                         {notification.imageUrl && (
-                            <div className="mb-3">
-                                <img src={notification.imageUrl} alt="notification" className="max-h-30 rounded-md border" />
+                            <div className="mb-3 relative h-32 w-full">
+                                <Image
+                                    src={notification.imageUrl}
+                                    alt="notification"
+                                    fill
+                                    className="object-contain rounded-md border"
+                                    sizes="(max-width: 768px) 100vw, 600px"
+                                    unoptimized
+                                />
                             </div>
                         )}
 

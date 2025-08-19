@@ -12,7 +12,7 @@ import { api } from "@/trpc/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { EMOJIS } from "@/utils/emoji";
 import { uploadMediaToSupabase } from "@/lib/supabase";
-// import Image from "next/image";
+import Image from "next/image";
 
 const NotificationComposer: React.FC = () => {
     const utils = api.useUtils();
@@ -92,8 +92,15 @@ const NotificationComposer: React.FC = () => {
                                     </div>
                                 )}
                                 {imageUrl && (
-                                    <div className="mt-3">
-                                        <img src={imageUrl} alt="notification" className="max-h-32 rounded-md border" />
+                                    <div className="mt-3 relative h-32 w-full">
+                                        <Image
+                                            src={imageUrl}
+                                            alt="notification"
+                                            fill
+                                            className="object-contain rounded-md border"
+                                            sizes="(max-width: 768px) 100vw, 600px"
+                                            unoptimized
+                                        />
                                     </div>
                                 )}
                             </div>

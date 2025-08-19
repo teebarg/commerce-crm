@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 "use client";
 
 import React, { useState } from "react";
@@ -13,19 +14,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Smile } from "lucide-react";
 import { EMOJIS } from "@/utils/emoji";
 import { uploadMediaToSupabase } from "@/lib/supabase";
+import Image from "next/image";
 
 interface UseTemplateFormProps {
     template: NotificationTemplate;
     onClose: () => void;
 }
 
- 
-
 const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) => {
     const utils = api.useUtils();
     const [title, setTitle] = useState<string>(template.title);
     const [body, setBody] = useState<string>(template.body);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const [actionUrl, setActionUrl] = useState<string>((template.data as any)?.actionUrl ?? "");
     const [imageUrl, setImageUrl] = useState<string>((template as any)?.imageUrl ?? "");
     const [scheduleEnabled, setScheduleEnabled] = useState<boolean>(false);
@@ -91,7 +90,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
                                 )}
                                 {imageUrl && (
                                     <div className="mt-3">
-                                        <img src={imageUrl} alt="notification" className="max-h-32 rounded-md border" />
+                                        <Image src={imageUrl} alt="notification" className="rounded-md border" height={100} width={100} />
                                     </div>
                                 )}
                             </div>
@@ -166,11 +165,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
 
                         <div>
                             <label className="text-sm font-medium mb-2 block">Action URL</label>
-                            <Input
-                                placeholder="https://example.com (optional)"
-                                value={actionUrl}
-                                onChange={(e) => setActionUrl(e.target.value)}
-                            />
+                            <Input placeholder="https://example.com (optional)" value={actionUrl} onChange={(e) => setActionUrl(e.target.value)} />
                         </div>
                         <div>
                             <label className="text-sm font-medium mb-2 block">Image URL</label>
@@ -227,11 +222,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
                         {!sendNowEnabled && scheduleEnabled && (
                             <div>
                                 <label className="text-sm font-medium mb-2 block">Schedule Time</label>
-                                <Input
-                                    type="datetime-local"
-                                    value={scheduleTime}
-                                    onChange={(e) => setScheduleTime(e.target.value)}
-                                />
+                                <Input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} />
                             </div>
                         )}
 
