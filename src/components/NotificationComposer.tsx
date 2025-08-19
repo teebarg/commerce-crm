@@ -10,26 +10,11 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { EMOJIS } from "@/utils/emoji";
 // import Image from "next/image";
 
 const NotificationComposer: React.FC = () => {
     const utils = api.useUtils();
-    const SMILEYS = [
-        "😀",
-        "😁",
-        "😂",
-        "🤣",
-        "😊",
-        "😍",
-        "🤩",
-        "😎",
-        "😉",
-        "🙂",
-        "😄",
-        "😅",
-        "😇",
-        "🤗",
-    ];
     const [title, setTitle] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const [actionUrl, setActionUrl] = useState<string>("");
@@ -131,7 +116,7 @@ const NotificationComposer: React.FC = () => {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            {SMILEYS.map((emoji) => (
+                                            {EMOJIS.map((emoji) => (
                                                 <DropdownMenuItem key={emoji} onClick={() => setTitle((t) => `${t}${emoji}`)}>
                                                     {emoji}
                                                 </DropdownMenuItem>
@@ -153,7 +138,7 @@ const NotificationComposer: React.FC = () => {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        {SMILEYS.map((emoji) => (
+                                        {EMOJIS.map((emoji) => (
                                             <DropdownMenuItem key={emoji} onClick={() => setMessage((m) => `${m}${emoji}`)}>
                                                 {emoji}
                                             </DropdownMenuItem>
@@ -233,14 +218,6 @@ const NotificationComposer: React.FC = () => {
                         )}
 
                         <div className="pt-4 border-t">
-                            <div className="text-sm text-gray-600 mb-4">
-                                <p className="flex items-center gap-2 mb-1">
-                                    <Users className="h-4 w-4" />
-                                    Estimated reach: {targetAll ? "2,847" : "1,423"} subscribers
-                                </p>
-                                <p className="text-xs text-gray-500">Based on current active subscribers</p>
-                            </div>
-
                             <Button
                                 isLoading={mutation.isPending}
                                 onClick={handleSendNotification}

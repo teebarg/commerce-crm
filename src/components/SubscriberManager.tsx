@@ -57,7 +57,7 @@ const SubscriberManager = () => {
                     <CardContent className="flex items-center p-6">
                         <Users className="h-8 w-8 text-blue-600" />
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Total Subscribers</p>
+                            <p className="text-sm font-medium text-default-500">Total Subscribers</p>
                             <p className="text-2xl font-bold">{isLoading ? "-" : subscribers.length}</p>
                         </div>
                     </CardContent>
@@ -67,7 +67,7 @@ const SubscriberManager = () => {
                     <CardContent className="flex items-center p-6">
                         <UserCheck className="h-8 w-8 text-green-600" />
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Active</p>
+                            <p className="text-sm font-medium text-default-500">Active</p>
                             <p className="text-2xl font-bold">{isLoading ? "-" : subscribers.filter((s) => s.status === "active").length}</p>
                         </div>
                     </CardContent>
@@ -77,7 +77,7 @@ const SubscriberManager = () => {
                     <CardContent className="flex items-center p-6">
                         <UserX className="h-8 w-8 text-red-600" />
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Inactive</p>
+                            <p className="text-sm font-medium text-default-500">Inactive</p>
                             <p className="text-2xl font-bold">{isLoading ? "-" : subscribers.filter((s) => s.status !== "active").length}</p>
                         </div>
                     </CardContent>
@@ -87,7 +87,7 @@ const SubscriberManager = () => {
                     <CardContent className="flex items-center p-6">
                         <Globe className="h-8 w-8 text-purple-600" />
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Countries</p>
+                            <p className="text-sm font-medium text-default-500">Countries</p>
                             <p className="text-2xl font-bold">
                                 {isLoading ? "-" : new Set(subscribers.map((s) => s.country).filter((c) => c && c !== "-")).size}
                             </p>
@@ -136,7 +136,10 @@ const SubscriberManager = () => {
 
                     <div className="space-y-4">
                         {filteredSubscribers.map((subscriber, idx: number) => (
-                            <div key={idx} className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg hover:bg-muted/50">
+                            <div
+                                key={idx}
+                                className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
+                            >
                                 <div className="flex items-center gap-4">
                                     <div>
                                         <p className="font-medium overflow-hidden text-ellipsis line-clamp-1 max-w-[70vw]">{subscriber.endpoint}</p>

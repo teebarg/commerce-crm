@@ -26,7 +26,7 @@ const NotificationHistory: React.FC = () => {
                             <Send className="h-6 w-6 text-green-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Total Sent</p>
+                            <p className="text-sm font-medium text-default-600">Total Sent</p>
                             <p className="text-2xl font-bold">
                                 {notifications.filter((n) => n.status === NotificationStatusEnum.Values.PUBLISHED).length}
                             </p>
@@ -40,7 +40,7 @@ const NotificationHistory: React.FC = () => {
                             <Clock className="h-6 w-6 text-blue-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Scheduled</p>
+                            <p className="text-sm font-medium text-default-600">Scheduled</p>
                             <p className="text-2xl font-bold">
                                 {notifications.filter((n) => n.status === NotificationStatusEnum.Values.SCHEDULED).length}
                             </p>
@@ -54,7 +54,7 @@ const NotificationHistory: React.FC = () => {
                             <Edit className="h-6 w-6 text-gray-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Drafts</p>
+                            <p className="text-sm font-medium text-default-600">Drafts</p>
                             <p className="text-2xl font-bold">
                                 {notifications.filter((n) => n.status === NotificationStatusEnum.Values.DRAFT).length}
                             </p>

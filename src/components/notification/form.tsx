@@ -16,6 +16,7 @@ import { UpdateNotificationSchema } from "@/schemas/notification.schema";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Smile } from "lucide-react";
+import { EMOJIS } from "@/utils/emoji";
 import { Button as UIButton } from "@/components/ui/button";
 
 interface Props {
@@ -68,22 +69,7 @@ const NotificationForm = forwardRef<ChildRef, Props>(({ onClose, notification },
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const [actionUrl, setActionUrl] = React.useState<string>(actionUrlDefault);
 
-    const SMILEYS = [
-        "😀",
-        "😁",
-        "😂",
-        "🤣",
-        "😊",
-        "😍",
-        "🤩",
-        "😎",
-        "😉",
-        "🙂",
-        "😄",
-        "😅",
-        "😇",
-        "🤗",
-    ];
+    
 
     const onSubmit = (form: Form): void => {
         if (!notification) return;
@@ -114,7 +100,7 @@ const NotificationForm = forwardRef<ChildRef, Props>(({ onClose, notification },
                                             </UIButton>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            {SMILEYS.map((emoji) => (
+                                            {EMOJIS.map((emoji) => (
                                                 <DropdownMenuItem key={emoji} onClick={() => setValue("title", `${title}${emoji}`, { shouldDirty: true })}>
                                                     {emoji}
                                                 </DropdownMenuItem>
@@ -135,7 +121,7 @@ const NotificationForm = forwardRef<ChildRef, Props>(({ onClose, notification },
                                         </UIButton>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        {SMILEYS.map((emoji) => (
+                                        {EMOJIS.map((emoji) => (
                                             <DropdownMenuItem key={emoji} onClick={() => setValue("body", `${body}${emoji}`, { shouldDirty: true })}>
                                                 {emoji}
                                             </DropdownMenuItem>

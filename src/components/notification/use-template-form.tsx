@@ -11,15 +11,14 @@ import { api } from "@/trpc/react";
 import { type NotificationTemplate } from "@prisma/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Smile } from "lucide-react";
+import { EMOJIS } from "@/utils/emoji";
 
 interface UseTemplateFormProps {
     template: NotificationTemplate;
     onClose: () => void;
 }
 
-const SMILEYS = [
-    "😀", "😁", "😂", "🤣", "😊", "😍", "🤩", "😎", "😉", "🙂", "😄", "😅", "😇", "🤗",
-];
+ 
 
 const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) => {
     const utils = api.useUtils();
@@ -116,7 +115,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            {SMILEYS.map((emoji) => (
+                                            {EMOJIS.map((emoji) => (
                                                 <DropdownMenuItem key={emoji} onClick={() => setTitle((t) => `${t}${emoji}`)}>
                                                     {emoji}
                                                 </DropdownMenuItem>
@@ -138,7 +137,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        {SMILEYS.map((emoji) => (
+                                        {EMOJIS.map((emoji) => (
                                             <DropdownMenuItem key={emoji} onClick={() => setBody((m) => `${m}${emoji}`)}>
                                                 {emoji}
                                             </DropdownMenuItem>
