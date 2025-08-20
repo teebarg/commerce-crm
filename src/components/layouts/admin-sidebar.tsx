@@ -29,11 +29,6 @@ const AdminItems = [
         icon: Home,
     },
     {
-        title: "Users",
-        url: "/users",
-        icon: Users,
-    },
-    {
         title: "Settings",
         url: "/settings",
         icon: Settings,

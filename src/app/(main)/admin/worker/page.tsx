@@ -1,27 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { QueueStats } from "@/trpc/schema";
 
-interface QueueStats {
-    queueLength: number;
-    sampleEvents: Array<{
-        id: string;
-        data: {
-            id?: string;
-            type: string;
-            campaignId?: string;
-            recipient?: string;
-            email?: string;
-            timestamp?: number;
-            raw?: string;
-        };
-    }>;
-}
+// interface QueueStats {
+//     queueLength: number;
+//     sampleEvents: Array<{
+//         id: string;
+//         data: {
+//             id?: string;
+//             type: string;
+//             campaignId?: string;
+//             recipient?: string;
+//             email?: string;
+//             timestamp?: number;
+//             raw?: string;
+//         };
+//     }>;
+// }
 
 export default function WorkerPage() {
     const [stats, setStats] = useState<QueueStats | null>(null);
@@ -29,10 +30,14 @@ export default function WorkerPage() {
     const [processing, setProcessing] = useState<boolean>(false);
     const [lastProcessed, setLastProcessed] = useState<{ processed: number; errors?: string[] } | null>(null);
 
+    useEffect(() => {
+        fetchStats();
+    }, []);
+
     const fetchStats = async () => {
         setLoading(true);
         try {
-            const response = await fetch("/api/worker");
+            const response = await fetch("/api/worker/email");
             if (response.ok) {
                 const data = await response.json();
                 console.log("🚀 ~ fetchStats ~ data:", data);
@@ -50,7 +55,7 @@ export default function WorkerPage() {
     const processEvents = async (limit = 50) => {
         setProcessing(true);
         try {
-            const response = await fetch("/api/worker", {
+            const response = await fetch("/api/worker/email", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ limit }),
@@ -139,7 +144,7 @@ export default function WorkerPage() {
                         <CardTitle>Actions</CardTitle>
                         <CardDescription>Manual queue management</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-2">
+                    <CardContent className="space-x-2">
                         <Button
                             onClick={() => processEvents(10)}
                             disabled={processing || (stats?.queueLength ?? 0) === 0}
@@ -172,10 +177,10 @@ export default function WorkerPage() {
                                 <Skeleton key={i} className="h-16 w-full" />
                             ))}
                         </div>
-                    ) : stats?.sampleEvents && stats.sampleEvents.length > 0 ? (
+                    ) : stats && stats.queueLength > 0 ? (
                         <div className="space-y-3">
-                            {stats.sampleEvents.map(({id, data: event}, index) => (
-                                <div key={event.id ?? index} className="p-3 border rounded-lg">
+                            {stats.sampleEvents.map(({ id, data: event }, index) => (
+                                <div key={id ?? index} className="p-3 border rounded-lg">
                                     <div className="flex items-center justify-between mb-2">
                                         <Badge className={getEventTypeColor(event.type)}>{event.type}</Badge>
                                         {event.timestamp && <span className="text-sm text-gray-500">{formatTimestamp(event.timestamp)}</span>}
@@ -194,11 +199,6 @@ export default function WorkerPage() {
                                         {event.email && (
                                             <div>
                                                 <strong>Email:</strong> {event.email}
-                                            </div>
-                                        )}
-                                        {event.raw && (
-                                            <div>
-                                                <strong>Raw:</strong> <code className="text-xs">{event.raw}</code>
                                             </div>
                                         )}
                                     </div>

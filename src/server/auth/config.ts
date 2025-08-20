@@ -167,7 +167,7 @@ export const authConfig = {
             return token;
         },
         async session({ session, token }) {
-            if (token?.sub) {
+            if (token?.sub && token.user) {
                 session.user.id = token.sub;
                 session.user.firstName = token.firstName as string;
                 session.user.lastName = token.lastName as string;

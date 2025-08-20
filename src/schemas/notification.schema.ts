@@ -66,6 +66,7 @@ export const CreateEmailCampaignSchema = z.object({
     actionUrl: z.string().url().optional(),
     imageUrl: z.string().url().optional(),
     recipients: z.array(z.string().email()).min(1).optional(),
+    groupId: z.string().optional(),
     groupSlug: z.string().optional(),
 });
 

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{email_title}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, {{primary_color}} 0%, {{secondary_color}} 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .logo {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .hero-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+        
+        .hero-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .hero-subtitle {
+            font-size: 16px;
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+        
+        .promotion-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #e74c3c, #f39c12);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .product-card {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .product-description {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .price-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .current-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: {{primary_color}};
+        }
+        
+        .original-price {
+            font-size: 16px;
+            color: #95a5a6;
+            text-decoration: line-through;
+            margin-left: 10px;
+        }
+        
+        .discount-badge {
+            background-color: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, {{primary_color}} 0%, {{secondary_color}} 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            width: 100%;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .main-cta {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .main-cta .cta-button {
+            padding: 18px 40px;
+            font-size: 18px;
+            display: inline-block;
+            width: auto;
+        }
+        
+        .features-section {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+        
+        .features-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .features-list {
+            list-style: none;
+        }
+        
+        .features-list li {
+            padding: 10px 0;
+            font-size: 15px;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+        
+        .features-list li::before {
+            content: "✓";
+            color: {{primary_color}};
+            font-weight: bold;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        
+        .social-proof {
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .testimonial {
+            font-style: italic;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .customer-info {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        .footer {
+            background-color: #34495e;
+            color: #ecf0f1;
+            padding: 40px 30px 30px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            margin-bottom: 25px;
+        }
+        
+        .social-links {
+            margin: 20px 0;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .unsubscribe {
+            font-size: 12px;
+            color: #bdc3c7;
+            margin-top: 20px;
+        }
+        
+        .unsubscribe a {
+            color: #bdc3c7;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                box-shadow: none;
+            }
+            
+            .header, .content, .footer {
+                padding: 25px 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .hero-title {
+                font-size: 20px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .main-cta .cta-button {
+                padding: 15px 25px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            {{
+#if
+ logo_url}}
+            <img src="{{logo_url}}" alt="{{company_name}}" class="logo">
+            {{
+/if
+}}
+            <h1>{{email_title}}</h1>
+            <p>{{email_subtitle}}</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Hero Section -->
+            <div class="hero-section">
+                {{
+#if
+ promotion_badge}}
+                <div class="promotion-badge">{{promotion_badge}}</div>
+                {{
+/if
+}}
+                
+                {{
+#if
+ hero_image}}
+                <img src="{{hero_image}}" alt="{{hero_alt_text}}" class="hero-image">
+                {{
+/if
+}}
+                
+                <h2 class="hero-title">{{hero_title}}</h2>
+                <p class="hero-subtitle">{{hero_description}}</p>
+            </div>
+            
+            <!-- Products Grid -->
+            {{
+#if
+ products}}
+            <div class="products-grid">
+                {{
+#each
+ products}}
+                <div class="product-card">
+                    <img src="{{image}}" alt="{{name}}" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">{{name}}</h3>
+                        <p class="product-description">{{description}}</p>
+                        <div class="price-container">
+                            <div>
+                                <span class="current-price">${{current_price}}</span>
+                                {{
+#if
+ original_price}}
+                                <span class="original-price">${{original_price}}</span>
+                                {{
+/if
+}}
+                            </div>
+                            {{
+#if
+ discount}}
+                            <div class="discount-badge">{{discount}}% OFF</div>
+                            {{
+/if
+}}
+                        </div>
+                        <a href="{{product_url}}" class="cta-button">{{cta_text}}</a>
+                    </div>
+                </div>
+                {{
+/each
+}}
+            </div>
+            {{
+/if
+}}
+            
+            <!-- Main CTA -->
+            {{
+#if
+ main_cta_text}}
+            <div class="main-cta">
+                <a href="{{main_cta_url}}" class="cta-button">{{main_cta_text}}</a>
+            </div>
+            {{
+/if
+}}
+            
+            <!-- Features Section -->
+            {{
+#if
+ features}}
+            <div class="features-section">
+                <h3 class="features-title">{{features_title}}</h3>
+                <ul class="features-list">
+                    {{
+#each
+ features}}
+                    <li>{{this}}</li>
+                    {{
+/each
+}}
+                </ul>
+            </div>
+            {{
+/if
+}}
+            
+            <!-- Social Proof / Testimonial -->
+            {{
+#if
+ testimonial}}
+            <div class="social-proof">
+                <div class="testimonial">"{{testimonial.text}}"</div>
+                <div class="customer-info">— {{testimonial.customer_name}}, {{testimonial.customer_title}}</div>
+            </div>
+            {{
+/if
+}}
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <p><strong>{{company_name}}</strong></p>
+                <p>{{company_address}}</p>
+                {{
+#if
+ phone}}
+                <p>Phone: {{phone}}</p>
+                {{
+/if
+}}
+                <p>Email: {{contact_email}}</p>
+            </div>
+            
+            {{
+#if
+ social_links}}
+            <div class="social-links">
+                {{
+#each
+ social_links}}
+                <a href="{{url}}">{{name}}</a>
+                {{
+/each
+}}
+            </div>
+            {{
+/if
+}}
+            
+            <div class="unsubscribe">
+                <p>Don't want to receive these emails? <a href="{{unsubscribe_url}}">Unsubscribe</a></p>
+                <p>{{company_name}} | {{company_address}}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

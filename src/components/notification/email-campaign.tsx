@@ -5,14 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, Mail, MoreHorizontal, Eye, Edit, Trash2, Send, Calendar, Users, TrendingUp } from "lucide-react";
+import { Plus, Mail, MoreHorizontal, Eye, Edit, Trash2, Files, Send, Calendar, Users, TrendingUp } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import EmailCampaignComposer from "../EmailCampaignComposer";
-
-const dummyCampaigns: any[] = [];
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
+import EmailCampaignAction from "./email-campaign-action";
 
 const statusColors = {
     sent: "bg-green-500/10 text-green-700 border-green-200",
@@ -20,8 +20,22 @@ const statusColors = {
     scheduled: "bg-blue-500/10 text-blue-700 border-blue-200",
 };
 
+// interface Campaign {
+//     id: string;
+//     subject: string;
+//     body: string;
+//     status: string;
+//     recipients: number;
+//     openRate: number;
+//     clickRate: number;
+//     sentAt: Date | null;
+//     imageUrl?: string;
+//     data?: { actionUrl?: string };
+// }
+
 export default function EmailCampaigns() {
-    const [campaigns] = useState(dummyCampaigns);
+    // const utils = api.useUtils();
+    const { data } = api.email.campaignsAnalytics.useQuery();
     const createState = useOverlayTriggerState({});
 
     return (
@@ -41,6 +55,7 @@ export default function EmailCampaigns() {
                         </Button>
                     }
                     onOpenChange={createState.setOpen}
+                    sheetClassName="min-w-[40vw]"
                 >
                     <EmailCampaignComposer onClose={createState.close} />
                 </Overlay>
@@ -53,7 +68,7 @@ export default function EmailCampaigns() {
                         <Mail className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">24</div>
+                        <div className="text-2xl font-bold">{data?.totalCampaigns ?? 0}</div>
                         <p className="text-xs text-muted-foreground">+2 from last month</p>
                     </CardContent>
                 </Card>
@@ -64,7 +79,7 @@ export default function EmailCampaigns() {
                         <Send className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">125,430</div>
+                        <div className="text-2xl font-bold">{data?.totalSent ?? 0}</div>
                         <p className="text-xs text-muted-foreground">emails this month</p>
                     </CardContent>
                 </Card>
@@ -75,7 +90,7 @@ export default function EmailCampaigns() {
                         <Eye className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">28.4%</div>
+                        <div className="text-2xl font-bold">{data ? `${data.avgOpenRate.toFixed(1)}%` : "-"}</div>
                         <p className="text-xs text-muted-foreground">+2.1% from last month</p>
                     </CardContent>
                 </Card>
@@ -100,11 +115,11 @@ export default function EmailCampaigns() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {campaigns.map((campaign) => (
-                                <TableRow key={campaign.id}>
+                            {data?.campaigns?.map((campaign, idx: number) => (
+                                <TableRow key={idx}>
                                     <TableCell>
                                         <div>
-                                            <div className="font-medium">{campaign.name}</div>
+                                            {/* <div className="font-medium">{campaign.title}</div> */}
                                             <div className="text-sm text-muted-foreground truncate max-w-[300px]">{campaign.subject}</div>
                                         </div>
                                     </TableCell>
@@ -119,8 +134,8 @@ export default function EmailCampaigns() {
                                             {campaign.recipients.toLocaleString()}
                                         </div>
                                     </TableCell>
-                                    <TableCell>{campaign.status === "sent" ? `${campaign.openRate}%` : "—"}</TableCell>
-                                    <TableCell>{campaign.status === "sent" ? `${campaign.clickRate}%` : "—"}</TableCell>
+                                    <TableCell>{campaign.status === "sent" ? `${campaign.openRate.toFixed(1)}%` : "—"}</TableCell>
+                                    <TableCell>{campaign.status === "sent" ? `${campaign.clickRate.toFixed(1)}%` : "—"}</TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-2">
                                             <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -128,35 +143,7 @@ export default function EmailCampaigns() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem className="cursor-pointer">
-                                                    <Eye className="mr-2 h-4 w-4" />
-                                                    View Details
-                                                </DropdownMenuItem>
-                                                {campaign.status === "draft" && (
-                                                    <DropdownMenuItem className="cursor-pointer">
-                                                        <Edit className="mr-2 h-4 w-4" />
-                                                        Edit Campaign
-                                                    </DropdownMenuItem>
-                                                )}
-                                                {campaign.status === "draft" && (
-                                                    <DropdownMenuItem className="cursor-pointer">
-                                                        <Send className="mr-2 h-4 w-4" />
-                                                        Send Now
-                                                    </DropdownMenuItem>
-                                                )}
-                                                <DropdownMenuItem className="cursor-pointer text-destructive">
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <EmailCampaignAction campaign={campaign} />
                                     </TableCell>
                                 </TableRow>
                             ))}

@@ -8,9 +8,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Redis not configured" }, { status: 500 });
         }
 
-        const { limit = 50 } = await request.json();
+        const { limit = 50, eventType } = await request.json();
 
-        const events = await redis.xrange("events:USER_REGISTERED", "-", "+", "COUNT", limit);
+        // Get events from Redis queue
+        // const events = await redis.lrange("email_events", 0, limit - 1);
+        const events = await redis.xrange("events:EMAIL", "-", "+", "COUNT", limit);
 
         if (!events.length) {
             return NextResponse.json({
@@ -23,10 +25,21 @@ export async function POST(request: NextRequest) {
         const errors: string[] = [];
 
         for (const [id, fields] of events) {
-            const data = JSON.parse(fields[1]!);
             try {
-                processNewUserEmail(data);
-                await redis.xdel("events:USER_REGISTERED", id);
+                const event = JSON.parse(fields[1]!);
+
+                const { campaignId, recipient, timestamp } = event;
+
+                await db.emailCampaignEvent.create({
+                    data: {
+                        campaignId,
+                        recipient,
+                        eventType: event.type,
+                        occurredAt: new Date(timestamp ?? Date.now()),
+                    },
+                });
+
+                await redis.xdel("events:EMAIL", id);
                 processedCount++;
             } catch (error) {
                 const errorMsg = `Failed to process event: ${error instanceof Error ? error.message : "Unknown error"}`;
@@ -46,47 +59,13 @@ export async function POST(request: NextRequest) {
     }
 }
 
-async function processNewUserEmail(data: { email: string; first_name: string; last_name: string; group?: string }) {
-    const { email, first_name, last_name, group } = data;
-    const name = first_name + last_name
-
-    const contact = await db.emailContact.upsert({
-        where: { email },
-        create: { email, name },
-        update: { name: name ?? undefined },
-    });
-
-    // Add to group if specified
-    if (group) {
-        const emailGroup = await db.emailGroup.upsert({
-            where: { slug: group },
-            create: { name: group, slug: group },
-            update: {},
-        });
-
-        await db.emailGroupMember.upsert({
-            where: {
-                contactId_groupId: {
-                    contactId: contact.id,
-                    groupId: emailGroup.id,
-                },
-            },
-            create: {
-                contactId: contact.id,
-                groupId: emailGroup.id,
-            },
-            update: {},
-        });
-    }
-}
-
 export async function GET() {
     try {
         if (!redis) {
             return NextResponse.json({ error: "Redis not configured" }, { status: 500 });
         }
 
-        const events = await redis.xrange("events:USER_REGISTERED", "-", "+", "COUNT", 50);
+        const events = await redis.xrange("events:EMAIL", "-", "+", "COUNT", 50);
 
         const parsed = events.map(([id, fields]) => ({
             id,
