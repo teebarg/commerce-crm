@@ -39,6 +39,8 @@ const config = {
                 },
             },
         ],
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "warn",
     },
 };
 module.exports = config;

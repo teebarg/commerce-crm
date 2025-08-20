@@ -104,10 +104,18 @@ const PushNotification = [
         url: "/notification/settings",
         icon: Settings,
     },
+];
+
+const Email = [
     {
-        title: "Email Campaigns",
-        url: "/notification/email",
-        icon: Mail,
+        title: "Campaigns",
+        url: "/email/campaigns",
+        icon: FileText,
+    },
+    {
+        title: "Contacts",
+        url: "/email/contacts",
+        icon: Users,
     },
 ];
 
@@ -168,6 +176,23 @@ export function AdminSidebar({ session }: { session: Session | null }) {
                             {PushNotification.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
                                     <SidebarMenuButton asChild isActive={path === item.url}>
+                                        <Link href={item.url}>
+                                            <item.icon />
+                                            <span>{item.title}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Email</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            {Email.map((item, idx: number) => (
+                                <SidebarMenuItem key={idx}>
+                                    <SidebarMenuButton asChild isActive={path === item.url || (item.url !== "/notification/email" && path.startsWith(item.url))}>
                                         <Link href={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>

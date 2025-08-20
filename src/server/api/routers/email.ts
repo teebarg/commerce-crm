@@ -1,7 +1,48 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { CreateEmailCampaignSchema } from "@/schemas/notification.schema";
+import { z } from "zod";
 
 export const emailRouter = createTRPCRouter({
+    listContacts: protectedProcedure
+        .input(
+            z
+                .object({
+                    search: z.string().optional(),
+                    page: z.number().int().min(1).default(1).optional(),
+                    pageSize: z.number().int().min(1).max(100).default(20).optional(),
+                    groupSlug: z.string().optional(),
+                })
+                .optional()
+        )
+        .query(async ({ input, ctx }) => {
+            const page = input?.page ?? 1;
+            const pageSize = input?.pageSize ?? 20;
+            const where: any = {};
+            if (input?.search) {
+                where.OR = [
+                    { email: { contains: input.search, mode: "insensitive" } },
+                    { name: { contains: input.search, mode: "insensitive" } },
+                ];
+            }
+            if (input?.groupSlug) {
+                where.memberships = {
+                    some: { group: { slug: input.groupSlug } },
+                };
+            }
+
+            const [total, items] = await Promise.all([
+                ctx.db.emailContact.count({ where }),
+                ctx.db.emailContact.findMany({
+                    where,
+                    include: { memberships: { include: { group: true } } },
+                    orderBy: { createdAt: "desc" },
+                    skip: (page - 1) * pageSize,
+                    take: pageSize,
+                }),
+            ]);
+
+            return { items, total, page, pageSize } as const;
+        }),
     sendCampaign: protectedProcedure.input(CreateEmailCampaignSchema).mutation(async ({ input, ctx }) => {
         const { renderEmail, sendEmail } = await import("@/utils/email");
 
@@ -34,7 +75,7 @@ export const emailRouter = createTRPCRouter({
             },
         });
 
-        const baseUrl = process.env.BASE_URL || (typeof window === "undefined" ? "" : window.location.origin) || "";
+        const baseUrl = (process.env.BASE_URL ?? (typeof window === "undefined" ? "" : window.location.origin)) || "";
         for (const to of recipients) {
             const originalAction = input.actionUrl ?? "";
             const trackedAction = originalAction
@@ -75,9 +116,9 @@ export const emailRouter = createTRPCRouter({
         const campaigns: any[] = await dbAny.emailCampaign.findMany({ orderBy: { createdAt: "desc" } });
         const analytics = campaigns.map((c: any) => {
             const m = eventMap.get(c.id) ?? {};
-            const delivered = (m.DELIVERED ?? 0) as number;
-            const opened = (m.OPENED ?? 0) as number;
-            const clicked = (m.CLICKED ?? 0) as number;
+            const delivered = (m.DELIVERED ?? 0);
+            const opened = (m.OPENED ?? 0);
+            const clicked = (m.CLICKED ?? 0);
             const openRate = delivered > 0 ? (opened / delivered) * 100 : 0;
             const clickRate = delivered > 0 ? (clicked / delivered) * 100 : 0;
             return {

@@ -25,8 +25,7 @@ export const env = createEnv({
         GOOGLE_CLIENT_SECRET: z.string().optional(),
         GEMINI_API_KEY: z.string(),
 
-        REDIS_URL: z.string().url().optional(),
-        REDIS_NEW_USERS_KEY: z.string().optional(),
+        REDIS_URL: z.string().url(),
 
         TWITTER_CONSUMER_KEY: z.string().optional(),
         TWITTER_CONSUMER_SECRET: z.string().optional(),
@@ -78,7 +77,6 @@ export const env = createEnv({
         GEMINI_API_KEY: process.env.GEMINI_API_KEY,
 
         REDIS_URL: process.env.REDIS_URL,
-        REDIS_NEW_USERS_KEY: process.env.REDIS_NEW_USERS_KEY,
 
         TWITTER_CONSUMER_KEY: process.env.TWITTER_CONSUMER_KEY,
         TWITTER_CONSUMER_SECRET: process.env.TWITTER_CONSUMER_SECRET,

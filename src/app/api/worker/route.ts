@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
 import { db } from "@/server/db";
 
@@ -12,14 +12,14 @@ export async function POST(request: NextRequest) {
         }
 
         const { limit = 50, eventType } = await request.json();
-        
+
         // Get events from Redis queue
         const events = await redis.lrange("email_events", 0, limit - 1);
-        
+
         if (!events.length) {
-            return NextResponse.json({ 
-                message: "No events in queue", 
-                processed: 0 
+            return NextResponse.json({
+                message: "No events in queue",
+                processed: 0
             });
         }
 
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
         for (const eventStr of events) {
             try {
                 const event = JSON.parse(eventStr);
-                
+
                 // Process based on event type
                 switch (event.type) {
                     case "EMAIL_DELIVERED":
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
                 // Remove processed event from queue
                 await redis.lrem("email_events", 1, eventStr);
                 processedCount++;
-                
+
             } catch (error) {
                 const errorMsg = `Failed to process event: ${error instanceof Error ? error.message : 'Unknown error'}`;
                 errors.push(errorMsg);
@@ -77,51 +77,51 @@ export async function POST(request: NextRequest) {
 
 async function processEmailDelivered(event: any) {
     const { campaignId, recipient, timestamp } = event;
-    
+
     await db.emailCampaignEvent.create({
         data: {
             campaignId,
             recipient,
             eventType: "DELIVERED",
-            occurredAt: new Date(timestamp || Date.now())
+            occurredAt: new Date(timestamp ?? Date.now())
         }
     });
 }
 
 async function processEmailOpened(event: any) {
     const { campaignId, recipient, timestamp } = event;
-    
+
     await db.emailCampaignEvent.create({
         data: {
             campaignId,
             recipient,
             eventType: "OPENED",
-            occurredAt: new Date(timestamp || Date.now())
+            occurredAt: new Date(timestamp ?? Date.now())
         }
     });
 }
 
 async function processEmailClicked(event: any) {
     const { campaignId, recipient, timestamp, url } = event;
-    
+
     await db.emailCampaignEvent.create({
         data: {
             campaignId,
             recipient,
             eventType: "CLICKED",
-            occurredAt: new Date(timestamp || Date.now())
+            occurredAt: new Date(timestamp ?? Date.now())
         }
     });
 }
 
 async function processNewUserEmail(event: any) {
     const { email, name, group } = event;
-    
+
     // Upsert email contact
     const contact = await db.emailContact.upsert({
         where: { email },
         create: { email, name },
-        update: { name: name || undefined }
+        update: { name: name ?? undefined }
     });
 
     // Add to group if specified
@@ -158,18 +158,28 @@ export async function GET() {
             );
         }
 
-        const queueLength = await redis.llen("email_events");
-        const sampleEvents = await redis.lrange("email_events", 0, 4); // Get first 5 events
-        
+        // Read up to 50 events from the stream (from the beginning "0")
+        const events = await redis.xrange("events:USER_REGISTERED", "-", "+", "COUNT", 50);
+
+        // Transform to usable objects
+        const parsed = events.map(([id, fields]) => ({
+            id,
+            data: JSON.parse(fields[1]!),
+        }));
+
+        console.log("🚀 ~ GET ~ parsed:", parsed)
+
         return NextResponse.json({
-            queueLength,
-            sampleEvents: sampleEvents.map(event => {
-                try {
-                    return JSON.parse(event);
-                } catch {
-                    return { raw: event };
-                }
-            })
+            queueLength: parsed.length,
+            sampleEvents: parsed
+            // sampleEvents: sampleEvents.map(event => {
+            //     try {
+            //         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            //         return JSON.parse(event);
+            //     } catch {
+            //         return { raw: event };
+            //     }
+            // })
         });
     } catch (error) {
         console.error("Error checking queue:", error);

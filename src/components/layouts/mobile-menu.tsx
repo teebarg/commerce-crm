@@ -49,6 +49,7 @@ const Menu: React.FC<{ session: any }> = ({ session }) => {
         { id: "notif-history", label: "History", icon: <History size={20} />, href: "/notification/history" },
         { id: "notif-settings", label: "Notification Settings", icon: <Settings size={20} />, href: "/notification/settings" },
         { id: "notif-email", label: "Email Campaigns", icon: <Mail size={20} />, href: "/notification/email" },
+        { id: "email-contacts", label: "Email Contacts", icon: <Users size={20} />, href: "/notification/email/contacts" },
     ];
 
     return (

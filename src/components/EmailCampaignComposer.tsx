@@ -25,7 +25,7 @@ const EmailCampaignComposer: React.FC<{ onClose?: () => void }> = ({ onClose }) 
             setRecipientsRaw("");
             onClose?.();
         },
-        onError: (e) => toast.error(String(e)),
+        onError: (e) => toast.error("Failed to send email campaign"),
     });
 
     const onSend = () => {

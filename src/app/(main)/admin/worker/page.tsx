@@ -5,24 +5,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 interface QueueStats {
     queueLength: number;
     sampleEvents: Array<{
-        id?: string;
-        type: string;
-        campaignId?: string;
-        recipient?: string;
-        email?: string;
-        timestamp?: number;
-        raw?: string;
+        id: string;
+        data: {
+            id?: string;
+            type: string;
+            campaignId?: string;
+            recipient?: string;
+            email?: string;
+            timestamp?: number;
+            raw?: string;
+        };
     }>;
 }
 
 export default function WorkerPage() {
     const [stats, setStats] = useState<QueueStats | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [processing, setProcessing] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [processing, setProcessing] = useState<boolean>(false);
     const [lastProcessed, setLastProcessed] = useState<{ processed: number; errors?: string[] } | null>(null);
 
     const fetchStats = async () => {
@@ -31,32 +35,37 @@ export default function WorkerPage() {
             const response = await fetch("/api/worker");
             if (response.ok) {
                 const data = await response.json();
+                console.log("🚀 ~ fetchStats ~ data:", data);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 setStats(data);
             }
         } catch (error) {
-            console.error("Failed to fetch stats:", error);
+            console.log("🚀 ~ fetchStats ~ error:", error);
+            toast.error("Failed to fetch stats:");
         } finally {
             setLoading(false);
         }
     };
 
-    const processEvents = async (limit: number = 50) => {
+    const processEvents = async (limit = 50) => {
         setProcessing(true);
         try {
             const response = await fetch("/api/worker", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ limit })
+                body: JSON.stringify({ limit }),
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 setLastProcessed(data);
                 // Refresh stats after processing
                 await fetchStats();
             }
         } catch (error) {
-            console.error("Failed to process events:", error);
+            console.log("🚀 ~ processEvents ~ error:", error);
+            toast.error("Failed to process events:");
         } finally {
             setProcessing(false);
         }
@@ -68,11 +77,16 @@ export default function WorkerPage() {
 
     const getEventTypeColor = (type: string) => {
         switch (type) {
-            case "EMAIL_DELIVERED": return "bg-green-100 text-green-800";
-            case "EMAIL_OPENED": return "bg-blue-100 text-blue-800";
-            case "EMAIL_CLICKED": return "bg-purple-100 text-purple-800";
-            case "NEW_USER_EMAIL": return "bg-orange-100 text-orange-800";
-            default: return "bg-gray-100 text-gray-800";
+            case "EMAIL_DELIVERED":
+                return "bg-green-100 text-green-800";
+            case "EMAIL_OPENED":
+                return "bg-blue-100 text-blue-800";
+            case "EMAIL_CLICKED":
+                return "bg-purple-100 text-purple-800";
+            case "NEW_USER_EMAIL":
+                return "bg-orange-100 text-orange-800";
+            default:
+                return "bg-gray-100 text-gray-800";
         }
     };
 
@@ -84,11 +98,7 @@ export default function WorkerPage() {
                     <Button onClick={fetchStats} disabled={loading}>
                         {loading ? "Refreshing..." : "Refresh Stats"}
                     </Button>
-                    <Button 
-                        onClick={() => processEvents(50)} 
-                        disabled={processing || (stats?.queueLength || 0) === 0}
-                        variant="default"
-                    >
+                    <Button onClick={() => processEvents(50)} disabled={processing || (stats?.queueLength ?? 0) === 0} variant="default">
                         {processing ? "Processing..." : "Process Events (50)"}
                     </Button>
                 </div>
@@ -101,13 +111,7 @@ export default function WorkerPage() {
                         <CardDescription>Current events in Redis queue</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {loading ? (
-                            <Skeleton className="h-8 w-16" />
-                        ) : (
-                            <div className="text-3xl font-bold">
-                                {stats?.queueLength ?? 0}
-                            </div>
-                        )}
+                        {loading ? <Skeleton className="h-8 w-16" /> : <div className="text-3xl font-bold">{stats?.queueLength ?? 0}</div>}
                     </CardContent>
                 </Card>
 
@@ -119,13 +123,9 @@ export default function WorkerPage() {
                     <CardContent>
                         {lastProcessed ? (
                             <div className="space-y-2">
-                                <div className="text-2xl font-bold text-green-600">
-                                    {lastProcessed.processed}
-                                </div>
+                                <div className="text-2xl font-bold text-green-600">{lastProcessed.processed}</div>
                                 {lastProcessed.errors && lastProcessed.errors.length > 0 && (
-                                    <Badge variant="destructive">
-                                        {lastProcessed.errors.length} errors
-                                    </Badge>
+                                    <Badge variant="destructive">{lastProcessed.errors.length} errors</Badge>
                                 )}
                             </div>
                         ) : (
@@ -140,17 +140,17 @@ export default function WorkerPage() {
                         <CardDescription>Manual queue management</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                        <Button 
-                            onClick={() => processEvents(10)} 
-                            disabled={processing || (stats?.queueLength || 0) === 0}
+                        <Button
+                            onClick={() => processEvents(10)}
+                            disabled={processing || (stats?.queueLength ?? 0) === 0}
                             size="sm"
                             variant="outline"
                         >
                             Process 10 Events
                         </Button>
-                        <Button 
-                            onClick={() => processEvents(100)} 
-                            disabled={processing || (stats?.queueLength || 0) === 0}
+                        <Button
+                            onClick={() => processEvents(100)}
+                            disabled={processing || (stats?.queueLength ?? 0) === 0}
                             size="sm"
                             variant="outline"
                         >
@@ -174,39 +174,39 @@ export default function WorkerPage() {
                         </div>
                     ) : stats?.sampleEvents && stats.sampleEvents.length > 0 ? (
                         <div className="space-y-3">
-                            {stats.sampleEvents.map((event, index) => (
-                                <div key={event.id || index} className="p-3 border rounded-lg">
+                            {stats.sampleEvents.map(({id, data: event}, index) => (
+                                <div key={event.id ?? index} className="p-3 border rounded-lg">
                                     <div className="flex items-center justify-between mb-2">
-                                        <Badge className={getEventTypeColor(event.type)}>
-                                            {event.type}
-                                        </Badge>
-                                        {event.timestamp && (
-                                            <span className="text-sm text-gray-500">
-                                                {formatTimestamp(event.timestamp)}
-                                            </span>
-                                        )}
+                                        <Badge className={getEventTypeColor(event.type)}>{event.type}</Badge>
+                                        {event.timestamp && <span className="text-sm text-gray-500">{formatTimestamp(event.timestamp)}</span>}
                                     </div>
                                     <div className="text-sm space-y-1">
                                         {event.campaignId && (
-                                            <div><strong>Campaign:</strong> {event.campaignId}</div>
+                                            <div>
+                                                <strong>Campaign:</strong> {event.campaignId}
+                                            </div>
                                         )}
                                         {event.recipient && (
-                                            <div><strong>Recipient:</strong> {event.recipient}</div>
+                                            <div>
+                                                <strong>Recipient:</strong> {event.recipient}
+                                            </div>
                                         )}
                                         {event.email && (
-                                            <div><strong>Email:</strong> {event.email}</div>
+                                            <div>
+                                                <strong>Email:</strong> {event.email}
+                                            </div>
                                         )}
                                         {event.raw && (
-                                            <div><strong>Raw:</strong> <code className="text-xs">{event.raw}</code></div>
+                                            <div>
+                                                <strong>Raw:</strong> <code className="text-xs">{event.raw}</code>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="text-gray-500 text-center py-8">
-                            No events in queue
-                        </div>
+                        <div className="text-gray-500 text-center py-8">No events in queue</div>
                     )}
                 </CardContent>
             </Card>

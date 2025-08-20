@@ -28,7 +28,7 @@ async function tryLPopCount(key: string, count: number): Promise<string[]> {
         }
         const results = await pipeline.exec();
         if (!results) return [];
-        
+
         const values: string[] = [];
         for (const [error, value] of results) {
             if (!error && value && typeof value === "string") {
@@ -46,7 +46,7 @@ async function lpopOne(key: string): Promise<string | undefined> {
     if (!redis) return undefined;
     try {
         const result = await redis.lpop(key);
-        return result || undefined;
+        return result ?? undefined;
     } catch (error) {
         console.error("Redis lpop failed:", error);
         return undefined;
@@ -59,7 +59,7 @@ async function lpopOne(key: string): Promise<string | undefined> {
  */
 export async function popNewUsersFromRedisAsJson(limit = 100): Promise<any[]> {
     if (!redis) return [];
-    const key = env.REDIS_NEW_USERS_KEY ?? "new_users";
+    const key = "user_events";
     // Try batch pop first
     let raw: string[] = [];
     try {
@@ -105,14 +105,14 @@ export async function queueEmailEvent(event: {
     group?: string;
 }) {
     if (!redis) return false;
-    
+
     try {
         const eventData = {
             ...event,
-            timestamp: event.timestamp || Date.now(),
+            timestamp: event.timestamp ?? Date.now(),
             id: crypto.randomUUID()
         };
-        
+
         await redis.rpush("email_events", JSON.stringify(eventData));
         return true;
     } catch (error) {
@@ -123,11 +123,11 @@ export async function queueEmailEvent(event: {
 
 export async function getQueueStats() {
     if (!redis) return null;
-    
+
     try {
         const queueLength = await redis.llen("email_events");
         const sampleEvents = await redis.lrange("email_events", 0, 4);
-        
+
         return {
             queueLength,
             sampleEvents: sampleEvents.map((event: string) => {
