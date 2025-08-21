@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         for (const [id, fields] of events) {
             const data = JSON.parse(fields[1]!);
             try {
-                processNewUserEmail(data);
+                await processNewUserEmail(data);
                 await redis.xdel("events:USER_REGISTERED", id);
                 processedCount++;
             } catch (error) {

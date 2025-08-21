@@ -35,12 +35,9 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
     const [selectedGroup, setSelectedGroup] = useState<string>(initialData?.groupId ?? "all");
     const [recipientsRaw, setRecipientsRaw] = useState("");
     const [isDraft, setIsDraft] = useState(false);
-    
+
     const { data: groups } = api.email.getGroups.useQuery();
-    const { data: recipients, refetch: refetchRecipients } = api.email.getRecipients.useQuery(
-        { groupId: selectedGroup },
-        { enabled: false }
-    );
+    const { data: recipients, refetch: refetchRecipients } = api.email.getRecipients.useQuery({ groupId: selectedGroup }, { enabled: false });
 
     const updateMutation = api.email.updateCampaign.useMutation({
         onSuccess: () => {
@@ -60,18 +57,9 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
         onError: () => toast.error("Failed to create draft campaign"),
     });
 
-    const sendDraftMutation = api.email.sendDraftCampaign.useMutation({
-        onSuccess: () => {
-            toast.success("Draft campaign sent successfully");
-            void utils.email.campaignsAnalytics.invalidate();
-            onClose?.();
-        },
-        onError: () => toast.error("Failed to send draft campaign"),
-    });
-
     useEffect(() => {
         if (selectedGroup) {
-            refetchRecipients();
+            void refetchRecipients();
         }
     }, [selectedGroup, refetchRecipients]);
 
@@ -95,10 +83,12 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
     }, [recipients]);
 
     const onSend = () => {
-        const recipientList = recipients?.emails || recipientsRaw
-            .split(/[\n,;\s]+/)
-            .map((s) => s.trim())
-            .filter(Boolean);
+        const recipientList =
+            recipients?.emails ??
+            recipientsRaw
+                .split(/[\n,;\s]+/)
+                .map((s) => s.trim())
+                .filter(Boolean);
 
         if (!isDraft && recipientList.length === 0 && !initialData) {
             toast.error("Please select a group or add recipient emails");
@@ -106,27 +96,20 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
         }
 
         if (initialData?.id) {
-            if (initialData.status === "DRAFT" && !isDraft) {
-                sendDraftMutation.mutate({
-                    id: initialData.id,
-                    recipients: recipientList
-                });
-            } else {
-                updateMutation.mutate({
-                    id: initialData.id,
-                    subject,
-                    body,
-                    actionUrl: actionUrl || undefined,
-                    imageUrl: imageUrl || undefined
-                });
-            }
+            updateMutation.mutate({
+                id: initialData.id,
+                subject,
+                body,
+                actionUrl: actionUrl || undefined,
+                imageUrl: imageUrl || undefined,
+            });
         } else if (isDraft) {
             createDraftMutation.mutate({
                 subject,
                 body,
                 actionUrl: actionUrl || undefined,
                 imageUrl: imageUrl || undefined,
-                groupId: selectedGroup === "all" ? undefined : selectedGroup
+                groupId: selectedGroup === "all" ? undefined : selectedGroup,
             });
         } else {
             mutation.mutate({
@@ -135,7 +118,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                 actionUrl: actionUrl || undefined,
                 imageUrl: imageUrl || undefined,
                 recipients: recipientList,
-                groupId: selectedGroup === "all" ? undefined : selectedGroup
+                groupId: selectedGroup === "all" ? undefined : selectedGroup,
             });
         }
     };
@@ -151,7 +134,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                 <Textarea label="Body" rows={6} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Email body" />
                 <Input label="Action URL (optional)" value={actionUrl} onChange={(e) => setActionUrl(e.target.value)} placeholder="https://..." />
                 <Input label="Image URL (optional)" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." />
-                
+
                 {!initialData && (
                     <>
                         <div className="space-y-2">
@@ -183,22 +166,14 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                                 placeholder="Recipients will be populated based on selected group, or enter emails manually"
                                 disabled={selectedGroup !== "all"}
                             />
-                            {recipients && (
-                                <p className="text-sm text-muted-foreground">
-                                    {recipients.emails.length} recipients in selected group
-                                </p>
-                            )}
+                            {recipients && <p className="text-sm text-muted-foreground">{recipients.emails.length} recipients in selected group</p>}
                         </div>
                     </>
                 )}
 
                 {!initialData && (
                     <div className="flex items-center space-x-2">
-                        <Switch
-                            id="draft-mode"
-                            checked={isDraft}
-                            onCheckedChange={setIsDraft}
-                        />
+                        <Switch id="draft-mode" checked={isDraft} onCheckedChange={setIsDraft} />
                         <Label htmlFor="draft-mode">Save as draft</Label>
                     </div>
                 )}
@@ -209,25 +184,23 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                             Cancel
                         </Button>
                     )}
-                    {initialData?.status === "DRAFT" ? (
-                        <>
-                            <Button 
-                                onClick={onSend} 
-                                isLoading={updateMutation.isPending}
-                                disabled={updateMutation.isPending || !subject || !body}
-                                variant="outline"
-                            >
-                                Save Draft
-                            </Button>
-                        </>
+                    {initialData ? (
+                        <Button
+                            onClick={onSend}
+                            isLoading={updateMutation.isPending}
+                            disabled={updateMutation.isPending ?? !subject ?? !body}
+                            variant="outline"
+                        >
+                            Update Draft
+                        </Button>
                     ) : (
-                        <Button 
-                            onClick={onSend} 
-                            isLoading={initialData ? updateMutation.isPending : mutation.isPending}
-                            disabled={initialData ? (updateMutation.isPending || !subject || !body) : (mutation.isPending || !subject || !body)}
+                        <Button
+                            onClick={onSend}
+                            isLoading={mutation.isPending || createDraftMutation.isPending}
+                            disabled={mutation.isPending || createDraftMutation.isPending || !subject || !body}
                             variant="primary"
                         >
-                            {initialData ? 'Save Changes' : (isDraft ? 'Save Draft' : 'Send Campaign')}
+                            {isDraft ? "Save Draft" : "Send Campaign"}
                         </Button>
                     )}
                 </div>

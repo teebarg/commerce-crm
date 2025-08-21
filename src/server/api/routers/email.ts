@@ -27,59 +27,90 @@ export const emailRouter = createTRPCRouter({
         }),
 
     sendDraftCampaign: protectedProcedure
-        .input(z.object({ 
+        .input(z.object({
             id: z.string(),
             recipients: z.array(z.string().email()).min(1)
         }))
         .mutation(async ({ ctx, input }) => {
             const { renderEmail, sendEmail } = await import("@/utils/email");
-            
+
             const campaign = await ctx.db.emailCampaign.findUnique({
                 where: { id: input.id }
             });
-            
+
             if (!campaign || campaign.status !== "DRAFT") {
                 throw new Error("Campaign not found or is not in draft status");
             }
 
             const baseUrl = (process.env.BASE_URL ?? (typeof window === "undefined" ? "" : window.location.origin)) || "";
-            
-            // Update campaign status
-            await ctx.db.emailCampaign.update({
-                where: { id: input.id },
-                data: {
-                    status: "PUBLISHED",
-                    sentAt: new Date(),
-                    sentCount: input.recipients.length
+
+            // Partial success: try all sends, collect successes and failures
+            const successfulRecipients: string[] = [];
+            const failedRecipients: { recipient: string; error: unknown }[] = [];
+
+            for (const to of input.recipients) {
+                try {
+                    const originalAction = "/";
+                    const trackedAction = `${baseUrl}/api/email/track/click?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}&u=${encodeURIComponent(originalAction)}`;
+
+                    let emailHtml = await renderEmail("marketing", {
+                        title: campaign.subject,
+                        message: campaign.body,
+                        action_url: trackedAction,
+                        image_url: campaign.imageUrl ?? "",
+                    });
+
+                    const pixel = `<img src="${baseUrl}/api/email/track/open?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}" alt="" width="1" height="1" style="display:none" />`;
+                    emailHtml = emailHtml.replace("</body>", `${pixel}</body>`);
+                    console.log("🚀 ~ emailHtml:", emailHtml)
+
+                    await sendEmail({ to, subject: campaign.subject, html: emailHtml });
+                    successfulRecipients.push(to);
+                } catch (error) {
+                    console.log("🚀 ~ error:", error)
+                    failedRecipients.push({ recipient: to, error });
+                }
+            }
+
+            // Persist DB changes atomically so status and events are consistent
+            await ctx.db.$transaction(async (tx) => {
+                await tx.emailCampaign.update({
+                    where: { id: input.id },
+                    data: {
+                        status: "PUBLISHED",
+                        sentAt: new Date(),
+                        sentCount: successfulRecipients.length,
+                        failedCount: failedRecipients.length,
+                    },
+                });
+
+                if (successfulRecipients.length > 0) {
+                    await tx.emailCampaignEvent.createMany({
+                        data: successfulRecipients.map((recipient) => ({
+                            campaignId: campaign.id,
+                            recipient,
+                            eventType: "DELIVERED",
+                        })),
+                    });
+                }
+
+                if (failedRecipients.length > 0) {
+                    await tx.emailCampaignEvent.createMany({
+                        data: failedRecipients.map(({ recipient }) => ({
+                            campaignId: campaign.id,
+                            recipient,
+                            eventType: "FAILED",
+                        })),
+                    });
                 }
             });
 
-            // Send emails
-            for (const to of input.recipients) {
-                const originalAction = "/";
-                const trackedAction = `${baseUrl}/api/email/track/click?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}&u=${encodeURIComponent(originalAction)}`;
-                
-                let emailHtml = await renderEmail("marketing", {
-                    title: campaign.subject,
-                    message: campaign.body,
-                    action_url: trackedAction,
-                    image_url: campaign.imageUrl ?? "",
-                });
-
-                const pixel = `<img src="${baseUrl}/api/email/track/open?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}" alt="" width="1" height="1" style="display:none" />`;
-                emailHtml = emailHtml.replace("</body>", `${pixel}</body>`);
-
-                await sendEmail({ to, subject: campaign.subject, html: emailHtml });
-                await ctx.db.emailCampaignEvent.create({ 
-                    data: { 
-                        campaignId: campaign.id, 
-                        recipient: to, 
-                        eventType: "DELIVERED" 
-                    } 
-                });
-            }
-
-            return { message: "Campaign sent successfully" };
+            return {
+                message: "Campaign processed",
+                delivered: successfulRecipients.length,
+                failed: failedRecipients.length,
+                failedRecipients: failedRecipients.map((f) => f.recipient),
+            } as const;
         }),
 
     getGroups: protectedProcedure.query(async ({ ctx }) => {
@@ -182,51 +213,90 @@ export const emailRouter = createTRPCRouter({
     sendCampaign: protectedProcedure.input(CreateEmailCampaignSchema).mutation(async ({ input, ctx }) => {
         const { renderEmail, sendEmail } = await import("@/utils/email");
 
-        let recipients: string[] = input.recipients ?? [];
+        const recipients: string[] = input.recipients ?? [];
         if (!recipients.length) return { message: "No recipients found" } as const;
 
-        const dbAny = ctx.db as any;
         const group = input.groupSlug ? await ctx.db.emailGroup.findUnique({ where: { slug: input.groupSlug } }) : null;
-        const campaign = await dbAny.emailCampaign.create({
+
+        // Create as DRAFT first to obtain an ID for tracking links
+        const campaign = await ctx.db.emailCampaign.create({
             data: {
                 subject: input.subject,
                 body: input.body,
                 imageUrl: input.imageUrl,
                 data: { actionUrl: input.actionUrl },
-                status: "PUBLISHED",
-                sentAt: new Date(),
+                status: "DRAFT",
                 groupId: group?.id,
-                sentCount: recipients.length,
             },
         });
 
         const baseUrl = (process.env.BASE_URL ?? (typeof window === "undefined" ? "" : window.location.origin)) || "";
-        for (const to of recipients) {
-            const originalAction = input.actionUrl ?? "";
-            // const trackedAction = originalAction
-            //     ? `${baseUrl}/api/email/track/click?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}&u=${encodeURIComponent(
-            //           originalAction
-            //       )}`
-            //     : "";
-            const trackedAction = `${baseUrl}/api/email/track/click?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}&u=${encodeURIComponent(
-                originalAction
-            )}`;
-            console.log("trackedAction", trackedAction);
-            let emailHtml = await renderEmail("marketing", {
-                title: input.subject,
-                message: input.body,
-                action_url: trackedAction,
-                image_url: input.imageUrl ?? "",
-            });
-            const pixel = `<img src="${baseUrl}/api/email/track/open?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(
-                to
-            )}" alt="" width="1" height="1" style="display:none" />`;
-            emailHtml = emailHtml.replace("</body>", `${pixel}</body>`);
 
-            await sendEmail({ to, subject: input.subject, html: emailHtml });
-            await dbAny.emailCampaignEvent.create({ data: { campaignId: campaign.id, recipient: to, eventType: "DELIVERED" } });
+        // Attempt all sends; collect successes and failures for partial success handling
+        const successfulRecipients: string[] = [];
+        const failedRecipients: { recipient: string; error: unknown }[] = [];
+
+        for (const to of recipients) {
+            try {
+                const originalAction = input.actionUrl ?? "";
+                const trackedAction = `${baseUrl}/api/email/track/click?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}&u=${encodeURIComponent(
+                    originalAction
+                )}`;
+                let emailHtml = await renderEmail("marketing", {
+                    title: input.subject,
+                    message: input.body,
+                    action_url: trackedAction,
+                    image_url: input.imageUrl ?? "",
+                });
+                const pixel = `<img src="${baseUrl}/api/email/track/open?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}" alt="" width="1" height="1" style="display:none" />`;
+                emailHtml = emailHtml.replace("</body>", `${pixel}</body>`);
+
+                await sendEmail({ to, subject: input.subject, html: emailHtml });
+                successfulRecipients.push(to);
+            } catch (error) {
+                failedRecipients.push({ recipient: to, error });
+            }
         }
-        return { message: "Email campaign sent" } as const;
+
+        // Atomically persist campaign final status and per-recipient events
+        await ctx.db.$transaction(async (tx) => {
+            await tx.emailCampaign.update({
+                where: { id: campaign.id },
+                data: {
+                    status: "PUBLISHED",
+                    sentAt: new Date(),
+                    sentCount: successfulRecipients.length,
+                    failedCount: failedRecipients.length,
+                },
+            });
+
+            if (successfulRecipients.length > 0) {
+                await tx.emailCampaignEvent.createMany({
+                    data: successfulRecipients.map((recipient) => ({
+                        campaignId: campaign.id,
+                        recipient,
+                        eventType: "DELIVERED",
+                    })),
+                });
+            }
+            if (failedRecipients.length > 0) {
+                await tx.emailCampaignEvent.createMany({
+                    data: failedRecipients.map(({ recipient }) => ({
+                        campaignId: campaign.id,
+                        recipient,
+                        eventType: "FAILED",
+                    })),
+                });
+            }
+        });
+
+        return {
+            message: "Email campaign processed",
+            delivered: successfulRecipients.length,
+            failed: failedRecipients.length,
+            failedRecipients: failedRecipients.map((f) => f.recipient),
+            campaignId: campaign.id,
+        } as const;
     }),
 
     getCampaign: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {

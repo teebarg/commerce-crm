@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { QueueStats } from "@/trpc/schema";
+import { type QueueStats } from "@/trpc/schema";
 
 // interface QueueStats {
 //     queueLength: number;
@@ -31,7 +31,7 @@ export default function WorkerPage() {
     const [lastProcessed, setLastProcessed] = useState<{ processed: number; errors?: string[] } | null>(null);
 
     useEffect(() => {
-        fetchStats();
+        void fetchStats();
     }, []);
 
     const fetchStats = async () => {

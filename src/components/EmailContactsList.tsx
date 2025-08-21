@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { QueueStats } from "@/trpc/schema";
+import { type QueueStats } from "@/trpc/schema";
 import { Trash2 } from "lucide-react";
 import {
     AlertDialog,
@@ -20,7 +20,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { EmailContact } from "@prisma/client";
+import { type EmailContact } from "@prisma/client";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 const EmailContactItem: React.FC<{ c: EmailContact; onRefetch: () => void }> = ({ c, onRefetch }) => {
@@ -86,7 +86,7 @@ const EmailContactsList: React.FC = () => {
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
     useEffect(() => {
-        fetchStats();
+        void fetchStats();
     }, []);
 
     const fetchStats = async () => {
