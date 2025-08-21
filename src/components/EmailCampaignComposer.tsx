@@ -10,6 +10,32 @@ import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import ProductSearchClient from "./product-search";
+import { X } from "lucide-react";
+
+interface Product {
+    name: string;
+    price: string;
+    originalPrice?: string;
+    imageUrl: string;
+    url: string;
+}
+
+interface Promotion {
+    title: string;
+    description: string;
+    discount: number;
+    code: string;
+    ctaText: string;
+    ctaLink: string;
+    urgency: string;
+}
+
+interface SocialLinks {
+    facebook: string;
+    instagram: string;
+    twitter: string;
+}
 
 interface Campaign {
     id: string;
@@ -17,8 +43,19 @@ interface Campaign {
     body: string;
     status: string;
     imageUrl?: string;
-    data?: { actionUrl?: string };
     groupId?: string;
+    data?: {
+        promotion?: Promotion;
+        featuredProducts?: Product[];
+        socialLinks?: SocialLinks;
+        supportLink?: string;
+        unsubscribeLink?: string;
+        preferencesLink?: string;
+        companyName?: string;
+        companyAddress?: string;
+        companyPhone?: string;
+        contactEmail?: string;
+    };
 }
 
 interface EmailCampaignComposerProps {
@@ -30,11 +67,28 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
     const utils = api.useUtils();
     const [subject, setSubject] = useState(initialData?.subject ?? "");
     const [body, setBody] = useState(initialData?.body ?? "");
-    const [actionUrl, setActionUrl] = useState(initialData?.data?.actionUrl ?? "");
     const [imageUrl, setImageUrl] = useState(initialData?.imageUrl ?? "");
     const [selectedGroup, setSelectedGroup] = useState<string>(initialData?.groupId ?? "all");
     const [recipientsRaw, setRecipientsRaw] = useState("");
     const [isDraft, setIsDraft] = useState(false);
+
+    // Promotion fields
+    const [promotion, setPromotion] = useState<Promotion>(initialData?.data?.promotion ?? {
+        title: "",
+        description: "",
+        discount: 0,
+        code: "",
+        ctaText: "",
+        ctaLink: "",
+        urgency: ""
+    });
+
+    // Featured Products
+    const [selectedProducts, setSelectedProducts] = useState<Product[]>(initialData?.data?.featuredProducts ?? []);
+    const [showProductSearch, setShowProductSearch] = useState(false);
+
+    // Load shop settings
+    const { data: shopSettings } = api.email.getShopSettings.useQuery();
 
     const { data: groups } = api.email.getGroups.useQuery();
     const { data: recipients, refetch: refetchRecipients } = api.email.getRecipients.useQuery({ groupId: selectedGroup }, { enabled: false });
@@ -95,30 +149,48 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
             return;
         }
 
+        if (!shopSettings) {
+            toast.error("Shop settings not found. Please contact support.");
+            return;
+        }
+
+        const campaignData = {
+            promotion: Object.values(promotion).some(Boolean) ? promotion : undefined,
+            featuredProducts: selectedProducts.length > 0 ? selectedProducts : undefined,
+            socialLinks: shopSettings.socialLinks as SocialLinks,
+            supportLink: shopSettings.supportLink,
+            unsubscribeLink: shopSettings.unsubscribeLink,
+            preferencesLink: shopSettings.preferencesLink,
+            companyName: shopSettings.companyName,
+            companyAddress: shopSettings.companyAddress,
+            companyPhone: shopSettings.companyPhone,
+            contactEmail: shopSettings.contactEmail
+        };
+
         if (initialData?.id) {
             updateMutation.mutate({
                 id: initialData.id,
                 subject,
                 body,
-                actionUrl: actionUrl || undefined,
                 imageUrl: imageUrl || undefined,
+                data: campaignData
             });
         } else if (isDraft) {
             createDraftMutation.mutate({
                 subject,
                 body,
-                actionUrl: actionUrl || undefined,
                 imageUrl: imageUrl || undefined,
                 groupId: selectedGroup === "all" ? undefined : selectedGroup,
+                data: campaignData
             });
         } else {
             mutation.mutate({
                 subject,
                 body,
-                actionUrl: actionUrl || undefined,
                 imageUrl: imageUrl || undefined,
                 recipients: recipientList,
                 groupId: selectedGroup === "all" ? undefined : selectedGroup,
+                data: campaignData
             });
         }
     };
@@ -132,8 +204,144 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
             <CardContent className="space-y-4">
                 <Input label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" />
                 <Textarea label="Body" rows={6} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Email body" />
-                <Input label="Action URL (optional)" value={actionUrl} onChange={(e) => setActionUrl(e.target.value)} placeholder="https://..." />
-                <Input label="Image URL (optional)" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." />
+                <div className="border rounded-lg p-4 space-y-4 mt-4">
+                    <h3 className="text-lg font-semibold">Marketing Template Details</h3>
+                    <Input label="Promotion Badge" value={promotionBadge} onChange={(e) => setPromotionBadge(e.target.value)} placeholder="e.g., New Arrival, Special Offer" />
+                    <Input label="Hero Image URL" value={heroImage} onChange={(e) => setHeroImage(e.target.value)} placeholder="https://..." />
+                    <Input label="Hero Image Alt Text" value={heroAltText} onChange={(e) => setHeroAltText(e.target.value)} placeholder="Image description..." />
+                    <Input label="Hero Overlay Text" value={heroOverlayText} onChange={(e) => setHeroOverlayText(e.target.value)} placeholder="Text overlay on hero image" />
+                    <Input label="Hero Title" value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="Main title" />
+                    <Textarea label="Hero Description" value={heroDescription} onChange={(e) => setHeroDescription(e.target.value)} placeholder="Hero section description" />
+                    <Input label="Main CTA Text" value={mainCtaText} onChange={(e) => setMainCtaText(e.target.value)} placeholder="e.g., Shop Now" />
+                    <Input label="Main CTA URL" value={mainCtaUrl} onChange={(e) => setMainCtaUrl(e.target.value)} placeholder="https://..." />
+                    <Input label="Features Section Title" value={featuresTitle} onChange={(e) => setFeaturesTitle(e.target.value)} placeholder="e.g., Key Features" />
+                    <Textarea 
+                        label="Features (one per line)" 
+                        value={features.join('\n')} 
+                        onChange={(e) => setFeatures(e.target.value.split('\n').filter(Boolean))} 
+                        placeholder="Enter features, one per line"
+                    />
+                </div>
+
+                <div className="border rounded-lg p-4 space-y-4">
+                    <h3 className="text-lg font-semibold">Promotion</h3>
+                    <Input 
+                        label="Title" 
+                        value={promotion.title} 
+                        onChange={(e) => setPromotion({ ...promotion, title: e.target.value })} 
+                        placeholder="Special Offer" 
+                    />
+                    <Input 
+                        label="Description" 
+                        value={promotion.description} 
+                        onChange={(e) => setPromotion({ ...promotion, description: e.target.value })} 
+                        placeholder="Get 10% off your first purchase" 
+                    />
+                    <Input 
+                        type="number" 
+                        label="Discount %" 
+                        value={promotion.discount} 
+                        onChange={(e) => setPromotion({ ...promotion, discount: parseInt(e.target.value) })} 
+                        placeholder="10" 
+                    />
+                    <Input 
+                        label="Promo Code" 
+                        value={promotion.code} 
+                        onChange={(e) => setPromotion({ ...promotion, code: e.target.value })} 
+                        placeholder="SAVE10" 
+                    />
+                    <Input 
+                        label="CTA Text" 
+                        value={promotion.ctaText} 
+                        onChange={(e) => setPromotion({ ...promotion, ctaText: e.target.value })} 
+                        placeholder="Shop Now" 
+                    />
+                    <Input 
+                        label="CTA Link" 
+                        value={promotion.ctaLink} 
+                        onChange={(e) => setPromotion({ ...promotion, ctaLink: e.target.value })} 
+                        placeholder="https://..." 
+                    />
+                    <Input 
+                        label="Urgency Message" 
+                        value={promotion.urgency} 
+                        onChange={(e) => setPromotion({ ...promotion, urgency: e.target.value })} 
+                        placeholder="Limited time offer" 
+                    />
+                </div>
+
+                <div className="border rounded-lg p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">Featured Products</h3>
+                        <Button variant="outline" onClick={() => setShowProductSearch(true)}>
+                            Add Product
+                        </Button>
+                    </div>
+                    
+                    {selectedProducts.length > 0 && (
+                        <div className="grid grid-cols-2 gap-4">
+                            {selectedProducts.map((product, index) => (
+                                <div key={index} className="relative border rounded-md p-3">
+                                    <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="absolute right-2 top-2"
+                                        onClick={() => {
+                                            setSelectedProducts(products => 
+                                                products.filter((_, i) => i !== index)
+                                            )
+                                        }}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                    <div className="relative w-full h-32 mb-2">
+                                        <img 
+                                            src={product.imageUrl} 
+                                            alt={product.name}
+                                            className="absolute inset-0 w-full h-full object-cover rounded-md"
+                                        />
+                                    </div>
+                                    <h4 className="font-medium truncate">{product.name}</h4>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className="font-semibold">${product.price}</span>
+                                        {product.originalPrice && (
+                                            <span className="text-sm line-through text-muted-foreground">
+                                                ${product.originalPrice}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {showProductSearch && (
+                    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                        <div className="bg-card rounded-lg shadow-lg p-6 w-full max-w-2xl">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold">Search Products</h3>
+                                <Button variant="ghost" size="icon" onClick={() => setShowProductSearch(false)}>
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                            <ProductSearchClient 
+                                onProductSelect={(product) => {
+                                    setSelectedProducts(products => [...products, {
+                                        name: product.name,
+                                        price: product.price.toString(),
+                                        originalPrice: product.originalPrice?.toString(),
+                                        imageUrl: product.images[0] || product.image || "/placeholder.jpg",
+                                        url: `/products/${product.slug}`
+                                    }]);
+                                    setShowProductSearch(false);
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                <Input label="Cover Image URL (optional)" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." />
 
                 {!initialData && (
                     <>
@@ -188,7 +396,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                         <Button
                             onClick={onSend}
                             isLoading={updateMutation.isPending}
-                            disabled={updateMutation.isPending ?? !subject ?? !body}
+                            disabled={updateMutation.isPending || !subject || !body}
                             variant="outline"
                         >
                             Update Draft

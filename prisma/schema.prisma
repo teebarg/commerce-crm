@@ -48,6 +48,22 @@ enum DeviceType {
   @@map("device_types")
 }
 
+model ShopSettings {
+  id              String    @id @default(cuid())
+  companyName     String
+  companyAddress  String
+  companyPhone    String
+  contactEmail    String
+  supportLink     String
+  unsubscribeLink String
+  preferencesLink String
+  socialLinks     Json      // Will store facebook, instagram, twitter URLs
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("shop_settings")
+}
+
 enum NotificationCategory {
   GENERIC
   ONBOARDING

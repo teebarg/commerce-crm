@@ -89,7 +89,7 @@ export const authConfig = {
         //             });
         //         } catch (error) {
         //             console.log("🚀 ~ file: config.ts:134 ~ error:", error);
-        //             throw new Error(error as string);
+        //             return null;
         //         }
         //     },
         // },

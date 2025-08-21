@@ -60,18 +60,6 @@ export const NotificationTemplateSchema = z.object({
     updatedAt: z.date(),
 });
 
-export const CreateEmailCampaignSchema = z.object({
-    subject: z.string().min(1),
-    body: z.string().min(1),
-    actionUrl: z.string().url().optional(),
-    imageUrl: z.string().url().optional(),
-    recipients: z.array(z.string().email()).min(1).optional(),
-    groupId: z.string().optional(),
-    groupSlug: z.string().optional(),
-});
-
-export type CreateEmailCampaign = z.infer<typeof CreateEmailCampaignSchema>;
-
 export const EmailCampaignAnalyticsSchema = z.object({
     id: z.string(),
     subject: z.string(),
@@ -111,6 +99,35 @@ export const CreateNotificationEventInput = z.object({
     notificationId: z.string().uuid(),
     subscriberIds: z.array(z.string().uuid()).min(1), // bulk creation
 });
+
+export const EmailDataSchema = z.object({
+    promotionBadge: z.string().optional(),
+    heroImage: z.string().url().optional(),
+    heroAltText: z.string().optional(),
+    heroOverlayText: z.string().optional(),
+    heroTitle: z.string().optional(),
+    heroDescription: z.string().optional(),
+    mainCtaText: z.string().optional(),
+    mainCtaUrl: z.string().url().optional(),
+    featuresTitle: z.string().optional(),
+    features: z.array(z.string()).optional(),
+    actionUrl: z.string().url().optional()
+})
+
+export type EmailData = z.infer<typeof EmailDataSchema>;
+
+export const CreateEmailCampaignSchema = z.object({
+    subject: z.string().min(1),
+    body: z.string().min(1),
+    actionUrl: z.string().url().optional(),
+    imageUrl: z.string().url().optional(),
+    recipients: z.array(z.string().email()).min(1).optional(),
+    groupId: z.string().optional(),
+    groupSlug: z.string().optional(),
+    data: EmailDataSchema.optional(),
+});
+
+export type CreateEmailCampaign = z.infer<typeof CreateEmailCampaignSchema>;
 
 export type PushSubscription = z.infer<typeof PushSubscriptionSchema>;
 export type Notification = z.infer<typeof NotificationSchema>;
