@@ -12,80 +12,37 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import ProductSearchClient from "./product-search";
 import { X } from "lucide-react";
-import Image from "next/image";
-
-interface Product {
-    name: string;
-    price: string;
-    originalPrice?: string;
-    imageUrl: string;
-    url: string;
-}
-
-interface Promotion {
-    title: string;
-    description: string;
-    discount: number;
-    code: string;
-    ctaText: string;
-    ctaLink: string;
-    urgency: string;
-}
-
-interface SocialLinks {
-    facebook: string;
-    instagram: string;
-    twitter: string;
-}
-
-interface Campaign {
-    id: string;
-    subject: string;
-    body: string;
-    status: string;
-    imageUrl?: string;
-    groupId?: string;
-    data?: {
-        promotion?: Promotion;
-        featuredProducts?: Product[];
-        socialLinks?: SocialLinks;
-        supportLink?: string;
-        unsubscribeLink?: string;
-        preferencesLink?: string;
-        companyName?: string;
-        companyAddress?: string;
-        companyPhone?: string;
-        contactEmail?: string;
-    };
-}
+import { EmailCampaign, EmailProduct, Promotion } from "@/schemas/notification.schema";
 
 interface EmailCampaignComposerProps {
-    initialData?: Campaign;
+    initialData?: EmailCampaign;
     onClose?: () => void;
 }
 
 const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialData, onClose }) => {
+    console.log("🚀 ~ file: EmailCampaignComposer.tsx:57 ~ initialData:", initialData);
     const utils = api.useUtils();
     const [subject, setSubject] = useState(initialData?.subject ?? "");
     const [body, setBody] = useState(initialData?.body ?? "");
-    const [imageUrl, setImageUrl] = useState(initialData?.imageUrl ?? "");
     const [selectedGroup, setSelectedGroup] = useState<string>(initialData?.groupId ?? "all");
     const [recipientsRaw, setRecipientsRaw] = useState("");
     const [isDraft, setIsDraft] = useState(false);
 
     // Promotion fields
-    const [promotion, setPromotion] = useState<Promotion>(initialData?.data?.promotion ?? {
-        title: "",
-        description: "",
-        discount: 0,
-        code: "",
-        ctaText: "",
-        ctaLink: "",
-        urgency: ""
-    });
+    const [promotion, setPromotion] = useState<Promotion>(
+        initialData?.data?.promotion ?? {
+            title: "",
+            description: "",
+            discount: 0,
+            code: "",
+            ctaText: "",
+            ctaLink: "",
+            urgency: "",
+        }
+    );
 
     // Featured Products
-    const [selectedProducts, setSelectedProducts] = useState<Product[]>(initialData?.data?.featuredProducts ?? []);
+    const [selectedProducts, setSelectedProducts] = useState<EmailProduct[]>(initialData?.data?.featuredProducts ?? []);
     const [showProductSearch, setShowProductSearch] = useState(false);
 
     // Load shop settings
@@ -123,8 +80,6 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
             toast.success("Email campaign sent");
             setSubject("");
             setBody("");
-            setActionUrl("");
-            setImageUrl("");
             setRecipientsRaw("");
             onClose?.();
         },
@@ -158,14 +113,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
         const campaignData = {
             promotion: Object.values(promotion).some(Boolean) ? promotion : undefined,
             featuredProducts: selectedProducts.length > 0 ? selectedProducts : undefined,
-            socialLinks: shopSettings.socialLinks as SocialLinks,
-            supportLink: shopSettings.supportLink,
-            unsubscribeLink: shopSettings.unsubscribeLink,
-            preferencesLink: shopSettings.preferencesLink,
-            companyName: shopSettings.companyName,
-            companyAddress: shopSettings.companyAddress,
-            companyPhone: shopSettings.companyPhone,
-            contactEmail: shopSettings.contactEmail
+            settings: shopSettings,
         };
 
         if (initialData?.id) {
@@ -173,25 +121,22 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                 id: initialData.id,
                 subject,
                 body,
-                imageUrl: imageUrl || undefined,
-                data: campaignData
+                data: campaignData,
             });
         } else if (isDraft) {
             createDraftMutation.mutate({
                 subject,
                 body,
-                imageUrl: imageUrl || undefined,
                 groupId: selectedGroup === "all" ? undefined : selectedGroup,
-                data: campaignData
+                data: campaignData,
             });
         } else {
             mutation.mutate({
                 subject,
                 body,
-                imageUrl: imageUrl || undefined,
                 recipients: recipientList,
                 groupId: selectedGroup === "all" ? undefined : selectedGroup,
-                data: campaignData
+                data: campaignData,
             });
         }
     };
@@ -269,27 +214,16 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                                         size="icon"
                                         className="absolute right-2 top-2"
                                         onClick={() => {
-                                            setSelectedProducts(products =>
-                                                products.filter((_, i) => i !== idx)
-                                            )
+                                            setSelectedProducts((products) => products.filter((_, i) => i !== idx));
                                         }}
                                     >
                                         <X className="h-4 w-4" />
                                     </Button>
-                                    <div className="relative w-full h-32 mb-2">
-                                        <Image
-                                            src={product.imageUrl}
-                                            alt={product.name}
-                                            className="absolute inset-0 w-full h-full object-cover rounded-md"
-                                        />
-                                    </div>
                                     <h4 className="font-medium truncate">{product.name}</h4>
                                     <div className="flex items-center gap-2 mt-1">
                                         <span className="font-semibold">${product.price}</span>
                                         {product.originalPrice && (
-                                            <span className="text-sm line-through text-muted-foreground">
-                                                ${product.originalPrice}
-                                            </span>
+                                            <span className="text-sm line-through text-muted-foreground">${product.originalPrice}</span>
                                         )}
                                     </div>
                                 </div>
@@ -309,21 +243,22 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                             </div>
                             <ProductSearchClient
                                 onProductSelect={(product) => {
-                                    setSelectedProducts(products => [...products, {
-                                        name: product.name,
-                                        price: product.price.toString(),
-                                        originalPrice: product.originalPrice?.toString(),
-                                        imageUrl: product.images[0] || product.image || "/placeholder.jpg",
-                                        url: `/products/${product.slug}`
-                                    }]);
+                                    setSelectedProducts((products) => [
+                                        ...products,
+                                        {
+                                            name: product.name,
+                                            price: product.price.toString(),
+                                            // originalPrice: product.originalPrice?.toString(),
+                                            imageUrl: product.images[0] || product.image || "/placeholder.jpg",
+                                            url: `/products/${product.slug}`,
+                                        },
+                                    ]);
                                     setShowProductSearch(false);
                                 }}
                             />
                         </div>
                     </div>
                 )}
-
-                <Input label="Cover Image URL (optional)" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." />
 
                 {!initialData && (
                     <>

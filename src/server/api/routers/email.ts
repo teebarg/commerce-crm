@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { CreateEmailCampaignSchema, EmailDataSchema } from "@/schemas/notification.schema";
+import { CreateEmailCampaignSchema, EmailDataSchema, UpdateEmailCampaignSchema } from "@/schemas/notification.schema";
 import { z } from "zod";
 import { shopSettingsSchema } from "@/schemas/base.schema";
 
@@ -14,35 +14,35 @@ export const emailRouter = createTRPCRouter({
         return settings;
     }),
 
-    updateShopSettings: protectedProcedure
-        .input(shopSettingsSchema)
-        .mutation(async ({ ctx, input }) => {
-            const settings = await ctx.db.shopSettings.findFirst();
+    updateShopSettings: protectedProcedure.input(shopSettingsSchema).mutation(async ({ ctx, input }) => {
+        const settings = await ctx.db.shopSettings.findFirst();
 
-            if (!settings) {
-                return await ctx.db.shopSettings.create({
-                    data: {
-                        ...input
-                    }
-                });
-            }
-
-            return await ctx.db.shopSettings.update({
-                where: { id: settings.id },
+        if (!settings) {
+            return await ctx.db.shopSettings.create({
                 data: {
-                    ...input
-                }
+                    ...input,
+                },
             });
-        }),
+        }
+
+        return await ctx.db.shopSettings.update({
+            where: { id: settings.id },
+            data: {
+                ...input,
+            },
+        });
+    }),
 
     createDraftCampaign: protectedProcedure
-        .input(z.object({
-            subject: z.string().min(1),
-            body: z.string().min(1),
-            imageUrl: z.string().url().optional(),
-            groupId: z.string().optional(),
-            data: EmailDataSchema.optional()
-        }))
+        .input(
+            z.object({
+                subject: z.string().min(1),
+                body: z.string().min(1),
+                imageUrl: z.string().url().optional(),
+                groupId: z.string().optional(),
+                data: EmailDataSchema.optional(),
+            })
+        )
         .mutation(async ({ ctx, input }) => {
             const campaign = await ctx.db.emailCampaign.create({
                 data: {
@@ -51,23 +51,25 @@ export const emailRouter = createTRPCRouter({
                     imageUrl: input.imageUrl,
                     data: input.data ?? {},
                     status: "DRAFT",
-                    groupId: input.groupId === "all" ? undefined : input.groupId
-                }
+                    groupId: input.groupId === "all" ? undefined : input.groupId,
+                },
             });
 
             return campaign;
         }),
 
     sendDraftCampaign: protectedProcedure
-        .input(z.object({
-            id: z.string(),
-            recipients: z.array(z.string().email()).min(1)
-        }))
+        .input(
+            z.object({
+                id: z.string(),
+                recipients: z.array(z.string().email()).min(1),
+            })
+        )
         .mutation(async ({ ctx, input }) => {
             const { renderEmail, sendEmail } = await import("@/utils/email");
 
             const campaign = await ctx.db.emailCampaign.findUnique({
-                where: { id: input.id }
+                where: { id: input.id },
             });
 
             if (!campaign || campaign.status !== "DRAFT") {
@@ -95,8 +97,6 @@ export const emailRouter = createTRPCRouter({
 
                     // get shop settings
 
-
-
                     let emailHtml = await renderEmail("marketing", templateData);
 
                     const pixel = `<img src="${baseUrl}/api/email/track/open?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}" alt="" width="1" height="1" style="display:none" />`;
@@ -105,7 +105,7 @@ export const emailRouter = createTRPCRouter({
                     await sendEmail({ to, subject: campaign.subject, html: emailHtml });
                     successfulRecipients.push(to);
                 } catch (error) {
-                    console.log("🚀 ~ error:", error)
+                    console.log("🚀 ~ error:", error);
                     failedRecipients.push({ recipient: to, error });
                 }
             }
@@ -389,31 +389,20 @@ export const emailRouter = createTRPCRouter({
         return duplicated;
     }),
 
-    updateCampaign: protectedProcedure
-        .input(
-            z.object({
-                id: z.string(),
-                subject: z.string().min(1),
-                body: z.string().min(1),
-                actionUrl: z.string().url().optional(),
-                imageUrl: z.string().url().optional(),
-                data: EmailDataSchema.optional(),
-            })
-        )
-        .mutation(async ({ ctx, input }) => {
-            const campaign = await ctx.db.emailCampaign.update({
-                where: { id: input.id },
-                data: {
-                    subject: input.subject,
-                    body: input.body,
-                    imageUrl: input.imageUrl,
-                    // data: { actionUrl: input.actionUrl },
-                    data: input.data ?? {},
-                },
-            });
+    updateCampaign: protectedProcedure.input(UpdateEmailCampaignSchema).mutation(async ({ ctx, input }) => {
+        const campaign = await ctx.db.emailCampaign.update({
+            where: { id: input.id },
+            data: {
+                subject: input.subject,
+                body: input.body,
+                // imageUrl: input.imageUrl,
+                // data: { actionUrl: input.actionUrl },
+                data: input.data ?? {},
+            },
+        });
 
-            return campaign;
-        }),
+        return campaign;
+    }),
 
     campaignsAnalytics: protectedProcedure.query(async ({ ctx }) => {
         const dbAny = ctx.db as any;

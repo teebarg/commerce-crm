@@ -68,10 +68,15 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
     const { data: products, isLoading } = useQuery<ProductSearch[]>({
         queryKey: ["products", query],
         queryFn: async () => {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_SEARCH_URL}/api/products/search/public?search=${debouncedQuery}&limit=5`);
-          return res.json();
+            const res = await fetch(`${process.env.NEXT_PUBLIC_SEARCH_URL}/api/product/search/public?search=${debouncedQuery}&limit=5`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            return res.json();
         },
-      });
+    });
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
