@@ -1,63 +1,15 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { CreateEmailCampaignSchema } from "@/schemas/notification.schema";
-import { z } from "zod";
-
-const shopSettingsSchema = z.object({
-    companyName: z.string(),
-    companyAddress: z.string(),
-    companyPhone: z.string(),
-    contactEmail: z.string().email(),
-    supportLink: z.string().url(),
-    unsubscribeLink: z.string().url(),
-    preferencesLink: z.string().url(),
-    socialLinks: z.object({
-        facebook: z.string().url(),
-        instagram: z.string().url(),
-        twitter: z.string().url(),
-    }),
-});
-
-interface CampaignData {t { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { CreateEmailCampaignSchema, EmailDataSchema } from "@/schemas/notification.schema";
 import { z } from "zod";
+import { shopSettingsSchema } from "@/schemas/base.schema";
 
 interface CampaignData {
-    promotionBadge?: string;
-    heroImage?: string;
-    heroAltText?: string;
-    heroOverlayText?: string;
-    heroTitle?: string;
-    heroDescription?: string;
-    mainCtaText?: string;
-    mainCtaUrl?: string;
-    featuresTitle?: string;
-    features?: string[];
     actionUrl?: string;
 }
 
 export const emailRouter = createTRPCRouter({
     getShopSettings: protectedProcedure.query(async ({ ctx }) => {
-        let settings = await ctx.db.shopSettings.findFirst();
-        
-        if (!settings) {
-            // Create default settings if none exist
-            settings = await ctx.db.shopSettings.create({
-                data: {
-                    companyName: "ThriftByOba",
-                    companyAddress: "123 Thrift St, Oba City, Nigeria",
-                    companyPhone: "+234 123 456 7890",
-                    contactEmail: process.env.SUPPORT_EMAIL || "support@thriftbyoba.com",
-                    supportLink: "https://www.thriftbyoba.com/support",
-                    unsubscribeLink: "https://www.thriftbyoba.com/unsubscribe",
-                    preferencesLink: "https://www.thriftbyoba.com/preferences",
-                    socialLinks: {
-                        facebook: "https://www.facebook.com/thriftbyoba",
-                        instagram: "https://www.instagram.com/thriftbyoba",
-                        twitter: "https://www.twitter.com/thriftbyoba"
-                    }
-                }
-            });
-        }
+        const settings = await ctx.db.shopSettings.findFirst();
 
         return settings;
     }),
@@ -97,7 +49,7 @@ export const emailRouter = createTRPCRouter({
                     subject: input.subject,
                     body: input.body,
                     imageUrl: input.imageUrl,
-                    data: input.data || {},
+                    data: input.data ?? {},
                     status: "DRAFT",
                     groupId: input.groupId === "all" ? undefined : input.groupId
                 }
@@ -139,19 +91,12 @@ export const emailRouter = createTRPCRouter({
                         message: campaign.body,
                         action_url: trackedAction,
                         image_url: campaign.imageUrl ?? "",
-                        promotion_badge: campaignData?.promotionBadge,
-                        hero_image: campaignData?.heroImage,
-                        hero_alt_text: campaignData?.heroAltText,
-                        hero_overlay_text: campaignData?.heroOverlayText,
-                        hero_title: campaignData?.heroTitle,
-                        hero_description: campaignData?.heroDescription,
-                        main_cta_text: campaignData?.mainCtaText,
-                        main_cta_url: campaignData?.mainCtaUrl || trackedAction,
-                        features_title: campaignData?.featuresTitle,
-                        features: campaignData?.features
                     };
 
-                    
+                    // get shop settings
+
+
+
                     let emailHtml = await renderEmail("marketing", templateData);
 
                     const pixel = `<img src="${baseUrl}/api/email/track/open?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}" alt="" width="1" height="1" style="display:none" />`;
@@ -463,7 +408,7 @@ export const emailRouter = createTRPCRouter({
                     body: input.body,
                     imageUrl: input.imageUrl,
                     // data: { actionUrl: input.actionUrl },
-                    data: input.data || {},
+                    data: input.data ?? {},
                 },
             });
 

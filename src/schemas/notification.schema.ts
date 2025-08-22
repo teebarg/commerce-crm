@@ -101,16 +101,6 @@ export const CreateNotificationEventInput = z.object({
 });
 
 export const EmailDataSchema = z.object({
-    promotionBadge: z.string().optional(),
-    heroImage: z.string().url().optional(),
-    heroAltText: z.string().optional(),
-    heroOverlayText: z.string().optional(),
-    heroTitle: z.string().optional(),
-    heroDescription: z.string().optional(),
-    mainCtaText: z.string().optional(),
-    mainCtaUrl: z.string().url().optional(),
-    featuresTitle: z.string().optional(),
-    features: z.array(z.string()).optional(),
     actionUrl: z.string().url().optional()
 })
 

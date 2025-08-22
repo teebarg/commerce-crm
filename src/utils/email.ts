@@ -41,6 +41,7 @@ export async function renderEmail(templateName: string, data: Record<string, any
     const contentTemplatePath = path.join(process.cwd(), "src/templates", `${templateName}.hbs`);
 
     handlebars.registerHelper("substring", function (str, start, length) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return str.substring(start, start + length);
     });
 

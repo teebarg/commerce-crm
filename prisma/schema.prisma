@@ -49,7 +49,7 @@ enum DeviceType {
 }
 
 model ShopSettings {
-  id              String    @id @default(cuid())
+  id              String   @id @default(cuid())
   companyName     String
   companyAddress  String
   companyPhone    String
@@ -57,9 +57,10 @@ model ShopSettings {
   supportLink     String
   unsubscribeLink String
   preferencesLink String
-  socialLinks     Json      // Will store facebook, instagram, twitter URLs
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  socialLinks     Json // Will store facebook, instagram, twitter URLs
+  extraSettings   Json? // Flexible field for future shop settings
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@map("shop_settings")
 }

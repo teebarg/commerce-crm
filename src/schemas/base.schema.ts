@@ -1,5 +1,23 @@
 import { z } from "zod";
 
+export const shopSettingsSchema = z.object({
+    companyName: z.string().min(1, "Company name is required"),
+    companyAddress: z.string().min(1, "Company address is required"),
+    companyPhone: z.string().min(1, "Company phone is required"),
+    contactEmail: z.string().email("Invalid email address"),
+    supportLink: z.string(),
+    unsubscribeLink: z.string(),
+    preferencesLink: z.string(),
+    socialLinks: z.object({
+        facebook: z.string(),
+        instagram: z.string(),
+        twitter: z.string(),
+    }),
+    extraSettings: z.record(z.any()).optional(),
+});
+
+export type ShopSettings = z.infer<typeof shopSettingsSchema>;
+
 export const PushEventSchema = z.object({
     notificationId: z.string(),
     subscriberId: z.string(),

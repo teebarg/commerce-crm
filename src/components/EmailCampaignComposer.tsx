@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import ProductSearchClient from "./product-search";
 import { X } from "lucide-react";
+import Image from "next/image";
 
 interface Product {
     name: string;
@@ -204,69 +205,50 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
             <CardContent className="space-y-4">
                 <Input label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" />
                 <Textarea label="Body" rows={6} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Email body" />
-                <div className="border rounded-lg p-4 space-y-4 mt-4">
-                    <h3 className="text-lg font-semibold">Marketing Template Details</h3>
-                    <Input label="Promotion Badge" value={promotionBadge} onChange={(e) => setPromotionBadge(e.target.value)} placeholder="e.g., New Arrival, Special Offer" />
-                    <Input label="Hero Image URL" value={heroImage} onChange={(e) => setHeroImage(e.target.value)} placeholder="https://..." />
-                    <Input label="Hero Image Alt Text" value={heroAltText} onChange={(e) => setHeroAltText(e.target.value)} placeholder="Image description..." />
-                    <Input label="Hero Overlay Text" value={heroOverlayText} onChange={(e) => setHeroOverlayText(e.target.value)} placeholder="Text overlay on hero image" />
-                    <Input label="Hero Title" value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="Main title" />
-                    <Textarea label="Hero Description" value={heroDescription} onChange={(e) => setHeroDescription(e.target.value)} placeholder="Hero section description" />
-                    <Input label="Main CTA Text" value={mainCtaText} onChange={(e) => setMainCtaText(e.target.value)} placeholder="e.g., Shop Now" />
-                    <Input label="Main CTA URL" value={mainCtaUrl} onChange={(e) => setMainCtaUrl(e.target.value)} placeholder="https://..." />
-                    <Input label="Features Section Title" value={featuresTitle} onChange={(e) => setFeaturesTitle(e.target.value)} placeholder="e.g., Key Features" />
-                    <Textarea 
-                        label="Features (one per line)" 
-                        value={features.join('\n')} 
-                        onChange={(e) => setFeatures(e.target.value.split('\n').filter(Boolean))} 
-                        placeholder="Enter features, one per line"
-                    />
-                </div>
-
                 <div className="border rounded-lg p-4 space-y-4">
                     <h3 className="text-lg font-semibold">Promotion</h3>
-                    <Input 
-                        label="Title" 
-                        value={promotion.title} 
-                        onChange={(e) => setPromotion({ ...promotion, title: e.target.value })} 
-                        placeholder="Special Offer" 
+                    <Input
+                        label="Title"
+                        value={promotion.title}
+                        onChange={(e) => setPromotion({ ...promotion, title: e.target.value })}
+                        placeholder="Special Offer"
                     />
-                    <Input 
-                        label="Description" 
-                        value={promotion.description} 
-                        onChange={(e) => setPromotion({ ...promotion, description: e.target.value })} 
-                        placeholder="Get 10% off your first purchase" 
+                    <Input
+                        label="Description"
+                        value={promotion.description}
+                        onChange={(e) => setPromotion({ ...promotion, description: e.target.value })}
+                        placeholder="Get 10% off your first purchase"
                     />
-                    <Input 
-                        type="number" 
-                        label="Discount %" 
-                        value={promotion.discount} 
-                        onChange={(e) => setPromotion({ ...promotion, discount: parseInt(e.target.value) })} 
-                        placeholder="10" 
+                    <Input
+                        type="number"
+                        label="Discount %"
+                        value={promotion.discount}
+                        onChange={(e) => setPromotion({ ...promotion, discount: parseInt(e.target.value) })}
+                        placeholder="10"
                     />
-                    <Input 
-                        label="Promo Code" 
-                        value={promotion.code} 
-                        onChange={(e) => setPromotion({ ...promotion, code: e.target.value })} 
-                        placeholder="SAVE10" 
+                    <Input
+                        label="Promo Code"
+                        value={promotion.code}
+                        onChange={(e) => setPromotion({ ...promotion, code: e.target.value })}
+                        placeholder="SAVE10"
                     />
-                    <Input 
-                        label="CTA Text" 
-                        value={promotion.ctaText} 
-                        onChange={(e) => setPromotion({ ...promotion, ctaText: e.target.value })} 
-                        placeholder="Shop Now" 
+                    <Input
+                        label="CTA Text"
+                        value={promotion.ctaText}
+                        onChange={(e) => setPromotion({ ...promotion, ctaText: e.target.value })}
+                        placeholder="Shop Now"
                     />
-                    <Input 
-                        label="CTA Link" 
-                        value={promotion.ctaLink} 
-                        onChange={(e) => setPromotion({ ...promotion, ctaLink: e.target.value })} 
-                        placeholder="https://..." 
+                    <Input
+                        label="CTA Link"
+                        value={promotion.ctaLink}
+                        onChange={(e) => setPromotion({ ...promotion, ctaLink: e.target.value })}
+                        placeholder="https://..."
                     />
-                    <Input 
-                        label="Urgency Message" 
-                        value={promotion.urgency} 
-                        onChange={(e) => setPromotion({ ...promotion, urgency: e.target.value })} 
-                        placeholder="Limited time offer" 
+                    <Input
+                        label="Urgency Message"
+                        value={promotion.urgency}
+                        onChange={(e) => setPromotion({ ...promotion, urgency: e.target.value })}
+                        placeholder="Limited time offer"
                     />
                 </div>
 
@@ -277,26 +259,26 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                             Add Product
                         </Button>
                     </div>
-                    
+
                     {selectedProducts.length > 0 && (
                         <div className="grid grid-cols-2 gap-4">
-                            {selectedProducts.map((product, index) => (
-                                <div key={index} className="relative border rounded-md p-3">
-                                    <Button 
-                                        variant="ghost" 
-                                        size="icon" 
+                            {selectedProducts.map((product, idx: number) => (
+                                <div key={idx} className="relative border rounded-md p-3">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
                                         className="absolute right-2 top-2"
                                         onClick={() => {
-                                            setSelectedProducts(products => 
-                                                products.filter((_, i) => i !== index)
+                                            setSelectedProducts(products =>
+                                                products.filter((_, i) => i !== idx)
                                             )
                                         }}
                                     >
                                         <X className="h-4 w-4" />
                                     </Button>
                                     <div className="relative w-full h-32 mb-2">
-                                        <img 
-                                            src={product.imageUrl} 
+                                        <Image
+                                            src={product.imageUrl}
                                             alt={product.name}
                                             className="absolute inset-0 w-full h-full object-cover rounded-md"
                                         />
@@ -325,7 +307,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                                     <X className="h-4 w-4" />
                                 </Button>
                             </div>
-                            <ProductSearchClient 
+                            <ProductSearchClient
                                 onProductSelect={(product) => {
                                     setSelectedProducts(products => [...products, {
                                         name: product.name,
