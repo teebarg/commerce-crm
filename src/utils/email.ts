@@ -3,6 +3,8 @@ import fs from "fs";
 import path from "path";
 import handlebars from "handlebars";
 import { env } from "@/env";
+import { type Settings } from "@/schemas/notification.schema";
+import { currency } from "@/lib/utils";
 
 interface SendEmailOptions {
     to: string;
@@ -36,7 +38,7 @@ export async function sendEmail(options: SendEmailOptions) {
     }
 }
 
-export async function renderEmail(templateName: string, data: Record<string, any>) {
+export async function renderEmail(templateName: string, settings: Settings,  data: Record<string, any>) {
     const mainLayoutPath = path.join(process.cwd(), "src/templates", "base.hbs");
     const contentTemplatePath = path.join(process.cwd(), "src/templates", `${templateName}.hbs`);
 
@@ -45,48 +47,49 @@ export async function renderEmail(templateName: string, data: Record<string, any
         return str.substring(start, start + length);
     });
 
+    handlebars.registerHelper("currency", function (price) {
+        return currency(price);
+    });
+
+    handlebars.registerHelper("url", function (path) {
+        return process.env.NEXT_PUBLIC_SHOP_FRONTEND + path;
+    });
+
+    handlebars.registerHelper("chunk", function (arr: any[], size: number, options: any) {
+        let out = "";
+        for (let i = 0; i < arr.length; i += size) {
+            // `arr.slice(i, i + size)` = a group
+            out += options.fn(arr.slice(i, i + size));
+        }
+        return out;
+    });
+
+
+    // handlebars.registerHelper("chunk", function (arr, size, options) {
+    //     const out: any[] = [];
+    //     for (let i = 0; i < arr.length; i += size) {
+    //         out.push(arr.slice(i, i + size));
+    //     }
+    //     return out.map(group => options.fn(group)).join("");
+    // });
+
     const emailData = {
         ...data,
         year: new Date().getFullYear(),
         app_name: env.APP_NAME,
         base_url: env.BASE_URL,
         socialLinks: {
-            facebook: "https://www.facebook.com",
-            instagram: "https://www.instagram.com",
-            twitter: "https://www.twitter.com",
+            facebook: `https://www.facebook.com/${settings.socialLinks.facebook}`,
+            instagram: `https://www.instagram.com/${settings.socialLinks.instagram}`,
+            twitter: `https://www.x.com/${settings.socialLinks.twitter}`,
         },
-        supportLink: "https://www.thriftbyoba.com",
-        unsubscribeLink: "https://www.thriftbyoba.com",
-        preferencesLink: "https://www.thriftbyoba.com",
-        companyName: "ThriftByOba",
-        companyAddress: "123 Thrift St, Oba City, Nigeria",
-        companyPhone: "+234 123 456 7890",
+        supportLink: settings.supportLink,
+        unsubscribeLink: settings.unsubscribeLink,
+        preferencesLink: settings.preferencesLink,
+        companyName: settings.companyName,
+        companyAddress: settings.companyAddress,
+        companyPhone: settings.companyPhone,
         contactEmail: env.NEXT_PUBLIC_CONTACT_EMAIL,
-        promotion: {
-            title: "Special Offer",
-            description: "Get 10% off your first purchase",
-            discount: 10,
-            code: "SAVE10",
-            ctaText: "Shop Now",
-            ctaLink: "https://www.thriftbyoba.com",
-            urgency: "Limited time offer",
-        },
-        featuredProducts: [
-            {
-                name: "Product 1",
-                price: "100",
-                originalPrice: "120",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzSOrIHIncvVwcn86Yj1lG2no3rymRPhF1AQ&s",
-                url: "https://www.thriftbyoba.com",
-            },
-            {
-                name: "Product 2",
-                price: "200",
-                originalPrice: "220",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzSOrIHIncvVwcn86Yj1lG2no3rymRPhF1AQ&s",
-                url: "https://www.thriftbyoba.com",
-            },
-        ],
     };
 
     const mainTemplate = handlebars.compile(fs.readFileSync(mainLayoutPath, "utf8"));

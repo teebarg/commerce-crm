@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {  Send } from "lucide-react";
+import { Send } from "lucide-react";
 import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { api } from "@/trpc/react";
@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button as UIButton } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { EmailCampaign } from "@/schemas/notification.schema";
+import { type EmailCampaign } from "@/schemas/notification.schema";
 
 const SendDraftCampaign: React.FC<{ campaign: EmailCampaign }> = ({ campaign }) => {
     const utils = api.useUtils();
@@ -116,6 +116,7 @@ const SendDraftCampaign: React.FC<{ campaign: EmailCampaign }> = ({ campaign }) 
                     <UIButton
                         onClick={() => void handleSendDraft(campaign)}
                         disabled={sendDraftMutation.isPending || recipientsQuery.isFetching || (recipientsQuery.data?.emails?.length ?? 0) === 0}
+                        variant="primary"
                     >
                         {sendDraftMutation.isPending ? "Sending..." : "Send"}
                     </UIButton>

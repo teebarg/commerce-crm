@@ -5,8 +5,8 @@ import { type ProductSearch, type ProductVariant } from "@/schemas/product.schem
 
 export const useProductVariant = (product: ProductSearch) => {
     const priceInfo = useMemo(() => {
-        const prices = product.variants?.map((v: ProductVariant) => v.price) || [];
-        const comparePrices = product.variants?.map((v: ProductVariant) => v.old_price || v.price) || [];
+        const prices = product.variants?.map((v: ProductVariant) => v.price) ?? [];
+        const comparePrices = product.variants?.map((v: ProductVariant) => v.old_price ?? v.price) ?? [];
 
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);

@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { CreateEmailCampaignSchema, EmailDataSchema, UpdateEmailCampaignSchema } from "@/schemas/notification.schema";
+import { CreateEmailCampaignSchema, type EmailData, EmailDataSchema, UpdateEmailCampaignSchema } from "@/schemas/notification.schema";
 import { z } from "zod";
 import { shopSettingsSchema } from "@/schemas/base.schema";
 
@@ -72,11 +72,22 @@ export const emailRouter = createTRPCRouter({
                 where: { id: input.id },
             });
 
-            if (!campaign || campaign.status !== "DRAFT") {
+            if (!campaign) {
                 throw new Error("Campaign not found or is not in draft status");
             }
 
             const baseUrl = (process.env.BASE_URL ?? (typeof window === "undefined" ? "" : window.location.origin)) || "";
+
+            const settings = await ctx.db.shopSettings.findFirst();
+
+            const data = campaign.data as EmailData;
+
+            const templateData = {
+                subject: campaign.subject,
+                body: campaign.body,
+                promotion: data?.promotion,
+                featuredProducts: data?.featuredProducts
+            }
 
             // Partial success: try all sends, collect successes and failures
             const successfulRecipients: string[] = [];
@@ -87,17 +98,7 @@ export const emailRouter = createTRPCRouter({
                     const originalAction = "/";
                     const trackedAction = `${baseUrl}/api/email/track/click?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}&u=${encodeURIComponent(originalAction)}`;
 
-                    const campaignData = campaign.data as unknown as CampaignData;
-                    const templateData = {
-                        title: campaign.subject,
-                        message: campaign.body,
-                        action_url: trackedAction,
-                        image_url: campaign.imageUrl ?? "",
-                    };
-
-                    // get shop settings
-
-                    let emailHtml = await renderEmail("marketing", templateData);
+                    let emailHtml = await renderEmail("marketing", settings!, templateData);
 
                     const pixel = `<img src="${baseUrl}/api/email/track/open?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}" alt="" width="1" height="1" style="display:none" />`;
                     emailHtml = emailHtml.replace("</body>", `${pixel}</body>`);
@@ -261,8 +262,7 @@ export const emailRouter = createTRPCRouter({
             data: {
                 subject: input.subject,
                 body: input.body,
-                imageUrl: input.imageUrl,
-                data: { actionUrl: input.actionUrl },
+                data: input.data,
                 status: "DRAFT",
                 groupId: group?.id,
             },
@@ -274,17 +274,24 @@ export const emailRouter = createTRPCRouter({
         const successfulRecipients: string[] = [];
         const failedRecipients: { recipient: string; error: unknown }[] = [];
 
+        const settings = await ctx.db.shopSettings.findFirst();
+
+        const templateData = {
+            subject: input.subject,
+            body: input.body,
+            promotion: input.data?.promotion,
+            featuredProducts: input.data?.featuredProducts
+        }
+
         for (const to of recipients) {
             try {
-                const originalAction = input.actionUrl ?? "";
+                const originalAction = "";
                 const trackedAction = `${baseUrl}/api/email/track/click?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}&u=${encodeURIComponent(
                     originalAction
                 )}`;
-                let emailHtml = await renderEmail("marketing", {
-                    title: input.subject,
-                    message: input.body,
+                let emailHtml = await renderEmail("marketing", settings!, {
+                    ...templateData,
                     action_url: trackedAction,
-                    image_url: input.imageUrl ?? "",
                 });
                 const pixel = `<img src="${baseUrl}/api/email/track/open?c=${encodeURIComponent(campaign.id)}&r=${encodeURIComponent(to)}" alt="" width="1" height="1" style="display:none" />`;
                 emailHtml = emailHtml.replace("</body>", `${pixel}</body>`);
@@ -434,6 +441,7 @@ export const emailRouter = createTRPCRouter({
                 openRate,
                 clickRate,
                 sentAt: c.sentAt ?? null,
+                data: c.data
             };
         });
         const deliveredTotal = (events as any[])

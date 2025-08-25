@@ -1,17 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Mail, MoreHorizontal, Eye, Edit, Trash2, Files, Send, Calendar, Users, TrendingUp } from "lucide-react";
+import { Plus, Mail, Eye, Send, Calendar, Users } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import EmailCampaignComposer from "../EmailCampaignComposer";
 import { api } from "@/trpc/react";
-import { toast } from "sonner";
 import EmailCampaignAction from "./email-campaign-action";
 
 const statusColors = {
@@ -19,19 +17,6 @@ const statusColors = {
     draft: "bg-gray-500/10 text-gray-700 border-gray-200",
     scheduled: "bg-blue-500/10 text-blue-700 border-blue-200",
 };
-
-// interface Campaign {
-//     id: string;
-//     subject: string;
-//     body: string;
-//     status: string;
-//     recipients: number;
-//     openRate: number;
-//     clickRate: number;
-//     sentAt: Date | null;
-//     imageUrl?: string;
-//     data?: { actionUrl?: string };
-// }
 
 export default function EmailCampaigns() {
     // const utils = api.useUtils();

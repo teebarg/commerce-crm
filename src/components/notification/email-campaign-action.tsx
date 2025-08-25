@@ -8,7 +8,7 @@ import EmailCampaignComposer from "../EmailCampaignComposer";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import EmailCampaignDetails from "./email-campaign-details";
-import { EmailCampaign } from "@/schemas/notification.schema";
+import { type EmailCampaign } from "@/schemas/notification.schema";
 import SendDraftCampaign from "./send-draft-campaign";
 
 const EmailCampaignAction: React.FC<{ campaign: EmailCampaign }> = ({ campaign }) => {
@@ -55,6 +55,20 @@ const EmailCampaignAction: React.FC<{ campaign: EmailCampaign }> = ({ campaign }
                 onOpenChange={detailState.setOpen}
             >
                 <EmailCampaignDetails campaign={campaign} />
+            </Overlay>
+            <SendDraftCampaign campaign={campaign} />
+            <Overlay
+                open={editState.isOpen}
+                title={`Edit ${campaign.subject}`}
+                trigger={
+                    <Button size="iconOnly">
+                        <Edit className="h-5 w-5" />
+                    </Button>
+                }
+                onOpenChange={editState.setOpen}
+                sheetClassName="min-w-[40vw]"
+            >
+                <EmailCampaignComposer initialData={campaign} onClose={editState.close} />
             </Overlay>
             {campaign.status === "DRAFT" && (
                 <>

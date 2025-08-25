@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
-import { EmailCampaign } from "@/schemas/notification.schema";
+import { type EmailCampaign } from "@/schemas/notification.schema";
 
 const statusColors = {
     sent: "bg-green-500/10 text-green-700 border-green-200",

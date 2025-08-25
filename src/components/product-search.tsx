@@ -24,7 +24,7 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
                     alt={product.name}
                     className="object-cover group-hover:scale-105 transition-transform duration-200"
                     sizes="48px"
-                    src={product.images[0] || product.image || "/placeholder.jpg"}
+                    src={product.images[0] ?? product.image ?? "/placeholder.jpg"}
                 />
             </div>
 
@@ -64,11 +64,10 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
 
     const searchRef = useRef<HTMLInputElement>(null);
 
-    // const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 5, page: 1 });
     const { data: products, isLoading } = useQuery<ProductSearch[]>({
         queryKey: ["products", query],
         queryFn: async () => {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_SEARCH_URL}/api/product/search/public?search=${debouncedQuery}&limit=5`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_SHOP_BACKEND}/api/product/search/public?q=${debouncedQuery}&limit=5`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

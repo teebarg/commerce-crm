@@ -16,56 +16,81 @@
     <![endif]-->
     <style>
         /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body, table, td, p, a, li, blockquote {
             -webkit-text-size-adjust: 100%;
             -ms-text-size-adjust: 100%;
         }
-        
+
+        /* Desktop styles (default) */
+        .mobile-stack {
+            display: inline-block;
+            vertical-align: top;
+        }
+
         table, td {
             mso-table-lspace: 0pt;
             mso-table-rspace: 0pt;
         }
-        
+
         img {
             -ms-interpolation-mode: bicubic;
             border: 0;
             outline: none;
             text-decoration: none;
         }
-        
+
         /* Client-specific styles */
         .ReadMsgBody { width: 100%; }
         .ExternalClass { width: 100%; }
         .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {
             line-height: 100%;
         }
-        
+
+        .mobile-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 20px !important;
+        }
+
         /* Mobile styles */
         @media screen and (max-width: 600px) {
             .mobile-center { text-align: center !important; }
             .mobile-full-width { width: 100% !important; }
             .mobile-padding { padding: 20px !important; }
             .mobile-hide { display: none !important; }
-            .mobile-stack { display: block !important; width: 100% !important; }
+            .mobile-stack { display: block !important; width: 100% !important; padding: 0 0 15px 0 !important; }
             .mobile-font-size { font-size: 18px !important; }
+            .mobile-container {
+                max-width: 600px;
+                margin: 0 auto;
+                display: grid;
+            }
         }
     </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    
+
     <!-- Preheader -->
     <div style="display: none; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #f8fafc;">
         {{preheader}}
     </div>
-    
+
     <!-- Main Container -->
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
         <tr>
             <td style="padding: 20px 0;">
-                
+
                 <!-- Email Container -->
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" class="mobile-full-width">
-                    
+
                     <!-- Header -->
                     <tr>
                         <td style="padding: 40px 30px 30px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px 12px 0 0;" class="mobile-padding">
@@ -85,7 +110,7 @@
                     </tr>
 
                     {{{body}}}
-                    
+
                     <!-- Footer -->
                     <tr>
                         <td style="padding: 40px 30px; background-color: #2d3748; color: #ffffff; border-radius: 0 0 12px 12px;" class="mobile-padding">
@@ -127,7 +152,7 @@
                                         <p style="margin: 0; font-size: 12px; color: #718096;">
                                             You're receiving this email because you subscribed to our newsletter.
                                             <br>
-                                            <a href="{{unsubscribeLink}}" style="color: #63b3ed;">Unsubscribe</a> | 
+                                            <a href="{{unsubscribeLink}}" style="color: #63b3ed;">Unsubscribe</a> |
                                             <a href="{{preferencesLink}}" style="color: #63b3ed;">Update preferences</a>
                                         </p>
                                     </td>

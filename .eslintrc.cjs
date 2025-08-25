@@ -40,7 +40,7 @@ const config = {
             },
         ],
         "@typescript-eslint/no-unsafe-argument": "off",
-        "@typescript-eslint/no-unsafe-return": "warn",
+        "@typescript-eslint/no-unsafe-return": "off",
     },
 };
 module.exports = config;

@@ -12,7 +12,10 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import ProductSearchClient from "./product-search";
 import { X } from "lucide-react";
-import { EmailCampaign, EmailProduct, Promotion } from "@/schemas/notification.schema";
+import { type EmailCampaign, type EmailProduct, type Promotion } from "@/schemas/notification.schema";
+import { type ProductSearch, type ProductVariant } from "@/schemas/product.schema";
+import { currency } from "@/lib/utils";
+import Image from "next/image";
 
 interface EmailCampaignComposerProps {
     initialData?: EmailCampaign;
@@ -20,7 +23,6 @@ interface EmailCampaignComposerProps {
 }
 
 const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialData, onClose }) => {
-    console.log("🚀 ~ file: EmailCampaignComposer.tsx:57 ~ initialData:", initialData);
     const utils = api.useUtils();
     const [subject, setSubject] = useState(initialData?.subject ?? "");
     const [body, setBody] = useState(initialData?.body ?? "");
@@ -46,7 +48,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
     const [showProductSearch, setShowProductSearch] = useState(false);
 
     // Load shop settings
-    const { data: shopSettings } = api.email.getShopSettings.useQuery();
+    // const { data: shopSettings } = api.email.getShopSettings.useQuery();
 
     const { data: groups } = api.email.getGroups.useQuery();
     const { data: recipients, refetch: refetchRecipients } = api.email.getRecipients.useQuery({ groupId: selectedGroup }, { enabled: false });
@@ -105,15 +107,15 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
             return;
         }
 
-        if (!shopSettings) {
-            toast.error("Shop settings not found. Please contact support.");
-            return;
-        }
+        // if (!shopSettings) {
+        //     toast.error("Shop settings not found. Please contact support.");
+        //     return;
+        // }
 
         const campaignData = {
             promotion: Object.values(promotion).some(Boolean) ? promotion : undefined,
-            featuredProducts: selectedProducts.length > 0 ? selectedProducts : undefined,
-            settings: shopSettings,
+            featuredProducts: selectedProducts.length > 0 ? selectedProducts : [],
+            // settings: shopSettings,
         };
 
         if (initialData?.id) {
@@ -139,6 +141,39 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                 data: campaignData,
             });
         }
+    };
+
+    const priceInfo = (product: ProductSearch) => {
+        const variants = product.variants ?? [];
+
+        if (variants.length === 0) {
+            return {
+                minPrice: 0,
+                outOfStock: true,
+            };
+        }
+
+        const prices = variants.map((v) => v.price);
+
+        const minPrice = Math.min(...prices);
+
+        return {
+            minPrice,
+            outOfStock: product.variants?.length == 0 || product.variants?.every((v: ProductVariant) => v.inventory <= 0),
+        };
+    };
+
+    const handleProductSelect = (product: ProductSearch) => {
+        setSelectedProducts((products) => [
+            ...products,
+            {
+                name: product.name,
+                price: priceInfo(product).minPrice,
+                imageUrl: product.images[0] ?? product.image ?? "/placeholder.jpg",
+                link: `/products/${product.slug}`,
+            },
+        ]);
+        setShowProductSearch(false);
     };
 
     return (
@@ -208,7 +243,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                     {selectedProducts.length > 0 && (
                         <div className="grid grid-cols-2 gap-4">
                             {selectedProducts.map((product, idx: number) => (
-                                <div key={idx} className="relative border rounded-md p-3">
+                                <div key={idx} className="relative border rounded-md p-4 flex items-center gap-2">
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -219,12 +254,21 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                                     >
                                         <X className="h-4 w-4" />
                                     </Button>
-                                    <h4 className="font-medium truncate">{product.name}</h4>
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <span className="font-semibold">${product.price}</span>
-                                        {product.originalPrice && (
-                                            <span className="text-sm line-through text-muted-foreground">${product.originalPrice}</span>
-                                        )}
+                                    {/* Product Image */}
+                                    <div className="relative w-12 h-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                                        <Image
+                                            fill
+                                            alt={product.name}
+                                            className="object-cover group-hover:scale-105 transition-transform duration-200"
+                                            sizes="96px"
+                                            src={product.imageUrl}
+                                        />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium truncate text-ellipsis max-w-sm text-wrap line-clamp-1">{product.name}</h4>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="font-semibold">{currency(product.price)}</span>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -241,21 +285,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                                     <X className="h-4 w-4" />
                                 </Button>
                             </div>
-                            <ProductSearchClient
-                                onProductSelect={(product) => {
-                                    setSelectedProducts((products) => [
-                                        ...products,
-                                        {
-                                            name: product.name,
-                                            price: product.price.toString(),
-                                            // originalPrice: product.originalPrice?.toString(),
-                                            imageUrl: product.images[0] || product.image || "/placeholder.jpg",
-                                            url: `/products/${product.slug}`,
-                                        },
-                                    ]);
-                                    setShowProductSearch(false);
-                                }}
-                            />
+                            <ProductSearchClient onProductSelect={handleProductSelect} />
                         </div>
                     </div>
                 )}
