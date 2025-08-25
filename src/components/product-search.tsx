@@ -9,7 +9,7 @@ import { type ProductSearch } from "@/schemas/product.schema";
 import { cn, currency } from "@/lib/utils";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import { useQuery } from "@tanstack/react-query";
-import { EmailProduct } from "@/schemas/notification.schema";
+import { type EmailProduct } from "@/schemas/notification.schema";
 
 const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product: EmailProduct) => void }> = ({ product, onProductSelect }) => {
     const { priceInfo } = useProductVariant(product);
