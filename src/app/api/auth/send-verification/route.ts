@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 			},
 		});
 
-		const emailHtml = await renderEmail("magic-link", { magic_link_url: url });
+		const emailHtml = await renderEmail("magic-link", {}, { magic_link_url: url });
 
 		const textTemplate = handlebars.compile(`
 Sign in to your account

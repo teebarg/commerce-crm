@@ -24,3 +24,19 @@ export const notificationTemplateSchema = z.object({
     body: z.string().min(1),
     excerpt: z.string().default("").nullable().optional(),
 });
+
+export interface QueueStats {
+    queueLength: number;
+    sampleEvents: Array<{
+        id: string;
+        data: {
+            id?: string;
+            type: string;
+            campaignId?: string;
+            recipient?: string;
+            email?: string;
+            timestamp?: number;
+            raw?: string;
+        };
+    }>;
+}

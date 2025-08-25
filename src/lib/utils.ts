@@ -15,3 +15,7 @@ export const formatDate = (date?: Date | null) => {
         day: "numeric",
     }).format(date);
 };
+
+export const currency = (number: number): string => {
+    return number?.toLocaleString("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 });
+};

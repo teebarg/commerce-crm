@@ -20,6 +20,8 @@ import {
     TrendingUp,
     Send,
     History,
+    Mail,
+    Settings2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -33,6 +35,7 @@ const Menu: React.FC<{ session: any }> = ({ session }) => {
         { id: "home", label: "Home", icon: <Home size={20} />, href: "/" },
         { id: "users", label: "Users", icon: <Users size={20} />, href: "/users" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/settings" },
+        { id: "worker", label: "Worker Dashboard", icon: <Settings2 size={20} />, href: "/admin/worker" },
         // Socials
         { id: "social-dashboard", label: "Social Dashboard", icon: <BarChart3 size={20} />, href: "/social" },
         { id: "social-create", label: "Create", icon: <PlusCircle size={20} />, href: "/social/create" },
@@ -45,6 +48,8 @@ const Menu: React.FC<{ session: any }> = ({ session }) => {
         { id: "notif-templates", label: "Templates", icon: <FileText size={20} />, href: "/notification/templates" },
         { id: "notif-history", label: "History", icon: <History size={20} />, href: "/notification/history" },
         { id: "notif-settings", label: "Notification Settings", icon: <Settings size={20} />, href: "/notification/settings" },
+        { id: "notif-email", label: "Email Campaigns", icon: <Mail size={20} />, href: "/notification/email" },
+        { id: "email-contacts", label: "Email Contacts", icon: <Users size={20} />, href: "/notification/email/contacts" },
     ];
 
     return (
