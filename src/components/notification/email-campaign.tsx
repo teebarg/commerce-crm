@@ -19,7 +19,6 @@ const statusColors = {
 };
 
 export default function EmailCampaigns() {
-    // const utils = api.useUtils();
     const { data } = api.email.campaignsAnalytics.useQuery();
     const createState = useOverlayTriggerState({});
 

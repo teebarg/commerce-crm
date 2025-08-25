@@ -64,15 +64,6 @@ export async function renderEmail(templateName: string, settings: Settings,  dat
         return out;
     });
 
-
-    // handlebars.registerHelper("chunk", function (arr, size, options) {
-    //     const out: any[] = [];
-    //     for (let i = 0; i < arr.length; i += size) {
-    //         out.push(arr.slice(i, i + size));
-    //     }
-    //     return out.map(group => options.fn(group)).join("");
-    // });
-
     const emailData = {
         ...data,
         year: new Date().getFullYear(),

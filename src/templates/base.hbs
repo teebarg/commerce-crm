@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -76,7 +77,9 @@
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
+<body
+    style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
     <!-- Preheader -->
     <div style="display: none; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #f8fafc;">
@@ -89,20 +92,27 @@
             <td style="padding: 20px 0;">
 
                 <!-- Email Container -->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" class="mobile-full-width">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"
+                    style="margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"
+                    class="mobile-full-width">
 
                     <!-- Header -->
                     <tr>
-                        <td style="padding: 40px 30px 30px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px 12px 0 0;" class="mobile-padding">
+                        <td style="padding: 40px 30px 30px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px 12px 0 0;"
+                            class="mobile-padding">
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
                                     <td style="text-align: center;">
                                         {{#if logo}}
-                                        <img src="{{logo}}" alt="{{companyName}}" style="height: 50px; width: auto; margin-bottom: 20px;" />
+                                        <img src="{{logo}}" alt="{{companyName}}"
+                                            style="height: 50px; width: auto; margin-bottom: 20px;" />
                                         {{else}}
-                                        <div style="color: #ffffff; font-size: 28px; font-weight: bold; margin-bottom: 20px;">{{companyName}}</div>
+                                        <div
+                                            style="color: #ffffff; font-size: 28px; font-weight: bold; margin-bottom: 20px;">
+                                            {{companyName}}</div>
                                         {{/if}}
-                                        <div style="color: #ffffff; font-size: 16px; opacity: 0.9;">Premium Quality • Fast Shipping • 30-Day Returns</div>
+                                        <div style="color: #ffffff; font-size: 16px; opacity: 0.9;">Premium Quality •
+                                            Fast Shipping</div>
                                     </td>
                                 </tr>
                             </table>
@@ -113,28 +123,34 @@
 
                     <!-- Footer -->
                     <tr>
-                        <td style="padding: 40px 30px; background-color: #2d3748; color: #ffffff; border-radius: 0 0 12px 12px;" class="mobile-padding">
+                        <td style="padding: 40px 30px; background-color: #2d3748; color: #ffffff; border-radius: 0 0 12px 12px;"
+                            class="mobile-padding">
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 20px;">
-                                        <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: bold; color: #ffffff;">
+                                        <h3
+                                            style="margin: 0 0 15px; font-size: 18px; font-weight: bold; color: #ffffff;">
                                             Stay Connected
                                         </h3>
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0"
+                                            style="margin: 0 auto;">
                                             <tr>
                                                 {{#if socialLinks.facebook}}
                                                 <td style="padding: 0 10px;">
-                                                    <a href="{{socialLinks.facebook}}" style="color: #ffffff; text-decoration: none; font-size: 24px;">📘</a>
+                                                    <a href="{{socialLinks.facebook}}"
+                                                        style="color: #ffffff; text-decoration: none; font-size: 24px;">📘</a>
                                                 </td>
                                                 {{/if}}
                                                 {{#if socialLinks.instagram}}
                                                 <td style="padding: 0 10px;">
-                                                    <a href="{{socialLinks.instagram}}" style="color: #ffffff; text-decoration: none; font-size: 24px;">📷</a>
+                                                    <a href="{{socialLinks.instagram}}"
+                                                        style="color: #ffffff; text-decoration: none; font-size: 24px;">📷</a>
                                                 </td>
                                                 {{/if}}
                                                 {{#if socialLinks.twitter}}
                                                 <td style="padding: 0 10px;">
-                                                    <a href="{{socialLinks.twitter}}" style="color: #ffffff; text-decoration: none; font-size: 24px;">🐦</a>
+                                                    <a href="{{socialLinks.twitter}}"
+                                                        style="color: #ffffff; text-decoration: none; font-size: 24px;">🐦</a>
                                                 </td>
                                                 {{/if}}
                                             </tr>
@@ -147,7 +163,8 @@
                                             {{companyName}} • {{companyAddress}}
                                         </p>
                                         <p style="margin: 0 0 15px; font-size: 14px; color: #a0aec0;">
-                                            Questions? Reply to this email or visit our <a href="{{supportLink}}" style="color: #63b3ed;">support center</a>
+                                            Questions? Reply to this email or visit our <a href="{{supportLink}}"
+                                                style="color: #63b3ed;">support center</a>
                                         </p>
                                         <p style="margin: 0; font-size: 12px; color: #718096;">
                                             You're receiving this email because you subscribed to our newsletter.
@@ -165,4 +182,5 @@
         </tr>
     </table>
 </body>
+
 </html>

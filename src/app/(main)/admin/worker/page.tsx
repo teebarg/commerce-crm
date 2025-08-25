@@ -8,27 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { type QueueStats } from "@/trpc/schema";
 
-// interface QueueStats {
-//     queueLength: number;
-//     sampleEvents: Array<{
-//         id: string;
-//         data: {
-//             id?: string;
-//             type: string;
-//             campaignId?: string;
-//             recipient?: string;
-//             email?: string;
-//             timestamp?: number;
-//             raw?: string;
-//         };
-//     }>;
-// }
-
 export default function WorkerPage() {
     const [stats, setStats] = useState<QueueStats | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [processing, setProcessing] = useState<boolean>(false);
-    const [lastProcessed, setLastProcessed] = useState<{ processed: number; errors?: string[] } | null>(null);
 
     useEffect(() => {
         void fetchStats();
@@ -40,7 +23,6 @@ export default function WorkerPage() {
             const response = await fetch("/api/worker/email");
             if (response.ok) {
                 const data = await response.json();
-                console.log("🚀 ~ fetchStats ~ data:", data);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 setStats(data);
             }
@@ -62,9 +44,7 @@ export default function WorkerPage() {
             });
 
             if (response.ok) {
-                const data = await response.json();
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                setLastProcessed(data);
+                await response.json();
                 // Refresh stats after processing
                 await fetchStats();
             }
@@ -88,8 +68,6 @@ export default function WorkerPage() {
                 return "bg-blue-100 text-blue-800";
             case "EMAIL_CLICKED":
                 return "bg-purple-100 text-purple-800";
-            case "NEW_USER_EMAIL":
-                return "bg-orange-100 text-orange-800";
             default:
                 return "bg-gray-100 text-gray-800";
         }
@@ -117,25 +95,6 @@ export default function WorkerPage() {
                     </CardHeader>
                     <CardContent>
                         {loading ? <Skeleton className="h-8 w-16" /> : <div className="text-3xl font-bold">{stats?.queueLength ?? 0}</div>}
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Last Processed</CardTitle>
-                        <CardDescription>Results from last worker run</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {lastProcessed ? (
-                            <div className="space-y-2">
-                                <div className="text-2xl font-bold text-green-600">{lastProcessed.processed}</div>
-                                {lastProcessed.errors && lastProcessed.errors.length > 0 && (
-                                    <Badge variant="destructive">{lastProcessed.errors.length} errors</Badge>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="text-gray-500">No events processed yet</div>
-                        )}
                     </CardContent>
                 </Card>
 

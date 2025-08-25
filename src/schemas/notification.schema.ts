@@ -115,9 +115,10 @@ export type Promotion = z.infer<typeof PromotionSchema>;
 export const EmailProductSchema = z.object({
     name: z.string(),
     price: z.number(),
-    // originalPrice: z.string().optional(),
     imageUrl: z.string().url(),
     link: z.string(),
+    hasDiscount: z.boolean().optional(),
+    maxDiscountPercent: z.number().optional(),
 });
 
 export type EmailProduct = z.infer<typeof EmailProductSchema>;

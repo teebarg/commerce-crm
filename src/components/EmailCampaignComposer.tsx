@@ -163,16 +163,9 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
         };
     };
 
-    const handleProductSelect = (product: ProductSearch) => {
-        setSelectedProducts((products) => [
-            ...products,
-            {
-                name: product.name,
-                price: priceInfo(product).minPrice,
-                imageUrl: product.images[0] ?? product.image ?? "/placeholder.jpg",
-                link: `/products/${product.slug}`,
-            },
-        ]);
+    const handleProductSelect = (product: EmailProduct) => {
+        console.log("🚀 ~ file: EmailCampaignComposer.tsx:167 ~ product:", product);
+        setSelectedProducts((products) => [...products, product]);
         setShowProductSearch(false);
     };
 
@@ -277,7 +270,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                 </div>
 
                 {showProductSearch && (
-                    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex justify-center">
                         <div className="bg-card rounded-lg shadow-lg p-6 w-full max-w-2xl">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold">Search Products</h3>

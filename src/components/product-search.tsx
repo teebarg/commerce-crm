@@ -9,14 +9,22 @@ import { type ProductSearch } from "@/schemas/product.schema";
 import { cn, currency } from "@/lib/utils";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import { useQuery } from "@tanstack/react-query";
+import { EmailProduct } from "@/schemas/notification.schema";
 
-const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product: ProductSearch) => void }> = ({ product, onProductSelect }) => {
+const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product: EmailProduct) => void }> = ({ product, onProductSelect }) => {
     const { priceInfo } = useProductVariant(product);
 
     return (
         <div
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-search-hover transition-colors cursor-pointer group"
-            onClick={() => onProductSelect?.(product)}
+            onClick={() => onProductSelect?.({
+                name: product.name,
+                price: priceInfo.minPrice,
+                imageUrl: product.images[0] ?? product.image ?? "/placeholder.jpg",
+                link: `/products/${product.slug}`,
+                hasDiscount: priceInfo.hasDiscount,
+                maxDiscountPercent: priceInfo.maxDiscountPercent,
+            })}
         >
             <div className="relative w-12 h-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
                 <Image
@@ -32,6 +40,11 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
                 <h4 className="font-medium text-sm text-foreground truncate">{product.name}</h4>
                 <div className="flex items-center gap-2 mt-1">
                     <span className="font-semibold text-sm text-primary">{currency(priceInfo.minPrice)}</span>
+                    {priceInfo.hasDiscount && (
+                        <span className="text-sm text-danger">
+                            Up to {priceInfo.maxDiscountPercent}%
+                        </span>
+                    )}
                 </div>
             </div>
         </div>
@@ -40,7 +53,7 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
 
 interface ProductSearchProps {
     initialQuery?: string;
-    onProductSelect?: (product: ProductSearch) => void;
+    onProductSelect?: (product: EmailProduct) => void;
     searchDelay?: number;
     className?: string;
     placeholder?: string;
@@ -89,7 +102,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleProductSelect = (product: ProductSearch) => {
+    const handleProductSelect = (product: EmailProduct) => {
         if (closeOnSelect) {
             setQuery(product.name);
             setIsOpen(false);
