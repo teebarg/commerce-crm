@@ -95,13 +95,11 @@ const EmailContactsList: React.FC = () => {
             const response = await fetch("/api/worker");
             if (response.ok) {
                 const data = await response.json();
-                console.log("🚀 ~ fetchStats ~ data:", data);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 setStats(data);
             }
         } catch (error) {
-            console.log("🚀 ~ fetchStats ~ error:", error);
-            toast.error("Failed to fetch stats:");
+            toast.error(`${error}`);
         } finally {
             setLoading(false);
         }
@@ -122,8 +120,7 @@ const EmailContactsList: React.FC = () => {
                 await utils.push.invalidate();
             }
         } catch (error) {
-            console.log("🚀 ~ processEvents ~ error:", error);
-            toast.error("Failed to process events:");
+            toast.error(`${error}`);
         } finally {
             setProcessing(false);
         }

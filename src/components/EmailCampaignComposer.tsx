@@ -164,7 +164,6 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
     };
 
     const handleProductSelect = (product: EmailProduct) => {
-        console.log("🚀 ~ file: EmailCampaignComposer.tsx:167 ~ product:", product);
         setSelectedProducts((products) => [...products, product]);
         setShowProductSearch(false);
     };

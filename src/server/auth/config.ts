@@ -88,7 +88,6 @@ export const authConfig = {
         //                 body: JSON.stringify({ email, url }),
         //             });
         //         } catch (error) {
-        //             console.log("🚀 ~ file: config.ts:134 ~ error:", error);
         //             return null;
         //         }
         //     },

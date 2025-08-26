@@ -27,8 +27,7 @@ export default function WorkerPage() {
                 setStats(data);
             }
         } catch (error) {
-            console.log("🚀 ~ fetchStats ~ error:", error);
-            toast.error("Failed to fetch stats:");
+            toast.error(`${error}`);
         } finally {
             setLoading(false);
         }
@@ -49,8 +48,7 @@ export default function WorkerPage() {
                 await fetchStats();
             }
         } catch (error) {
-            console.log("🚀 ~ processEvents ~ error:", error);
-            toast.error("Failed to process events:");
+            toast.error(`${error}`);
         } finally {
             setProcessing(false);
         }

@@ -27,7 +27,7 @@ Events are stored as JSON strings in a Redis list with the key `email_events`. E
 ```json
 {
   "id": "uuid",
-  "type": "EMAIL_OPENED|EMAIL_CLICKED|EMAIL_DELIVERED|NEW_USER_EMAIL",
+  "type": "EMAIL_OPENED|EMAIL_CLICKED|EMAIL_DELIVERED",
   "campaignId": "campaign-uuid",
   "recipient": "user@example.com",
   "timestamp": 1234567890,
@@ -54,7 +54,6 @@ Events are stored as JSON strings in a Redis list with the key `email_events`. E
 - **EMAIL_DELIVERED**: Email was delivered to recipient
 - **EMAIL_OPENED**: Email was opened (tracking pixel)
 - **EMAIL_CLICKED**: Email link was clicked
-- **NEW_USER_EMAIL**: New email contact from webhook
 
 ## Usage
 

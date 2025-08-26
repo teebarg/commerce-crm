@@ -106,7 +106,7 @@ export const emailRouter = createTRPCRouter({
                     await sendEmail({ to, subject: campaign.subject, html: emailHtml });
                     successfulRecipients.push(to);
                 } catch (error) {
-                    console.log("🚀 ~ error:", error);
+                    console.error(error);
                     failedRecipients.push({ recipient: to, error });
                 }
             }
