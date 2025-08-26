@@ -1,4 +1,4 @@
-import { startTransition, useCallback } from "react";
+import { startTransition, useCallback, useMemo } from "react";
 import { debounce } from "@/utils/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -15,27 +15,28 @@ const useUpdateQuery = (delay = 500) => {
     const searchParams = useSearchParams();
     const progress = useProgressBar();
 
-    const updateQuery = useCallback(
-        debounce((data: QueryParam[]) => {
-            const params = new URLSearchParams(searchParams);
+    const updateQuery = useMemo(() => {
+        const fn = debounce((data: QueryParam[]) => {
+            const params = new URLSearchParams(searchParams.toString());
 
             data.forEach(({ key, value }) => {
                 if (!value || value === "") {
                     params.delete(key);
-
-                    return;
+                } else {
+                    params.set(key, value);
                 }
-                params.set(key, value);
             });
+
             progress.start();
 
             startTransition(() => {
                 router.push(`${pathname}?${params.toString()}`);
                 progress.done();
             });
-        }, delay),
-        [searchParams]
-    );
+        }, delay);
+
+        return fn;
+    }, [searchParams, pathname, router, progress, delay]);
 
     return { updateQuery };
 };

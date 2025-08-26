@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, BarChart3, Send, History, FileText, PlusCircle, TrendingUp } from "lucide-react";
+import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, BarChart3, Send, History, FileText, PlusCircle, TrendingUp, Mail, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -29,14 +29,14 @@ const AdminItems = [
         icon: Home,
     },
     {
-        title: "Users",
-        url: "/users",
-        icon: Users,
-    },
-    {
         title: "Settings",
         url: "/settings",
         icon: Settings,
+    },
+    {
+        title: "Worker Dashboard",
+        url: "/admin/worker",
+        icon: Settings2,
     },
     // {
     //     title: "Profile",
@@ -101,6 +101,19 @@ const PushNotification = [
     },
 ];
 
+const Email = [
+    {
+        title: "Campaigns",
+        url: "/email/campaigns",
+        icon: FileText,
+    },
+    {
+        title: "Contacts",
+        url: "/email/contacts",
+        icon: Users,
+    },
+];
+
 export function AdminSidebar({ session }: { session: Session | null }) {
     const { toggleSidebar, state } = useSidebar();
     const path = usePathname();
@@ -158,6 +171,23 @@ export function AdminSidebar({ session }: { session: Session | null }) {
                             {PushNotification.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
                                     <SidebarMenuButton asChild isActive={path === item.url}>
+                                        <Link href={item.url}>
+                                            <item.icon />
+                                            <span>{item.title}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Email</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            {Email.map((item, idx: number) => (
+                                <SidebarMenuItem key={idx}>
+                                    <SidebarMenuButton asChild isActive={path === item.url || (item.url !== "/notification/email" && path.startsWith(item.url))}>
                                         <Link href={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>

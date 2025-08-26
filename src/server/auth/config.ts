@@ -88,8 +88,7 @@ export const authConfig = {
         //                 body: JSON.stringify({ email, url }),
         //             });
         //         } catch (error) {
-        //             console.log("🚀 ~ file: config.ts:134 ~ error:", error);
-        //             throw new Error(error as string);
+        //             return null;
         //         }
         //     },
         // },
@@ -167,7 +166,7 @@ export const authConfig = {
             return token;
         },
         async session({ session, token }) {
-            if (token?.sub) {
+            if (token?.sub && token.user) {
                 session.user.id = token.sub;
                 session.user.firstName = token.firstName as string;
                 session.user.lastName = token.lastName as string;

@@ -25,6 +25,8 @@ export const env = createEnv({
         GOOGLE_CLIENT_SECRET: z.string().optional(),
         GEMINI_API_KEY: z.string(),
 
+        REDIS_URL: z.string().url(),
+
         TWITTER_CONSUMER_KEY: z.string().optional(),
         TWITTER_CONSUMER_SECRET: z.string().optional(),
         TWITTER_ACCESS_TOKEN: z.string().optional(),
@@ -48,6 +50,7 @@ export const env = createEnv({
         NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
         NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
         NEXT_PUBLIC_CONTACT_EMAIL: z.string().optional(),
+        NEXT_PUBLIC_SHOP_BACKEND: z.string().url(),
     },
 
     /**
@@ -74,6 +77,8 @@ export const env = createEnv({
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
         GEMINI_API_KEY: process.env.GEMINI_API_KEY,
 
+        REDIS_URL: process.env.REDIS_URL,
+
         TWITTER_CONSUMER_KEY: process.env.TWITTER_CONSUMER_KEY,
         TWITTER_CONSUMER_SECRET: process.env.TWITTER_CONSUMER_SECRET,
         TWITTER_ACCESS_TOKEN: process.env.TWITTER_ACCESS_TOKEN,
@@ -88,6 +93,7 @@ export const env = createEnv({
 
         NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
         NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        NEXT_PUBLIC_SHOP_BACKEND: process.env.NEXT_PUBLIC_SHOP_BACKEND,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

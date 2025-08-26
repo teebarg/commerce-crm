@@ -60,6 +60,19 @@ export const NotificationTemplateSchema = z.object({
     updatedAt: z.date(),
 });
 
+export const EmailCampaignAnalyticsSchema = z.object({
+    id: z.string(),
+    subject: z.string(),
+    body: z.string(),
+    status: NotificationStatusEnum,
+    recipients: z.number(),
+    openRate: z.number(),
+    clickRate: z.number(),
+    sentAt: z.date().nullable(),
+});
+
+export type EmailCampaignAnalytics = z.infer<typeof EmailCampaignAnalyticsSchema>;
+
 export const CreateNotificationTemplateSchema = z.object({
     title: z.string().min(1),
     body: z.string().min(1),
@@ -86,6 +99,88 @@ export const CreateNotificationEventInput = z.object({
     notificationId: z.string().uuid(),
     subscriberIds: z.array(z.string().uuid()).min(1), // bulk creation
 });
+
+export const PromotionSchema = z.object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    discount: z.number().optional(),
+    code: z.string().optional(),
+    ctaText: z.string().optional(),
+    ctaLink: z.string().optional(),
+    urgency: z.string().optional(),
+});
+
+export type Promotion = z.infer<typeof PromotionSchema>;
+
+export const EmailProductSchema = z.object({
+    name: z.string(),
+    price: z.number(),
+    imageUrl: z.string().url(),
+    link: z.string(),
+    hasDiscount: z.boolean().optional(),
+    maxDiscountPercent: z.number().optional(),
+});
+
+export type EmailProduct = z.infer<typeof EmailProductSchema>;
+
+export const SettingsSchema = z.object({
+    socialLinks: z.any(),
+    supportLink: z.string().optional(),
+    unsubscribeLink: z.string().optional(),
+    preferencesLink: z.string().optional(),
+    companyName: z.string().optional(),
+    companyAddress: z.string().optional(),
+    companyPhone: z.string().optional(),
+    contactEmail: z.string().optional(),
+});
+
+export type Settings = z.infer<typeof SettingsSchema>;
+
+export const EmailDataSchema = z.object({
+    promotion: PromotionSchema.optional(),
+    featuredProducts: z.array(EmailProductSchema).optional(),
+});
+
+export type EmailData = z.infer<typeof EmailDataSchema>;
+
+export const EmailCampaign = z.object({
+    id: z.string(),
+    subject: z.string().min(1),
+    body: z.string().min(1),
+    recipients: z.array(z.string().email()).min(1).optional(),
+    groupId: z.string().optional(),
+    groupSlug: z.string().optional(),
+    status: NotificationStatusEnum,
+    sentAt: z.date().nullable().optional(),
+    scheduledAt: z.date().optional(),
+    createdAt: z.date().nullable().optional(),
+    updatedAt: z.date().nullable().optional(),
+    data: EmailDataSchema.optional(),
+});
+
+export type EmailCampaign = z.infer<typeof EmailCampaign>;
+
+export const CreateEmailCampaignSchema = z.object({
+    subject: z.string().min(1),
+    body: z.string().min(1),
+    recipients: z.array(z.string().email()).min(1).optional(),
+    groupId: z.string().optional(),
+    groupSlug: z.string().optional(),
+    data: EmailDataSchema.optional(),
+});
+
+export const UpdateEmailCampaignSchema = z.object({
+    id: z.string(),
+    subject: z.string().min(1),
+    body: z.string().min(1),
+    recipients: z.array(z.string().email()).min(1).optional(),
+    groupId: z.string().optional(),
+    groupSlug: z.string().optional(),
+    data: EmailDataSchema.optional(),
+});
+
+export type CreateEmailCampaign = z.infer<typeof CreateEmailCampaignSchema>;
+export type UpdateEmailCampaign = z.infer<typeof UpdateEmailCampaignSchema>;
 
 export type PushSubscription = z.infer<typeof PushSubscriptionSchema>;
 export type Notification = z.infer<typeof NotificationSchema>;

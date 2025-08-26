@@ -43,7 +43,6 @@ export async function postToFacebook({
     pageId: string;
     [key: string]: any;
 }) {
-    console.log("🚀 ~ mediaUrl:", mediaUrl);
     // You need a Facebook Page Access Token and Page ID
     const url = `https://graph.facebook.com/${pageId}/feed`;
     const body = new URLSearchParams({ message: text, access_token: pageAccessToken });

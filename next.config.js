@@ -16,6 +16,10 @@ const config = {
                 protocol: "https",
                 hostname: "*.supabase.co",
             },
+            {
+                protocol: "https",
+                hostname: "storage.googleapis.com",
+            },
         ],
     },
 };
