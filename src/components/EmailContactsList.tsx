@@ -99,7 +99,8 @@ const EmailContactsList: React.FC = () => {
                 setStats(data);
             }
         } catch (error) {
-            toast.error(`${error}`);
+            console.error(error)
+            toast.error("Failed to fetch stats");
         } finally {
             setLoading(false);
         }
@@ -120,7 +121,8 @@ const EmailContactsList: React.FC = () => {
                 await utils.push.invalidate();
             }
         } catch (error) {
-            toast.error(`${error}`);
+            console.error(error)
+            toast.error("Failed to process events");
         } finally {
             setProcessing(false);
         }
