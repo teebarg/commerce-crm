@@ -13,8 +13,10 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
     const recipients = (notification.sentCount ?? 0) + (notification.failedCount ?? 0);
     const delivered = metrics?.delivered ?? notification.sentCount ?? 0;
     const opened = metrics?.opened ?? 0;
+    const dismissed = metrics?.dismissed ?? 0;
     const deliveryRate = recipients > 0 ? Math.round((delivered / recipients) * 100) : 0;
     const openRate = delivered > 0 ? Math.round((opened / delivered) * 100) : 0;
+    const dismissRate = delivered > 0 ? Math.round((dismissed / delivered) * 100) : 0;
     const getStatusVariant = (status: NotificationStatusEnum) => {
         switch (status) {
             case "PUBLISHED":
@@ -65,7 +67,7 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
                             </div>
                         )}
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                             <div>
                                 <p className="text-muted-foreground">Audience</p>
                                 <p className="font-medium">All Subscribers</p>
@@ -84,6 +86,10 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
                             <div>
                                 <p className="text-muted-foreground">Delivery Rate</p>
                                 <p className="font-medium">{notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${deliveryRate}%` : "-"}</p>
+                            </div>
+                            <div>
+                                <p className="text-muted-foreground">Dismiss Rate</p>
+                                <p className="font-medium">{notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${dismissRate}%` : "-"}</p>
                             </div>
                         </div>
 

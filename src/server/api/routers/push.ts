@@ -49,11 +49,12 @@ export const pushNotificationRouter = createTRPCRouter({
         };
     }),
     notificationMetrics: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
-        const [delivered, opened] = await Promise.all([
+        const [delivered, opened, dismissed] = await Promise.all([
             ctx.db.notificationEvent.count({ where: { notificationId: input, eventType: "DELIVERED" } }),
             ctx.db.notificationEvent.count({ where: { notificationId: input, eventType: "OPENED" } }),
+            ctx.db.notificationEvent.count({ where: { notificationId: input, eventType: "DISMISSED" } }),
         ]);
-        return { delivered, opened };
+        return { delivered, opened, dismissed };
     }),
     subscriptions: protectedProcedure.query(async ({ ctx }) => {
         const subscriptions = await ctx.db.pushSubscription.findMany({
@@ -156,7 +157,7 @@ export const pushNotificationRouter = createTRPCRouter({
     notify: publicProcedure.input(NotifySchema).mutation(async ({ input, ctx }) => {
         const subs = await ctx.db.pushSubscription.findMany({});
         const { sentSubscriptions, failedSubscriptions } = await sendNotificationsToSubscribers(subs, input);
-        // update notification status to published
+
         await ctx.db.notification.update({
             where: { id: input.id },
             data: { status: "PUBLISHED", sentCount: sentSubscriptions.length, failedCount: failedSubscriptions.length, sentAt: new Date() },
