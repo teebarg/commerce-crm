@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import ProductSearchClient from "./product-search";
 import { X } from "lucide-react";
 import { type EmailCampaign, type EmailProduct, type Promotion } from "@/schemas/notification.schema";
-import { type ProductSearch, type ProductVariant } from "@/schemas/product.schema";
 import { currency } from "@/lib/utils";
 import Image from "next/image";
 
@@ -46,9 +45,6 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
     // Featured Products
     const [selectedProducts, setSelectedProducts] = useState<EmailProduct[]>(initialData?.data?.featuredProducts ?? []);
     const [showProductSearch, setShowProductSearch] = useState(false);
-
-    // Load shop settings
-    // const { data: shopSettings } = api.email.getShopSettings.useQuery();
 
     const { data: groups } = api.email.getGroups.useQuery();
     const { data: recipients, refetch: refetchRecipients } = api.email.getRecipients.useQuery({ groupId: selectedGroup }, { enabled: false });
@@ -107,15 +103,9 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
             return;
         }
 
-        // if (!shopSettings) {
-        //     toast.error("Shop settings not found. Please contact support.");
-        //     return;
-        // }
-
         const campaignData = {
             promotion: Object.values(promotion).some(Boolean) ? promotion : undefined,
             featuredProducts: selectedProducts.length > 0 ? selectedProducts : [],
-            // settings: shopSettings,
         };
 
         if (initialData?.id) {
@@ -141,26 +131,6 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                 data: campaignData,
             });
         }
-    };
-
-    const priceInfo = (product: ProductSearch) => {
-        const variants = product.variants ?? [];
-
-        if (variants.length === 0) {
-            return {
-                minPrice: 0,
-                outOfStock: true,
-            };
-        }
-
-        const prices = variants.map((v) => v.price);
-
-        const minPrice = Math.min(...prices);
-
-        return {
-            minPrice,
-            outOfStock: product.variants?.length == 0 || product.variants?.every((v: ProductVariant) => v.inventory <= 0),
-        };
     };
 
     const handleProductSelect = (product: EmailProduct) => {
@@ -246,7 +216,6 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                                     >
                                         <X className="h-4 w-4" />
                                     </Button>
-                                    {/* Product Image */}
                                     <div className="relative w-12 h-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
                                         <Image
                                             fill

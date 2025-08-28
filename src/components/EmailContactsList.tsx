@@ -78,7 +78,6 @@ const EmailContactsList: React.FC = () => {
     const [search, setSearch] = useState<string>("");
     const [page, setPage] = useState<number>(1);
     const [stats, setStats] = useState<QueueStats | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
     const pageSize = 20;
 
     const { data, isLoading, refetch } = api.email.listContacts.useQuery({ search, page, pageSize });
@@ -90,7 +89,6 @@ const EmailContactsList: React.FC = () => {
     }, []);
 
     const fetchStats = async () => {
-        setLoading(true);
         try {
             const response = await fetch("/api/worker");
             if (response.ok) {
@@ -98,11 +96,8 @@ const EmailContactsList: React.FC = () => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 setStats(data);
             }
-        } catch (error) {
-            console.error(error)
-            toast.error("Failed to fetch stats");
-        } finally {
-            setLoading(false);
+        } catch (error: any) {
+            toast.error(`Failed to fetch stats: ${error.message}`);
         }
     };
 
@@ -118,11 +113,10 @@ const EmailContactsList: React.FC = () => {
             if (response.ok) {
                 await response.json();
                 await fetchStats();
-                await utils.push.invalidate();
+                await utils.email.listContacts.invalidate();
             }
-        } catch (error) {
-            console.error(error)
-            toast.error("Failed to process events");
+        } catch (error: any) {
+            toast.error(`Failed to process events: ${error.message}`);
         } finally {
             setProcessing(false);
         }

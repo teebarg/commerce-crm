@@ -3,10 +3,6 @@ import { CreateEmailCampaignSchema, type EmailData, EmailDataSchema, UpdateEmail
 import { z } from "zod";
 import { shopSettingsSchema } from "@/schemas/base.schema";
 
-interface CampaignData {
-    actionUrl?: string;
-}
-
 export const emailRouter = createTRPCRouter({
     getShopSettings: protectedProcedure.query(async ({ ctx }) => {
         const settings = await ctx.db.shopSettings.findFirst();
