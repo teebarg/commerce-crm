@@ -1,18 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Users, Search, UserCheck, UserX, Globe, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/trpc/react";
+import { toast } from "sonner";
+import { QueueStats } from "@/trpc/schema";
 
 const SubscriberManager = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
+    const [processing, setProcessing] = useState<boolean>(false);
 
     const { data, isLoading } = api.push.subscriptions.useQuery();
+    const { data: events, isLoading: eventsLoading } = api.push.getEvents.useQuery();
+    const mutation = api.push.processEvents.useMutation();
     const utils = api.useUtils();
     const unsubscribeMutation = api.push.unsubscribe.useMutation({
         onSuccess: () => {
@@ -48,6 +53,35 @@ const SubscriberManager = () => {
 
     const handleUnsubscribe = async (subscriberId: string) => {
         await unsubscribeMutation.mutateAsync(subscriberId);
+    };
+
+    const processEvents = async (limit = 50) => {
+        mutation.mutate(
+            { limit },
+            {
+                onSuccess: (data) => {
+                    toast.success(`Processed ${data.processed} events`);
+                },
+            }
+        );
+        // setProcessing(true);
+        // try {
+        //     const response = await fetch("/api/worker/push", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({ limit }),
+        //     });
+
+        //     if (response.ok) {
+        //         await response.json();
+        //         await utils.push.getEvents.invalidate();
+        //         await utils.push.subscriptions.invalidate();
+        //     }
+        // } catch (error: any) {
+        //     toast.error(`Failed to process events: ${error.message}`);
+        // } finally {
+        //     setProcessing(false);
+        // }
     };
 
     return (
@@ -94,6 +128,14 @@ const SubscriberManager = () => {
                         </div>
                     </CardContent>
                 </Card>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+                <CardTitle>Email Contacts</CardTitle>
+                <div className="flex items-center gap-2">
+                    <Button onClick={() => processEvents(1)} disabled={mutation.isPending || (events?.queueLength ?? 0) === 0} variant="default">
+                        {mutation.isPending ? "Processing..." : eventsLoading ? "Loading..." : `Process Events (${events?.queueLength ?? 0})`}
+                    </Button>
+                </div>
             </div>
 
             <Card>

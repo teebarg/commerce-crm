@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         // });
 
         // XREADGROUP GROUP group consumer [COUNT count] [BLOCK milliseconds] STREAMS key [key ...] ID [ID ...]
-        const events = await redis.xreadgroup("GROUP", GROUP_NAME, CONSUMER_NAME, "COUNT", limit, "BLOCK", 5000, "STREAMS", STREAM_NAME, ">");
+        const events = await redis.xreadgroup("GROUP", GROUP_NAME, CONSUMER_NAME, "COUNT", limit, "BLOCK", 5000, "STREAMS", STREAM_NAME, "0");
         console.log("🚀 ~ file: route.ts:25 ~ events:", events)
 
         if (!events.length) {

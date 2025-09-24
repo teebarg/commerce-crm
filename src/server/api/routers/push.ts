@@ -10,6 +10,26 @@ import {
     UpdateNotificationSchema,
 } from "@/schemas/notification.schema";
 import { PushEventSchema } from "@/schemas/base.schema";
+import { redis } from "@/lib/redis";
+import { TRPCError } from "@trpc/server";
+
+const STREAM_NAME = "FCM";
+const GROUP_NAME = "FCM";
+const CONSUMER_NAME = "fcm-worker";
+
+function parseStreamResponse(events: any) {
+    if (!events) return [];
+
+    return events.flatMap(([stream, entries]: [string, any[]]) =>
+        entries.map(([id, fields]) => {
+            const data: Record<string, string> = {};
+            for (let i = 0; i < fields.length; i += 2) {
+                data[fields[i]] = fields[i + 1];
+            }
+            return { stream, id, data };
+        })
+    );
+}
 
 export const pushNotificationRouter = createTRPCRouter({
     templates: protectedProcedure.query(async ({ ctx }) => {
@@ -172,5 +192,103 @@ export const pushNotificationRouter = createTRPCRouter({
                 occurredAt: new Date(),
             },
         });
+    }),
+    getEvents: publicProcedure.query(async () => {
+        try {
+            if (!redis) {
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Redis not configured",
+                });
+            }
+
+            const events = await redis.xrange("FCM", "-", "+", "COUNT", 100);
+
+            const parsed = events.map(([id, fields]) => {
+                const data: Record<string, string> = {};
+                for (let i = 0; i < fields.length; i += 2) {
+                    data[fields[i]!] = fields[i + 1]!;
+                }
+                return { id, data };
+            });
+
+            return {
+                queueLength: parsed.length,
+                sampleEvents: parsed,
+            };
+        } catch (error) {
+            console.error("Error checking queue:", error);
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to check queue",
+            });
+        }
+    }),
+    processEvents: publicProcedure.input(z.object({ limit: z.number().optional() })).mutation(async ({ ctx, input }) => {
+        try {
+            if (!redis) {
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Redis not configured",
+                });
+            }
+
+            const { limit = 50 } = input;
+
+            const [stream, unacked]: [string, any[]] = await redis.xautoclaim(STREAM_NAME, GROUP_NAME, CONSUMER_NAME, 300_000, "0-0", "COUNT", limit);
+            console.log("🚀 ~ file: push.ts:239 ~ unacked:", unacked)
+            console.log("🚀 ~ file: push.ts:239 ~ stream:", stream)
+
+            if (unacked) {
+                console.log("♻️ Reclaiming unacked events:");
+            }
+
+            const events = await redis.xreadgroup("GROUP", GROUP_NAME, CONSUMER_NAME, "COUNT", limit, "BLOCK", 5000, "STREAMS", STREAM_NAME, ">");
+            console.log("🚀 ~ file: push.ts:239 ~ events:", events);
+
+            const streams = parseStreamResponse(events);
+            console.log("🚀 ~ file: push.ts:242 ~ streams:", streams);
+            if (!streams?.length) {
+                return {
+                    message: "No events in queue",
+                    processed: 0,
+                };
+            }
+
+            let processedCount = 0;
+            const errors: string[] = [];
+
+            for (const item of streams) {
+                try {
+                    await ctx.db.pushSubscription.upsert({
+                        where: { endpoint: item.data.endpoint },
+                        create: {
+                            ...item.data,
+                        },
+                        update: {
+                            ...item.data,
+                        },
+                    });
+                    // await redis.xack(STREAM_NAME, GROUP_NAME, item.id);
+                    processedCount++;
+                } catch (error) {
+                    const msg = error instanceof Error ? error.message : "Unknown error";
+                    errors.push(msg);
+                    console.error(error);
+                }
+            }
+
+            return {
+                message: "Events processed",
+                processed: processedCount,
+                errors: errors.length > 0 ? errors : undefined,
+            };
+        } catch (error) {
+            console.error("Worker error:", error);
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Internal server error",
+            });
+        }
     }),
 });
