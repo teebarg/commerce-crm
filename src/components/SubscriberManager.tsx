@@ -129,8 +129,8 @@ const SubscriberManager = () => {
                     </CardContent>
                 </Card>
             </div>
-            <div className="flex items-center justify-between gap-3">
-                <CardTitle>Email Contacts</CardTitle>
+            <div className="flex items-center justify-between gap-3 px-4">
+                <CardTitle>Push Notifications</CardTitle>
                 <div className="flex items-center gap-2">
                     <Button onClick={() => processEvents(1)} disabled={mutation.isPending || (events?.queueLength ?? 0) === 0} variant="default">
                         {mutation.isPending ? "Processing..." : eventsLoading ? "Loading..." : `Process Events (${events?.queueLength ?? 0})`}
@@ -160,15 +160,15 @@ const SubscriberManager = () => {
                             />
                         </div>
                         <div className="flex gap-2">
-                            <Button variant={filterStatus === "all" ? "default" : "outline"} size="sm" onClick={() => setFilterStatus("all")}>
+                            <Button variant={filterStatus === "all" ? "default" : "outline"} size="lg" onClick={() => setFilterStatus("all")}>
                                 All
                             </Button>
-                            <Button variant={filterStatus === "active" ? "default" : "outline"} size="sm" onClick={() => setFilterStatus("active")}>
+                            <Button variant={filterStatus === "active" ? "default" : "outline"} size="lg" onClick={() => setFilterStatus("active")}>
                                 Active
                             </Button>
                             <Button
                                 variant={filterStatus === "inactive" ? "default" : "outline"}
-                                size="sm"
+                                size="lg"
                                 onClick={() => setFilterStatus("inactive")}
                             >
                                 Inactive

@@ -6,7 +6,6 @@ import {
     CreateNotificationSchema,
     CreateNotificationTemplateSchema,
     NotifySchema,
-    PushSubscriptionSchema,
     UpdateNotificationSchema,
 } from "@/schemas/notification.schema";
 import { PushEventSchema } from "@/schemas/base.schema";
@@ -149,31 +148,9 @@ export const pushNotificationRouter = createTRPCRouter({
     deleteTemplate: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
         return await ctx.db.notificationTemplate.delete({ where: { id: input } });
     }),
-    createSubscription: publicProcedure.input(PushSubscriptionSchema).mutation(async ({ ctx, input }) => {
-        return ctx.db.pushSubscription.create({
-            data: {
-                ...input,
-            },
-        });
-    }),
-    syncSubscription: publicProcedure.input(PushSubscriptionSchema).mutation(async ({ ctx, input }) => {
-        return ctx.db.pushSubscription.upsert({
-            where: { endpoint: input.endpoint },
-            create: {
-                ...input,
-            },
-            update: {
-                ...input,
-            },
-        });
-    }),
-    getSubscription: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
-        return await ctx.db.pushSubscription.findUnique({ where: { endpoint: input } });
-    }),
     unsubscribe: protectedProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
         return await ctx.db.pushSubscription.delete({ where: { id: input } });
     }),
-
     notify: publicProcedure.input(NotifySchema).mutation(async ({ input, ctx }) => {
         const subs = await ctx.db.pushSubscription.findMany({});
         const { sentSubscriptions, failedSubscriptions } = await sendNotificationsToSubscribers(subs, input);
