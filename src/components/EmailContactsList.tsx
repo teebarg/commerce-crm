@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "@/trpc/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { type QueueStats } from "@/trpc/schema";
 import { Trash2 } from "lucide-react";
 import {
     AlertDialog,
@@ -74,53 +72,19 @@ const EmailContactItem: React.FC<{ c: EmailContact; onRefetch: () => void }> = (
 
 const EmailContactsList: React.FC = () => {
     const utils = api.useUtils();
-    const [processing, setProcessing] = useState<boolean>(false);
     const [search, setSearch] = useState<string>("");
     const [page, setPage] = useState<number>(1);
-    const [stats, setStats] = useState<QueueStats | null>(null);
+    const processMutation = api.push.processStream.useMutation({
+        onSuccess: () => {
+            void utils.email.listContacts.invalidate();
+            toast.success("Processed events");
+        },
+    });
     const pageSize = 20;
 
     const { data, isLoading, refetch } = api.email.listContacts.useQuery({ search, page, pageSize });
     const total = data?.total ?? 0;
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
-    useEffect(() => {
-        void fetchStats();
-    }, []);
-
-    const fetchStats = async () => {
-        try {
-            const response = await fetch("/api/worker");
-            if (response.ok) {
-                const data = await response.json();
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                setStats(data);
-            }
-        } catch (error: any) {
-            toast.error(`Failed to fetch stats: ${error.message}`);
-        }
-    };
-
-    const processEvents = async (limit = 50) => {
-        setProcessing(true);
-        try {
-            const response = await fetch("/api/worker", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ limit }),
-            });
-
-            if (response.ok) {
-                await response.json();
-                await fetchStats();
-                await utils.email.listContacts.invalidate();
-            }
-        } catch (error: any) {
-            toast.error(`Failed to process events: ${error.message}`);
-        } finally {
-            setProcessing(false);
-        }
-    };
 
     return (
         <Card>
@@ -149,8 +113,13 @@ const EmailContactsList: React.FC = () => {
                         >
                             Search
                         </Button>
-                        <Button onClick={() => processEvents(50)} disabled={processing || (stats?.queueLength ?? 0) === 0} variant="default">
-                            {processing ? "Processing..." : `Process Events (${stats?.queueLength ?? 0})`}
+                        <Button
+                            onClick={() => processMutation.mutate({ streamName: "USER_REGISTERED" })}
+                            disabled={processMutation.isPending}
+                            isLoading={processMutation.isPending}
+                            variant="default"
+                        >
+                            Process New Users
                         </Button>
                     </div>
                 </div>

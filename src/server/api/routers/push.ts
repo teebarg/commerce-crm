@@ -2,33 +2,14 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { sendNotificationsToSubscribers } from "@/trpc/services";
-import {
-    CreateNotificationSchema,
-    CreateNotificationTemplateSchema,
-    NotifySchema,
-    UpdateNotificationSchema,
-} from "@/schemas/notification.schema";
-import { PushEventSchema } from "@/schemas/base.schema";
+import { CreateNotificationSchema, CreateNotificationTemplateSchema, NotifySchema, UpdateNotificationSchema } from "@/schemas/notification.schema";
 import { redis } from "@/lib/redis";
 import { TRPCError } from "@trpc/server";
+import { handlers, parseStreamResponse } from "@/lib/consumer";
 
 const STREAM_NAME = "FCM";
 const GROUP_NAME = "FCM";
 const CONSUMER_NAME = "fcm-worker";
-
-function parseStreamResponse(events: any) {
-    if (!events) return [];
-
-    return events.flatMap(([stream, entries]: [string, any[]]) =>
-        entries.map(([id, fields]) => {
-            const data: Record<string, string> = {};
-            for (let i = 0; i < fields.length; i += 2) {
-                data[fields[i]] = fields[i + 1];
-            }
-            return { stream, id, data };
-        })
-    );
-}
 
 export const pushNotificationRouter = createTRPCRouter({
     templates: protectedProcedure.query(async ({ ctx }) => {
@@ -49,31 +30,36 @@ export const pushNotificationRouter = createTRPCRouter({
             notifications,
         };
     }),
-    analytics: protectedProcedure.query(async ({ ctx }) => {
-        const [totalSubscribers, notificationsSent, activeCampaigns, deliveredEvents, openedEvents] = await Promise.all([
-            ctx.db.pushSubscription.count(),
-            ctx.db.notification.count({ where: { status: "PUBLISHED" } }),
-            ctx.db.notification.count({ where: { status: "SCHEDULED" } }),
-            ctx.db.notificationEvent.count({ where: { eventType: "DELIVERED" } }),
-            ctx.db.notificationEvent.count({ where: { eventType: "OPENED" } }),
-        ]);
-
-        const openRate = deliveredEvents > 0 ? (openedEvents / deliveredEvents) * 100 : 0;
-
-        return {
-            totalSubscribers,
-            notificationsSent,
-            openRate,
-            activeCampaigns,
-        };
-    }),
-    notificationMetrics: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+    notificationMetrics2: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
         const [delivered, opened, dismissed] = await Promise.all([
             ctx.db.notificationEvent.count({ where: { notificationId: input, eventType: "DELIVERED" } }),
             ctx.db.notificationEvent.count({ where: { notificationId: input, eventType: "OPENED" } }),
             ctx.db.notificationEvent.count({ where: { notificationId: input, eventType: "DISMISSED" } }),
         ]);
         return { delivered, opened, dismissed };
+    }),
+    notificationMetrics: protectedProcedure.input(z.string().uuid("Invalid notification ID")).query(async ({ input, ctx }) => {
+        try {
+            const eventStats = await ctx.db.notificationEvent.groupBy({
+                by: ["eventType"],
+                where: {
+                    notificationId: input,
+                    eventType: { in: ["DELIVERED", "OPENED", "DISMISSED"] },
+                },
+                _count: { eventType: true },
+            });
+
+            const delivered = eventStats.find((s) => s.eventType === "DELIVERED")?._count.eventType || 0;
+            const opened = eventStats.find((s) => s.eventType === "OPENED")?._count.eventType || 0;
+            const dismissed = eventStats.find((s) => s.eventType === "DISMISSED")?._count.eventType || 0;
+
+            return { delivered, opened, dismissed };
+        } catch (error) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to fetch metrics",
+            });
+        }
     }),
     subscriptions: protectedProcedure.query(async ({ ctx }) => {
         const subscriptions = await ctx.db.pushSubscription.findMany({
@@ -161,15 +147,6 @@ export const pushNotificationRouter = createTRPCRouter({
         });
         return { message: "Notification sent successfully" };
     }),
-
-    createEvent: publicProcedure.input(PushEventSchema).mutation(async ({ input, ctx }) => {
-        return ctx.db.notificationEvent.create({
-            data: {
-                ...input,
-                occurredAt: new Date(),
-            },
-        });
-    }),
     getEvents: publicProcedure.query(async () => {
         try {
             if (!redis) {
@@ -230,10 +207,6 @@ export const pushNotificationRouter = createTRPCRouter({
             //     return { id, data };
             // });
 
-            // if (unacked) {
-            //     console.log("♻️ Reclaiming unacked events:");
-            // }
-
             const events = await redis.xreadgroup("GROUP", GROUP_NAME, CONSUMER_NAME, "COUNT", limit, "BLOCK", 5000, "STREAMS", STREAM_NAME, ">");
             const streams = parseStreamResponse(events);
             if (!streams?.length) {
@@ -279,5 +252,43 @@ export const pushNotificationRouter = createTRPCRouter({
                 message: "Internal server error",
             });
         }
+    }),
+    processStream: publicProcedure.input(z.object({ streamName: z.string() })).mutation(async ({ input, ctx }) => {
+        const { streamName } = input;
+
+        if (!redis) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Redis not configured",
+            });
+        }
+
+        const events = await redis.xread("COUNT", 100, "STREAMS", streamName, "0");
+
+        if (!events) return { message: "no events" };
+
+        for (const [key, entries] of events) {
+            for (const [id, fields] of entries) {
+                const event: Record<string, string> = {};
+                for (let i = 0; i < fields.length; i += 2) {
+                    const k = fields[i];
+                    const v = fields[i + 1];
+                    if (k && v) event[k] = v;
+                }
+
+                const handler = handlers[streamName];
+                if (handler) {
+                    try {
+                        await handler(ctx, event);
+                        await redis.xdel(streamName, id);
+                    } catch (error) {
+                        console.error(error);
+                    }
+                } else {
+                    console.warn(`No handler found for event type: ${event.type}`);
+                }
+            }
+        }
+        return { message: "processed" };
     }),
 });

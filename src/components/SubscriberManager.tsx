@@ -1,29 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Users, Search, UserCheck, UserX, Globe, Smartphone } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Users, UserCheck, UserX, Globe, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
-import { QueueStats } from "@/trpc/schema";
 
 const SubscriberManager = () => {
-    const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
-    const [processing, setProcessing] = useState<boolean>(false);
 
     const { data, isLoading } = api.push.subscriptions.useQuery();
     const { data: events, isLoading: eventsLoading } = api.push.getEvents.useQuery();
     const mutation = api.push.processEvents.useMutation();
-    const utils = api.useUtils();
-    const unsubscribeMutation = api.push.unsubscribe.useMutation({
-        onSuccess: () => {
-            void utils.push.subscriptions.invalidate();
-        },
-    });
 
     const subscribers = useMemo(() => {
         const subs = data?.subscriptions ?? [];
@@ -43,17 +33,11 @@ const SubscriberManager = () => {
     }, [data]);
 
     const filteredSubscribers = useMemo(() => {
-        const term = searchTerm.toLowerCase();
         return (subscribers ?? []).filter((subscriber) => {
-            const matchesSearch = subscriber.endpoint.toLowerCase().includes(term) || subscriber.userAgent.toLowerCase().includes(term);
             const matchesFilter = filterStatus === "all" || subscriber.status === filterStatus;
-            return matchesSearch && matchesFilter;
+            return matchesFilter;
         });
-    }, [subscribers, searchTerm, filterStatus]);
-
-    const handleUnsubscribe = async (subscriberId: string) => {
-        await unsubscribeMutation.mutateAsync(subscriberId);
-    };
+    }, [subscribers, filterStatus]);
 
     const processEvents = async (limit = 50) => {
         mutation.mutate(
@@ -64,24 +48,6 @@ const SubscriberManager = () => {
                 },
             }
         );
-        // setProcessing(true);
-        // try {
-        //     const response = await fetch("/api/worker/push", {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify({ limit }),
-        //     });
-
-        //     if (response.ok) {
-        //         await response.json();
-        //         await utils.push.getEvents.invalidate();
-        //         await utils.push.subscriptions.invalidate();
-        //     }
-        // } catch (error: any) {
-        //     toast.error(`Failed to process events: ${error.message}`);
-        // } finally {
-        //     setProcessing(false);
-        // }
     };
 
     return (
@@ -116,18 +82,6 @@ const SubscriberManager = () => {
                         </div>
                     </CardContent>
                 </Card>
-
-                <Card>
-                    <CardContent className="flex items-center p-6">
-                        <Globe className="h-8 w-8 text-purple-600" />
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-default-500">Countries</p>
-                            <p className="text-2xl font-bold">
-                                {isLoading ? "-" : new Set(subscribers.map((s) => s.country).filter((c) => c && c !== "-")).size}
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
             </div>
             <div className="flex items-center justify-between gap-3 px-4">
                 <CardTitle>Push Notifications</CardTitle>
@@ -150,15 +104,6 @@ const SubscriberManager = () => {
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                            <Input
-                                placeholder="Search subscribers..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10"
-                            />
-                        </div>
                         <div className="flex gap-2">
                             <Button variant={filterStatus === "all" ? "default" : "outline"} size="lg" onClick={() => setFilterStatus("all")}>
                                 All
@@ -184,7 +129,7 @@ const SubscriberManager = () => {
                             >
                                 <div className="flex items-center gap-4">
                                     <div>
-                                        <p className="font-medium overflow-hidden text-ellipsis line-clamp-1 max-w-[70vw]">{subscriber.endpoint}</p>
+                                        <p className="font-medium overflow-hidden text-ellipsis line-clamp-1 max-w-[50vw]">{subscriber.endpoint}</p>
                                         <div className="flex items-center gap-2">
                                             {["ios", "android"].includes(subscriber.device) ? (
                                                 <Smartphone className="h-4 w-4 text-gray-500" />
@@ -198,20 +143,9 @@ const SubscriberManager = () => {
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="flex items-center gap-4 flex-shrink-0 mt-4 md:mt-0">
-                                    <div className="text-sm">
-                                        <p className="text-muted-foreground">Subscribed: {subscriber.subscribeDate}</p>
-                                        <p className="text-muted-foreground">Last active: {subscriber.lastActive}</p>
-                                    </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleUnsubscribe(subscriber.id)}
-                                        className="text-red-600 hover:text-red-700"
-                                    >
-                                        <UserX className="h-4 w-4" />
-                                    </Button>
+                                <div className="text-sm">
+                                    <p className="text-muted-foreground">Subscribed: {subscriber.subscribeDate}</p>
+                                    <p className="text-muted-foreground">Last active: {subscriber.lastActive}</p>
                                 </div>
                             </div>
                         ))}

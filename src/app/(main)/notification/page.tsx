@@ -3,14 +3,12 @@
 import { RecentActivity } from "@/components/notification/recent-activity";
 import { StatsCard } from "@/components/notification/stats-card";
 import { Users, Send, TrendingUp, Bell } from "lucide-react";
-import { api } from "@/trpc/react";
 
 export default function Notification() {
-    const { data } = api.push.analytics.useQuery();
-    const totalSubscribers = data?.totalSubscribers ?? 0;
-    const notificationsSent = data?.notificationsSent ?? 0;
-    const openRate = data ? `${data.openRate.toFixed(1)}%` : "-";
-    const activeCampaigns = data?.activeCampaigns ?? 0;
+    const totalSubscribers = 10;
+    const notificationsSent = 10;
+    const openRate = 10;
+    const activeCampaigns = 10;
 
     return (
         <div className="container mx-auto px-4 py-6">
