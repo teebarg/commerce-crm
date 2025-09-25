@@ -202,7 +202,7 @@ export const pushNotificationRouter = createTRPCRouter({
                 });
             }
 
-            const events = await redis.xrange("FCM", "-", "+", "COUNT", 100);
+            const events = await redis.xrange("FCM", "-", "+", "COUNT", 10);
 
             const parsed = events.map(([id, fields]) => {
                 const data: Record<string, string> = {};
@@ -235,19 +235,30 @@ export const pushNotificationRouter = createTRPCRouter({
 
             const { limit = 50 } = input;
 
-            const [stream, unacked]: [string, any[]] = await redis.xautoclaim(STREAM_NAME, GROUP_NAME, CONSUMER_NAME, 300_000, "0-0", "COUNT", limit);
-            console.log("🚀 ~ file: push.ts:239 ~ unacked:", unacked)
-            console.log("🚀 ~ file: push.ts:239 ~ stream:", stream)
+            // const [stream, unacked]: [string, any[]] = (await redis.xautoclaim(
+            //     STREAM_NAME,
+            //     GROUP_NAME,
+            //     CONSUMER_NAME,
+            //     30_000,
+            //     "0-0",
+            //     "COUNT",
+            //     limit
+            // )) as [string, any[]];
 
-            if (unacked) {
-                console.log("♻️ Reclaiming unacked events:");
-            }
+            // const unackedParsed = (unacked ?? []).map(([id, fields]) => {
+            //     const data: Record<string, string> = {};
+            //     for (let i = 0; i < fields.length; i += 2) {
+            //         data[fields[i]!] = fields[i + 1]!;
+            //     }
+            //     return { id, data };
+            // });
+
+            // if (unacked) {
+            //     console.log("♻️ Reclaiming unacked events:");
+            // }
 
             const events = await redis.xreadgroup("GROUP", GROUP_NAME, CONSUMER_NAME, "COUNT", limit, "BLOCK", 5000, "STREAMS", STREAM_NAME, ">");
-            console.log("🚀 ~ file: push.ts:239 ~ events:", events);
-
             const streams = parseStreamResponse(events);
-            console.log("🚀 ~ file: push.ts:242 ~ streams:", streams);
             if (!streams?.length) {
                 return {
                     message: "No events in queue",
@@ -269,7 +280,8 @@ export const pushNotificationRouter = createTRPCRouter({
                             ...item.data,
                         },
                     });
-                    // await redis.xack(STREAM_NAME, GROUP_NAME, item.id);
+                    await redis.xack(STREAM_NAME, GROUP_NAME, item.id);
+                    await redis.xdel(STREAM_NAME, item.id);
                     processedCount++;
                 } catch (error) {
                     const msg = error instanceof Error ? error.message : "Unknown error";
