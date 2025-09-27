@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, BarChart3, Send, History, FileText, PlusCircle, TrendingUp, Mail, Settings2 } from "lucide-react";
+import { Home, Settings, Users, ChevronUp, LogOut, PanelLeftIcon, BarChart3, Send, History, FileText, PlusCircle, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -32,11 +32,6 @@ const AdminItems = [
         title: "Settings",
         url: "/settings",
         icon: Settings,
-    },
-    {
-        title: "Worker Dashboard",
-        url: "/admin/worker",
-        icon: Settings2,
     },
     // {
     //     title: "Profile",
@@ -80,25 +75,25 @@ const PushNotification = [
         icon: Users,
     },
     {
-        title: "Send",
+        title: "Compose",
         url: "/notification/send",
         icon: Send,
     },
-    {
-        title: "Templates",
-        url: "/notification/templates",
-        icon: FileText,
-    },
+    // {
+    //     title: "Templates",
+    //     url: "/notification/templates",
+    //     icon: FileText,
+    // },
     {
         title: "History",
         url: "/notification/history",
         icon: History,
     },
-    {
-        title: "Settings",
-        url: "/notification/settings",
-        icon: Settings,
-    },
+    // {
+    //     title: "Settings",
+    //     url: "/notification/settings",
+    //     icon: Settings,
+    // },
 ];
 
 const Email = [
@@ -187,7 +182,10 @@ export function AdminSidebar({ session }: { session: Session | null }) {
                         <SidebarMenu>
                             {Email.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
-                                    <SidebarMenuButton asChild isActive={path === item.url || (item.url !== "/notification/email" && path.startsWith(item.url))}>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={path === item.url || (item.url !== "/notification/email" && path.startsWith(item.url))}
+                                    >
                                         <Link href={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>

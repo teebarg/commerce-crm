@@ -9,24 +9,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
     useEffect(() => {
         if (error) {
-            // Prepare the error data
-            const errorData = {
-                message: error.message || "An error occurred",
-                name: error.name || "Error",
-                stack: error.stack ?? "",
-                timestamp: new Date().toISOString(),
-            };
-
-            // Send the error to the server
-            fetch(`${process.env.NEXT_PUBLIC_APP_NAME}/api/log-error`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(errorData),
-            }).catch((fetchError) => {
-                console.error("Failed to log error:", fetchError);
-            });
+            console.error(error);
         }
     }, [error]);
 

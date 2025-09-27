@@ -3,14 +3,23 @@
 import { RecentActivity } from "@/components/notification/recent-activity";
 import { StatsCard } from "@/components/notification/stats-card";
 import { Users, Send, TrendingUp, Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { api } from "@/trpc/react";
 
 export default function Notification() {
-    const { data } = api.push.analytics.useQuery();
-    const totalSubscribers = data?.totalSubscribers ?? 0;
-    const notificationsSent = data?.notificationsSent ?? 0;
-    const openRate = data ? `${data.openRate.toFixed(1)}%` : "-";
-    const activeCampaigns = data?.activeCampaigns ?? 0;
+    const totalSubscribers = 10;
+    const notificationsSent = 10;
+    const openRate = 10;
+    const activeCampaigns = 10;
+
+    const utils = api.useUtils();
+    const processMutation = api.push.processStream.useMutation({
+        onSuccess: () => {
+            void utils.push.subscriptions.invalidate();
+            toast.success("Processed events");
+        },
+    });
 
     return (
         <div className="container mx-auto px-4 py-6">
@@ -25,6 +34,17 @@ export default function Notification() {
                     <StatsCard title="Notifications Sent" value={String(notificationsSent)} icon={Send} description="all time" />
                     <StatsCard title="Open Rate" value={openRate} changeType="positive" icon={TrendingUp} description="based on delivered" />
                     <StatsCard title="Active Campaigns" value={String(activeCampaigns)} icon={Bell} description="scheduled" />
+                </div>
+
+                <div className="flex justify-end">
+                    <Button
+                        onClick={() => processMutation.mutate({ streamName: "PUSH_EVENT" })}
+                        disabled={processMutation.isPending}
+                        isLoading={processMutation.isPending}
+                        variant="outline"
+                    >
+                        Process Push Events
+                    </Button>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

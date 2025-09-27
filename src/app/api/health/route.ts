@@ -9,7 +9,7 @@ export async function GET() {
             await db.user.count();
             dbStatus = "ok";
         } catch (error) {
-            console.log(error)
+            console.error(error)
             dbStatus = "unavailable";
         }
 
