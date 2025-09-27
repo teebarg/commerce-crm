@@ -35,7 +35,7 @@ const UserSchema = z.object({
     id: z.string().uuid(),
     name: z.string().optional().nullable(),
     firstName: z.string().optional(),
-    lastName: z.string().optional(),
+    lastName: z.string().optional().nullable(),
     email: z.string().email().optional(),
     image: z.string().url().optional().nullable(),
 });

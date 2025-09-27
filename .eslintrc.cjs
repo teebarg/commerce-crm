@@ -41,6 +41,7 @@ const config = {
         ],
         "@typescript-eslint/no-unsafe-argument": "off",
         "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/prefer-nullish-coalescing": "warn",
     },
 };
 module.exports = config;
