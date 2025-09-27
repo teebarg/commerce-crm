@@ -86,7 +86,7 @@ const SubscriberManager = () => {
             <div className="flex items-center justify-between gap-3 px-4">
                 <CardTitle>Push Notifications</CardTitle>
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => processEvents(1)} disabled={mutation.isPending || (events?.queueLength ?? 0) === 0} variant="default">
+                    <Button onClick={() => processEvents(10)} disabled={mutation.isPending || (events?.queueLength ?? 0) === 0} variant="default">
                         {mutation.isPending ? "Processing..." : eventsLoading ? "Loading..." : `Process Events (${events?.queueLength ?? 0})`}
                     </Button>
                 </div>
