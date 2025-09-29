@@ -104,12 +104,14 @@ export const UpdatePlatformPostInput = z.object({
     platformPostPlatformId: z.string().optional(),
 });
 
-// New schemas for enhanced post creation
-export const AIGenerationInput = z.object({
-    prompt: z.string().optional(),
+export const AIGenerationInputSchema = z.object({
     platforms: z.array(z.string()),
     tone: z.enum(["professional", "casual", "friendly", "enthusiastic", "formal"]).optional(),
     industry: z.string().optional(),
+    businessName: z.string().optional(),
+    productService: z.string().optional(),
+    targetAudience: z.string().optional(),
+    specialOffer: z.string().optional(),
 });
 
 export const EnhancedCreatePostInput = z.object({
@@ -149,7 +151,7 @@ export type User = z.infer<typeof UserSchema>;
 export type CreatePostInput = z.infer<typeof CreatePostInput>;
 export type UpdatePostStatusInput = z.infer<typeof UpdatePostStatusInput>;
 export type UpdatePlatformPostInput = z.infer<typeof UpdatePlatformPostInput>;
-export type AIGenerationInput = z.infer<typeof AIGenerationInput>;
+export type AIGenerationInput = z.infer<typeof AIGenerationInputSchema>;
 export type EnhancedCreatePostInput = z.infer<typeof EnhancedCreatePostInput>;
 export type PlatformSelectionInput = z.infer<typeof PlatformSelectionInput>;
 

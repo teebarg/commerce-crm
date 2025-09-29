@@ -2,7 +2,7 @@ import { z } from "zod";
 import { GoogleGenAI } from "@google/genai";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { PostSchema, AIGenerationInput, EnhancedCreatePostInput, UpdatePostSchema } from "@/schemas/post.schema";
+import { PostSchema, EnhancedCreatePostInput, UpdatePostSchema, AIGenerationInputSchema } from "@/schemas/post.schema";
 import { env } from "@/env";
 import { postToPlatforms } from "@/server/services/platformPoster";
 
@@ -197,23 +197,83 @@ export const postRouter = createTRPCRouter({
         });
         return platforms;
     }),
+    generateAIContent: protectedProcedure.input(AIGenerationInputSchema).mutation(async ({ input }) => {
+        const { platforms, tone = "friendly", industry, businessName, productService, targetAudience, specialOffer } = input;
 
-    generateAIContent: protectedProcedure.input(AIGenerationInput).mutation(async ({ input }) => {
-        const { platforms, tone = "friendly", industry } = input;
-        const prompt = `Generate a social media post for the following industry: ${industry ?? "business"}.\nTone: ${tone}.\nPlatforms: ${platforms.join(", ")}.`;
+        const platformGuidance = platforms
+            .map((platform: string) => {
+                switch (platform.toLowerCase()) {
+                    case "instagram":
+                        return "Instagram: Include 3-5 relevant hashtags, emoji usage, visual-first approach, story-like format";
+                    case "facebook":
+                        return "Facebook: Conversational tone, community-focused, longer form acceptable, encourage shares";
+                    case "twitter":
+                        return "Twitter: Concise (under 280 chars), trending hashtags, engaging questions or polls";
+                    case "tiktok":
+                        return "TikTok: Trendy language, hook in first 3 seconds, call for video interaction";
+                    default:
+                        return `${platform}: Engaging and platform-appropriate content`;
+                }
+            })
+            .join(". ");
 
-        const genAI = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
-        const response = await genAI.models.generateContent({
-            model: "gemini-2.0-flash-001",
-            contents: prompt,
-        });
-        const content = response.text;
+        const prompt = `You are an expert social media marketer. Create ONE compelling social media post that drives customers to visit a shop immediately.
+    
+    BUSINESS DETAILS:
+    - Industry: ${industry ?? "retail business"}
+    - Business Name: ${businessName ?? "[Business Name]"}
+    - Product/Service: ${productService ?? "products and services"}
+    - Target Audience: ${targetAudience ?? "general consumers"}
+    - Special Offer: ${specialOffer ?? "quality products at great prices"}
+    
+    PLATFORM REQUIREMENTS:
+    - Tone: ${tone}
+    - Primary Platform: ${platforms[0]} ${platforms.length > 1 ? `(adaptable to: ${platforms.slice(1).join(", ")})` : ''}
+    - ${platformGuidance}
 
-        return {
-            content,
-            platforms,
-            generatedAt: new Date().toISOString(),
-        };
+    STRICT FORMAT REQUIREMENTS:
+    - Output ONLY the social media post text
+    - No image descriptions or extra marketing advice
+    - No "Caption:" or formatting labels
+    - Maximum 3-5 relevant hashtags only
+    - Keep under 200 words for most platforms
+    - Use emojis strategically (2-4 total)
+
+    MUST INCLUDE:
+    1. Hook: Start with an attention-grabbing question or statement
+    2. Value: Why visit your shop RIGHT NOW?
+    3. Urgency: Limited time, limited stock, or exclusive offer
+    4. Action: Clear "Visit us at [Address]" or "Link in bio" 
+    5. Incentive: Specific discount, deal, or exclusive offer
+
+    AVOID:
+    - Long explanatory text about the business
+    - Multiple call-to-actions
+    - Generic phrases like "check us out"
+    - Bullet points or lists in the main text
+    
+    Create a post that makes someone want to drop what they're doing and visit the shop TODAY.`;
+
+        try {
+            const genAI = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+            const response = await genAI.models.generateContent({
+                model: "gemini-2.0-flash-001",
+                contents: prompt,
+            });
+            const content = response.text;
+
+            return {
+                content,
+                platforms,
+                industry: industry ?? "business",
+                tone,
+                generatedAt: new Date().toISOString(),
+                optimizedFor: "shop_traffic_conversion",
+            };
+        } catch (error) {
+            console.error("AI content generation failed:", error);
+            throw new Error("Failed to generate content. Please try again.");
+        }
     }),
 
     createEnhancedPost: protectedProcedure.input(EnhancedCreatePostInput).mutation(async ({ ctx, input }) => {

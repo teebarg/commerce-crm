@@ -67,7 +67,7 @@ const PostManager: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+            <Card className="bg-default-100 border-0 shadow-lg">
                 <CardHeader>
                     <CardTitle>Filters</CardTitle>
                 </CardHeader>
@@ -105,7 +105,7 @@ const PostManager: React.FC = () => {
                 </CardContent>
             </Card>
 
-            <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+            <Card className="bg-content2 border-0 shadow-lg">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <FileText className="h-5 w-5 text-purple-600" />

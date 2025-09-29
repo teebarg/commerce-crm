@@ -30,9 +30,12 @@ interface MediaFile {
 const PostCreator = () => {
     const utils = api.useUtils();
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
-    const [aiPrompt, setAiPrompt] = useState<string>("");
+    const [aiBusinessName, setAiBusinessName] = useState<string>("Revoque");
+    const [aiProductService, setAiProductService] = useState<string>("thrift store");
+    const [aiTargetAudience, setAiTargetAudience] = useState<string>("people looking for unique and affordable items");
+    const [aiSpecialOffer, setAiSpecialOffer] = useState<string>("quality products at great prices");
     const [aiTone, setAiTone] = useState<string>("friendly");
-    const [aiIndustry, setAiIndustry] = useState<string>("");
+    const [aiIndustry, setAiIndustry] = useState<string>("ecommerce");
     const [scheduleTime, setScheduleTime] = useState<string>("");
     const [postLater, setPostLater] = useState(false);
     const form = useForm<z.infer<typeof EnhancedCreatePostInput>>({
@@ -62,8 +65,12 @@ const PostCreator = () => {
  
             form.reset();
             setMediaFiles([]);
-            setAiPrompt("");
             setScheduleTime("");
+            setAiProductService("thrift store");
+            setAiTargetAudience("people looking for unique and affordable items");
+            setAiSpecialOffer("quality products at great prices");
+            setAiTone("friendly");
+            setAiIndustry("ecommerce");
         },
         onError: (error) => {
             toast.error(`Error creating post: ${error.message}`);
@@ -102,10 +109,13 @@ const PostCreator = () => {
             return;
         }
         const input: AIGenerationInput = {
-            prompt: aiPrompt,
             platforms: selectedPlatforms,
             tone: aiTone as any,
             industry: aiIndustry,
+            businessName: aiBusinessName,
+            productService: aiProductService,
+            targetAudience: aiTargetAudience,
+            specialOffer: aiSpecialOffer,
         };
         await generateAIMutation.mutateAsync(input);
     };
@@ -165,11 +175,32 @@ const PostCreator = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                 <Input
-                                    label="Custom Prompt (Optional)"
-                                    id="ai-prompt"
-                                    placeholder="e.g., Share tips about productivity"
-                                    value={aiPrompt}
-                                    onChange={(e) => setAiPrompt(e.target.value)}
+                                    label="Business Name"
+                                    id="ai-business-name"
+                                    placeholder="e.g., My Business"
+                                    value={aiBusinessName}
+                                    onChange={(e) => setAiBusinessName(e.target.value)}
+                                />
+                                <Input
+                                    label="Product/Service"
+                                    id="ai-product-service"
+                                    placeholder="e.g., Products and Services"
+                                    value={aiProductService}
+                                    onChange={(e) => setAiProductService(e.target.value)}
+                                />
+                                <Input
+                                    label="Target Audience"
+                                    id="ai-target-audience"
+                                    placeholder="e.g., General Consumers"
+                                    value={aiTargetAudience}
+                                    onChange={(e) => setAiTargetAudience(e.target.value)}
+                                />
+                                <Input
+                                    label="Special Offer"
+                                    id="ai-special-offer"
+                                    placeholder="e.g., Quality Products at Great Prices"
+                                    value={aiSpecialOffer}
+                                    onChange={(e) => setAiSpecialOffer(e.target.value)}
                                 />
 
                                 <div className="space-y-2">
@@ -221,7 +252,7 @@ const PostCreator = () => {
                                 id="content"
                                 placeholder="What's on your mind? Share your thoughts, ideas, or let AI help you create something amazing..."
                                 {...form.register("content")}
-                                className="min-h-[120px] resize-none"
+                                className="min-h-[250px]!"
                             />
                             {errors.content && <p className="text-sm text-red-500">{errors.content.message}</p>}
                         </div>
@@ -242,7 +273,7 @@ const PostCreator = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-                <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+                <Card className="bg-default-100 border-0 shadow-lg">
                     <CardHeader>
                         <CardTitle>Select Platforms</CardTitle>
                         <CardDescription>Choose where to publish your post</CardDescription>
@@ -255,7 +286,7 @@ const PostCreator = () => {
                                 <div
                                     key={idx}
                                     className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                                        isSelected ? "border-purple-300 bg-purple-50" : "border-gray-200 hover:border-gray-300"
+                                        isSelected ? "border-purple-300 bg-purple-50 text-purple-600" : "border-gray-200 hover:border-gray-300"
                                     }`}
                                     onClick={() => togglePlatform(platform.id)}
                                 >
@@ -273,7 +304,7 @@ const PostCreator = () => {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+                <Card className="bg-default-100 border-0 shadow-lg">
                     <CardContent className="pt-6 space-y-3">
                         <div className="space-y-4">
                             <div className="flex items-center gap-3 mb-2">

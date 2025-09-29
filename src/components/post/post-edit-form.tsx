@@ -77,7 +77,7 @@ const PostForm: React.FC<{ post: EnhancedPost; onClose: () => void }> = ({ post,
             <div className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="edit-content">Content</Label>
-                    <Textarea id="edit-content" className="min-h-[120px]" {...register("content")} defaultValue={post.content ?? ""} />
+                    <Textarea id="edit-content" className="min-h-[250px]" {...register("content")} defaultValue={post.content ?? ""} />
                     {errors.content && <p className="text-xs text-rose-500 mt-0.5">{errors.content.message}</p>}
                 </div>
 

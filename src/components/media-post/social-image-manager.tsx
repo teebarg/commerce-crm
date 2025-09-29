@@ -5,6 +5,8 @@ import { useDropzone } from "react-dropzone";
 import { X, Upload, FileImage } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -26,6 +28,7 @@ interface SocialImageManagerProps {
 
 const SocialImageManager: React.FC<SocialImageManagerProps> = ({ onMediaChange, maxFiles = 5, maxSize = 10 }) => {
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+    const [imageUrl, setImageUrl] = useState<string>("");
 
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
@@ -77,6 +80,53 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({ onMediaChange, 
         return "VIDEO";
     };
 
+    const inferTypeFromUrl = (url: string): "IMAGE" | "VIDEO" | "GIF" => {
+        try {
+            const lower = url.toLowerCase();
+            if (lower.endsWith(".gif")) return "GIF";
+            if (lower.endsWith(".mp4") || lower.endsWith(".mov") || lower.endsWith(".avi") || lower.endsWith(".webm")) return "VIDEO";
+            return "IMAGE";
+        } catch {
+            return "IMAGE";
+        }
+    };
+
+    const addImageByUrl = () => {
+        if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) {
+            toast.error("Please enter a valid image URL");
+            return;
+        }
+        if (mediaFiles.length + 1 > maxFiles) {
+            toast.error(`Maximum ${maxFiles} files allowed`);
+            return;
+        }
+
+        const nameFromUrl = (() => {
+            try {
+                const u = new URL(imageUrl);
+                const last = u.pathname.split("/").filter(Boolean).pop() ?? "image-from-url";
+                return last;
+            } catch {
+                return "image-from-url";
+            }
+        })();
+
+        const syntheticFile = new File([], nameFromUrl, { type: "image/*" });
+        const type = inferTypeFromUrl(imageUrl);
+        const newItem: MediaFile = {
+            id: Math.random().toString(36).substr(2, 9),
+            file: syntheticFile,
+            url: imageUrl,
+            type,
+            name: nameFromUrl,
+        };
+        const updated = [...mediaFiles, newItem];
+        setMediaFiles(updated);
+        onMediaChange?.(updated);
+        setImageUrl("");
+        toast.success("Image URL added");
+    };
+
     const removeFile = async (id: string) => {
         const fileToRemove = mediaFiles.find((file) => file.id === id);
         if (fileToRemove?.url?.includes("supabase.co")) {
@@ -103,6 +153,22 @@ const SocialImageManager: React.FC<SocialImageManagerProps> = ({ onMediaChange, 
 
     return (
         <div className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="image-url">Image URL</Label>
+                <div className="flex gap-2">
+                    <Input
+                        id="image-url"
+                        placeholder="https://example.com/image.png"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                    />
+                    <Button type="button" onClick={addImageByUrl} variant="secondary">
+                        Add
+                    </Button>
+                </div>
+                <p className="text-xs text-gray-500">Or upload below</p>
+            </div>
+
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${

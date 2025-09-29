@@ -1,4 +1,4 @@
-import { Edit, Trash2, Eye, Copy, Image as ImageIcon, Play } from "lucide-react";
+import { Edit, Trash2, Eye, Copy, Image as ImageIcon, Play, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -14,6 +14,7 @@ import { Confirm } from "@/components/ui/confirm";
 import PostView from "@/components/post/post-view";
 import Image from "next/image";
 import { type EnhancedPlatformPost, type EnhancedPost } from "@/schemas/post.schema";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface PostItemProps {
     post: EnhancedPost;
@@ -72,6 +73,27 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
             facebook: "yellow" as const,
         };
         return variantMap[platform as keyof typeof variantMap] || variantMap.instagram;
+    };
+
+    const openPlatformComposer = async (platform: string) => {
+        const content = post.content ?? "";
+        try {
+            await navigator.clipboard.writeText(content);
+            toast.success("Content copied to clipboard", { description: `Paste in ${platform} composer` });
+        } catch {
+            // no-op if clipboard fails
+        }
+
+        const firstMediaUrl = post.media?.[0]?.url!;
+        const map: Record<string, string> = {
+            twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(content)}`,
+            facebook: firstMediaUrl
+                ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(firstMediaUrl)}`
+                : `https://www.facebook.com/`,
+            instagram: `https://www.instagram.com/`,
+        };
+        const url = map[platform.toLowerCase()] ?? "";
+        if (url) window.open(url, "_blank", "noopener,noreferrer");
     };
 
     return (
@@ -133,6 +155,20 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
                             <Button variant="ghost" size="sm" onClick={handlePublishPost}>
                                 <Play className="h-4 w-4" />
                             </Button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" title="Post to platform">
+                                        <ExternalLink className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    {post.platformPosts.map((pp: EnhancedPlatformPost, i: number) => (
+                                        <DropdownMenuItem key={i} onClick={() => openPlatformComposer(pp.platform.name)} className="cursor-pointer">
+                                            Open {pp.platform.name}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                             <Overlay
                                 open={editState.isOpen}
                                 title="Edit Post"
