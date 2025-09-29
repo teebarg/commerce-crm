@@ -84,7 +84,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
             // no-op if clipboard fails
         }
 
-        const firstMediaUrl = post.media?.[0]?.url!;
+        const firstMediaUrl = post.media?.[0]?.url;
         const map: Record<string, string> = {
             twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(content)}`,
             facebook: firstMediaUrl
