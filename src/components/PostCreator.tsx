@@ -158,7 +158,7 @@ const PostCreator = () => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-                <Card className="bg-default-100 backdrop-blur-md border-0 shadow-lg">
+                <Card className="backdrop-blur-md border-0 shadow-lg">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Sparkles className="h-5 w-5 text-purple-600" />
@@ -204,7 +204,7 @@ const PostCreator = () => {
                                 />
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="ai-tone" className="text-sm mb-0.5 text-default-500">
+                                    <Label htmlFor="ai-tone" className="text-sm mb-0.5 text-muted-foreground">
                                         Tone
                                     </Label>
                                     <Select value={aiTone} onValueChange={setAiTone}>
@@ -259,10 +259,9 @@ const PostCreator = () => {
 
                         <Separator />
 
-                        {/* Media Upload */}
                         <div className="space-y-3">
                             <div className="flex items-center gap-2">
-                                <Upload className="h-4 w-4 text-gray-600" />
+                                <Upload className="h-4 w-4 text-muted-foreground" />
                                 <Label>Add Media</Label>
                             </div>
                             <SocialImageManager onMediaChange={handleMediaChange} maxFiles={5} maxSize={10} />
@@ -271,9 +270,8 @@ const PostCreator = () => {
                 </Card>
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-6">
-                <Card className="bg-default-100 border-0 shadow-lg">
+                <Card className="border-0 shadow-lg">
                     <CardHeader>
                         <CardTitle>Select Platforms</CardTitle>
                         <CardDescription>Choose where to publish your post</CardDescription>
@@ -304,7 +302,7 @@ const PostCreator = () => {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-default-100 border-0 shadow-lg">
+                <Card className="border-0 shadow-lg">
                     <CardContent className="pt-6 space-y-3">
                         <div className="space-y-4">
                             <div className="flex items-center gap-3 mb-2">
@@ -344,7 +342,7 @@ const PostCreator = () => {
                 </Card>
 
                 {mediaFiles.length > 0 && (
-                    <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+                    <Card className="border-0 shadow-lg">
                         <CardHeader>
                             <CardTitle className="text-sm">Media Preview</CardTitle>
                         </CardHeader>
@@ -352,9 +350,9 @@ const PostCreator = () => {
                             <div className="space-y-2">
                                 {mediaFiles.map((file, idx: number) => (
                                     <div key={idx} className="flex items-center gap-2 text-sm">
-                                        <ImageIcon className="h-4 w-4 text-gray-500" />
+                                        <ImageIcon className="h-4 w-4 text-muted-foreground" />
                                         <span className="truncate">{file.name}</span>
-                                        <Badge variant="outline" className="text-xs">
+                                        <Badge variant="blue" className="text-xs">
                                             {file.type}
                                         </Badge>
                                     </div>

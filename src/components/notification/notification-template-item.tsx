@@ -58,12 +58,12 @@ const NotificationTemplateItem: React.FC<NotificationTemplateItemProps> = ({ tem
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="bg-default-50 rounded-lg p-3">
+                <div className="rounded-lg p-3">
                     <h4 className="font-medium text-sm mb-1">{template.title}</h4>
-                    <p className="text-sm text-default-500">{template.body}</p>
+                    <p className="text-sm text-muted-foreground">{template.body}</p>
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-default-500">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>Created {formatDate(template.createdAt)}</span>
                 </div>
 

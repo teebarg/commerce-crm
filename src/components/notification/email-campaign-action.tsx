@@ -43,12 +43,12 @@ const EmailCampaignAction: React.FC<{ campaign: EmailCampaign }> = ({ campaign }
     };
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
             <Overlay
                 open={detailState.isOpen}
                 title={`View ${campaign.subject}`}
                 trigger={
-                    <Button size="iconOnly">
+                    <Button size="icon" variant="ghost">
                         <Eye className="h-5 w-5" />
                     </Button>
                 }
@@ -61,7 +61,7 @@ const EmailCampaignAction: React.FC<{ campaign: EmailCampaign }> = ({ campaign }
                 open={editState.isOpen}
                 title={`Edit ${campaign.subject}`}
                 trigger={
-                    <Button size="iconOnly">
+                    <Button size="icon" variant="ghost">
                         <Edit className="h-5 w-5" />
                     </Button>
                 }
@@ -76,7 +76,7 @@ const EmailCampaignAction: React.FC<{ campaign: EmailCampaign }> = ({ campaign }
                         open={editState.isOpen}
                         title={`Edit ${campaign.subject}`}
                         trigger={
-                            <Button size="iconOnly">
+                            <Button size="icon" variant="ghost">
                                 <Edit className="h-5 w-5" />
                             </Button>
                         }
@@ -88,10 +88,10 @@ const EmailCampaignAction: React.FC<{ campaign: EmailCampaign }> = ({ campaign }
                     <SendDraftCampaign campaign={campaign} />
                 </>
             )}
-            <Button size="iconOnly" onClick={() => handleDuplicate(campaign)}>
+            <Button size="icon" variant="ghost" onClick={() => handleDuplicate(campaign)}>
                 <Files className="h-5 w-5" />
             </Button>
-            <Button size="iconOnly" className="text-destructive" onClick={() => handleDelete(campaign)}>
+            <Button size="icon" variant="ghost" className="text-destructive" onClick={() => handleDelete(campaign)}>
                 <Trash2 className="h-5 w-5" />
             </Button>
         </div>

@@ -103,7 +103,7 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
                                         Scheduled: {formatDistanceToNow(notification.scheduledAt, { addSuffix: true })}
                                     </div>
                                 )}
-                                {notification.status === NotificationStatusEnum.Values.DRAFT && <div className="text-gray-500">Draft</div>}
+                                {notification.status === NotificationStatusEnum.Values.DRAFT && <div className="text-muted-foreground">Draft</div>}
                             </div>
 
                             <NotificationActions notification={notification} />

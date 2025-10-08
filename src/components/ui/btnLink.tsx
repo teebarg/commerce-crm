@@ -8,8 +8,8 @@ import Link from "next/link";
 
 interface BtnLinkProps {
     children: React.ReactNode;
-    variant?: "primary" | "secondary" | "default" | "destructive" | "success" | "emerald" | "bordered" | "borderedSecondary";
-    size?: "sm" | "lg" | "icon" | "iconOnly";
+    variant?: "primary" | "secondary" | "default" | "destructive" | "success" | "emerald";
+    size?: "sm" | "lg" | "icon";
     className?: string;
     href: string;
 }

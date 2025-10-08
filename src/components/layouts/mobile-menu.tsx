@@ -67,14 +67,14 @@ const Menu: React.FC<{ session: any }> = ({ session }) => {
                 </div>
             </div>
 
-            <div className="p-4 border-b-divider">
+            <div className="p-4 border-b-border">
                 <div className="relative">
                     <input
-                        className="w-full py-2 pl-8 pr-4 bg-content1 rounded-lg text-sm focus:outline-none border"
+                        className="w-full py-2 pl-8 pr-4 bg-card rounded-lg text-sm focus:outline-none border"
                         placeholder="Search..."
                         type="text"
                     />
-                    <Search className="absolute left-2 top-2.5 text-default-500" size={16} />
+                    <Search className="absolute left-2 top-2.5 text-muted-foreground" size={16} />
                 </div>
             </div>
 
@@ -88,15 +88,15 @@ const Menu: React.FC<{ session: any }> = ({ session }) => {
                         href={item.href}
                     >
                         <div className="flex items-center space-x-3">
-                            <span className={pathname === item.href ? "text-accent" : "text-default-500"}>{item.icon}</span>
+                            <span className={pathname === item.href ? "text-accent" : "text-muted-foreground"}>{item.icon}</span>
                             <span>{item.label}</span>
                         </div>
-                        <ChevronRight className={pathname === item.href ? "text-accent" : "text-default-500"} size={16} />
+                        <ChevronRight className={pathname === item.href ? "text-accent" : "text-muted-foreground"} size={16} />
                     </Link>
                 ))}
             </nav>
 
-            <div className="p-4 border-t-divider sticky bottom-0 bg-content1">
+            <div className="p-4 border-t-border sticky bottom-0 bg-card">
                 <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
                     <LogOut size={20} />
                     <span>Logout</span>

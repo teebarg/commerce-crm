@@ -56,7 +56,7 @@ const SendDraftCampaign: React.FC<{ campaign: EmailCampaign }> = ({ campaign }) 
             open={sendState.isOpen}
             title={`Send ${campaign.subject}`}
             trigger={
-                <Button size="iconOnly" variant="secondary">
+                <Button size="icon" variant="ghost">
                     <Send className="h-5 w-5" />
                 </Button>
             }

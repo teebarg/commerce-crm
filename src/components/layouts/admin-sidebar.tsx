@@ -215,7 +215,7 @@ export function AdminSidebar({ session }: { session: Session | null }) {
                                         </Avatar>
                                         <div className="flex flex-col">
                                             <p className="font-semibold">{session?.user?.name ?? "User"}</p>
-                                            <p className="text-xs text-default-500">{session?.user?.email ?? "User"}</p>
+                                            <p className="text-xs text-muted-foreground">{session?.user?.email ?? "User"}</p>
                                         </div>
                                     </div>
                                     <ChevronUp className="ml-auto" />

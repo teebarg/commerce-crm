@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </head>
             <body className="min-h-screen">
                 <TRPCReactProvider>
-                    <ProgressBar className="">
+                    <ProgressBar>
                         {children}
                         <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
                     </ProgressBar>

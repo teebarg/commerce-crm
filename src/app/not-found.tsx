@@ -14,7 +14,7 @@ const NotFound: React.FC = async () => {
             <div className="max-w-md mx-auto text-center">
                 <Exclamation className="w-20 h-20 mx-auto text-rose-500" />
                 <h1 className="text-4xl font-bold mt-6">Oops! Page Not Found</h1>
-                <p className="text-gray-500 my-4">{`The page you're looking for doesn't exist or has been moved.`}</p>
+                <p className="text-muted-foreground my-4">{`The page you're looking for doesn't exist or has been moved.`}</p>
                 <BackButton />
             </div>
         </div>

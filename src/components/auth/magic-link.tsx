@@ -46,7 +46,7 @@ const MagicLink: React.FC<Props> = ({ onBack }) => {
                 Send Magic Link
             </Button>
             <div className="text-center mt-8">
-                <button onClick={onBack} className="text-gray-600 dark:text-gray-400 font-medium">
+                <button onClick={onBack} className="text-muted-foreground font-medium">
                     ← Back to password sign in
                 </button>
             </div>

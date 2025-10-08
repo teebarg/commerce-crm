@@ -114,22 +114,21 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
                 }`}
             >
                 <input {...getInputProps()} />
-                <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 {isDragActive ? (
                     <p className="text-purple-600 font-medium">Drop the files here...</p>
                 ) : (
                     <div>
-                        <p className="text-gray-600 font-medium mb-2">Drag & drop files here, or click to select</p>
-                        <p className="text-sm text-gray-500">Supports: JPG, PNG, GIF, MP4, MOV (Max {maxSize}MB per file)</p>
+                        <p className="font-medium mb-2">Drag & drop files here, or click to select</p>
+                        <p className="text-sm text-muted-foreground">Supports: JPG, PNG, GIF, MP4, MOV (Max {maxSize}MB per file)</p>
                     </div>
                 )}
             </div>
 
-            {/* File List */}
             {mediaFiles.length > 0 && (
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-gray-900">Uploaded Media</h4>
+                        <h4 className="font-medium">Uploaded Media</h4>
                         <Badge variant="secondary">
                             {mediaFiles.length}/{maxFiles} files
                         </Badge>
@@ -139,7 +138,7 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
                         {mediaFiles.map((file) => (
                             <Card key={file.id} className="relative group">
                                 <CardContent className="p-3">
-                                    <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                                    <div className="relative aspect-square bg-secondary rounded-lg overflow-hidden">
                                         {file.type === "IMAGE" || file.type === "GIF" ? (
                                             <Image src={file.url} alt={file.name} className="w-full h-full object-cover" width={100} height={100} />
                                         ) : (
@@ -161,8 +160,8 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
                                     </div>
 
                                     <div className="mt-2">
-                                        <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
-                                        <p className="text-xs text-gray-500">{formatFileSize(file.file.size)}</p>
+                                        <p className="text-sm font-medium truncate">{file.name}</p>
+                                        <p className="text-xs text-muted-foreground">{formatFileSize(file.file.size)}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -172,7 +171,7 @@ const PostMediaManager: React.FC<PostMediaManagerProps> = ({
             )}
 
             {mediaFiles.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                     <FileImage className="mx-auto h-12 w-12 mb-4 opacity-50" />
                     <p>No media uploaded yet</p>
                     <p className="text-sm">Upload images or videos to enhance your post</p>

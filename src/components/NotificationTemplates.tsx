@@ -41,7 +41,7 @@ const NotificationTemplates: React.FC = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h3 className="text-lg font-semibold">Notification Templates</h3>
-                    <p className="text-sm text-default-500">Create and manage reusable notification templates</p>
+                    <p className="text-sm text-muted-foreground">Create and manage reusable notification templates</p>
                 </div>
                 <Overlay
                     open={createState.isOpen}
@@ -95,9 +95,9 @@ const NotificationTemplates: React.FC = () => {
 
                     {filteredTemplates.length === 0 && (
                         <div className="text-center py-12">
-                            <FileText className="h-16 w-16 mx-auto text-default-300 mb-4" />
-                            <h3 className="text-lg font-medium text-default-900 mb-2">No templates found</h3>
-                            <p className="text-default-500 mb-4">
+                            <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                            <h3 className="text-lg font-medium mb-2">No templates found</h3>
+                            <p className="text-muted-foreground mb-4">
                                 {searchTerm ? "Try adjusting your search terms." : "Create your first notification template to get started."}
                             </p>
                         </div>

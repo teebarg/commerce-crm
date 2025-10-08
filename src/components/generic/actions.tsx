@@ -44,11 +44,13 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
     };
 
     return (
-        <div className="relative flex items-center gap-2">
+        <div className="relative flex items-center">
             {showDetails && (
                 <Tooltip>
-                    <TooltipTrigger>
-                        <Eye className="text-gray-500 cursor-pointer active:opacity-50" />
+                    <TooltipTrigger asChild>
+                        <Button size="icon" variant="ghost">
+                            <Eye className="text-muted-foreground cursor-pointer active:opacity-50" />
+                        </Button>
                     </TooltipTrigger>
                     <TooltipContent>
                         <p>Details</p>
@@ -59,7 +61,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                 open={editState.isOpen}
                 title={`Edit ${label}`}
                 trigger={
-                    <Button size="iconOnly">
+                    <Button size="icon" variant="ghost">
                         <Edit />
                     </Button>
                 }
@@ -68,8 +70,10 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                 {formWithHandler}
             </Overlay>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger>
-                    <Trash2 className="w-5 h-5 text-red-600" />
+                <DialogTrigger asChild>
+                    <Button size="icon" variant="ghost">
+                        <Trash2 className="w-5 h-5 text-red-600" />
+                    </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader className="sr-only">

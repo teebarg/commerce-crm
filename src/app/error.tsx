@@ -18,8 +18,8 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
             <div className="max-w-lg mx-auto bg-card rounded-lg shadow-lg overflow-hidden">
                 <div className="px-6 py-8">
                     <h1 className="text-4xl font-bold mb-2">500</h1>
-                    <p className="text-xl text-default-900 mb-4">Internal Server Error</p>
-                    <p className="text-default-500 mb-6">Oops! Something went wrong on our end. We apologize for the inconvenience.</p>
+                    <p className="text-xl mb-4">Internal Server Error</p>
+                    <p className="text-muted-foreground mb-6">Oops! Something went wrong on our end. We apologize for the inconvenience.</p>
                     <BtnLink variant="primary" href="/">
                         Go back to homepage
                     </BtnLink>
@@ -27,7 +27,7 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
                         Try again
                     </Button>
                 </div>
-                <div className="px-6 py-4 border-t border-default-100 text-sm text-default-500">
+                <div className="px-6 py-4 border-t border-border text-sm text-muted-foreground">
                     If the problem persists, please contact our support team.
                 </div>
             </div>

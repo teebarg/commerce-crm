@@ -111,7 +111,7 @@ const PostForm: React.FC<{ post: EnhancedPost; onClose: () => void }> = ({ post,
                             </div>
                         </div>
                     ) : (
-                        <div className="text-sm text-gray-500 p-4 border border-dashed rounded-lg text-center">No images attached to this post</div>
+                        <div className="text-sm text-muted-foreground p-4 border border-dashed rounded-lg text-center">No images attached to this post</div>
                     )}
                     <PostMediaManager
                         onMediaChange={(files) => {

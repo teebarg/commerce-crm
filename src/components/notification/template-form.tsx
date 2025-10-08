@@ -104,7 +104,7 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ onClose, template, mode }, _
                                 error={typeof errors.code?.message === "string" ? errors.code.message : undefined}
                                 disabled={mode === "update"}
                             />
-                            <p className="text-xs text-gray-500 mt-1">{code.length}/50 characters</p>
+                            <p className="text-xs text-muted-foreground mt-1">{code.length}/50 characters</p>
                         </div>
                         <div>
                             <Input
@@ -114,7 +114,7 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ onClose, template, mode }, _
                                 {...register("title")}
                                 error={typeof errors.title?.message === "string" ? errors.title.message : undefined}
                             />
-                            <p className="text-xs text-gray-500 mt-1">{title.length}/50 characters</p>
+                            <p className="text-xs text-muted-foreground mt-1">{title.length}/50 characters</p>
                         </div>
                         <div>
                             <Textarea
@@ -125,10 +125,10 @@ const TemplateForm = forwardRef<ChildRef, Props>(({ onClose, template, mode }, _
                                 {...register("body")}
                                 error={typeof errors.body?.message === "string" ? errors.body.message : undefined}
                             />
-                            <p className="text-xs text-gray-500 mt-1">{body.length}/200 characters</p>
+                            <p className="text-xs text-muted-foreground mt-1">{body.length}/200 characters</p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-default-500 mb-0.5 block">Category</label>
+                            <label className="text-sm font-medium text-muted-foreground mb-0.5 block">Category</label>
                             <select className="w-full border rounded-md px-2 py-2" {...register("category")}>
                                 {NOTIFICATION_CATEGORIES.map((opt) => (
                                     <option key={opt} value={opt}>

@@ -23,7 +23,7 @@ const AdminNavbar = async () => {
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                         <div>
-                            <p className="text-xs text-default-500">Signed in as</p>
+                            <p className="text-xs text-muted-foreground">Signed in as</p>
                             <p className="font-semibold text-sm">@{session.user?.name}</p>
                         </div>
                     </div>

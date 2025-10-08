@@ -36,7 +36,7 @@ const UserMenu = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-1 ring-default cursor-pointer">
+                <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-1 ring-primary cursor-pointer">
                     <Image fill alt="avatar" src={ProfileAvatar} />
                 </span>
             </DropdownMenuTrigger>

@@ -40,7 +40,7 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
                         </div>
                         <span className="font-semibold text-sm">brand</span>
                     </div>
-                    <MoreHorizontal className="h-5 w-5 text-gray-600" />
+                    <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                 </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -82,9 +82,9 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
                     <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-1">
                             <span className="font-bold text-sm">Your Brand</span>
-                            <span className="text-gray-500 text-sm">@brand</span>
-                            <span className="text-gray-500 text-sm">·</span>
-                            <span className="text-gray-500 text-sm">2h</span>
+                            <span className="text-muted-foreground text-sm">@brand</span>
+                            <span className="text-muted-foreground text-sm">·</span>
+                            <span className="text-muted-foreground text-sm">2h</span>
                         </div>
                         <div className="text-sm mb-3">
                             <ReactMarkdown>{post.content}</ReactMarkdown>
@@ -100,7 +100,7 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
                                 />
                             </div>
                         )}
-                        <div className="flex items-center justify-between text-gray-500 max-w-md">
+                        <div className="flex items-center justify-between text-muted-foreground max-w-md">
                             <div className="flex items-center space-x-2">
                                 <MessageCircle className="h-4 w-4" />
                                 <span className="text-sm">{0}</span>
@@ -131,10 +131,10 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
                         </div>
                         <div>
                             <p className="font-bold text-sm">Your Brand</p>
-                            <p className="text-gray-500 text-xs">2 hours ago · 🌍</p>
+                            <p className="text-muted-foreground text-xs">2 hours ago · 🌍</p>
                         </div>
                     </div>
-                    <MoreHorizontal className="h-5 w-5 text-gray-600" />
+                    <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div className="text-sm mb-3">
                     <ReactMarkdown>{post.content}</ReactMarkdown>
@@ -223,19 +223,19 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
                         <CardContent className="space-y-3">
                             {post.status === "SCHEDULED" && post.scheduledAt && (
                                 <div>
-                                    <p className="text-sm font-medium text-gray-700">Scheduled for:</p>
+                                    <p className="text-sm font-medium">Scheduled for:</p>
                                     <p className="text-sm">{formatDate(new Date(post.scheduledAt))}</p>
                                 </div>
                             )}
                             {post.status === "PUBLISHED" && post.publishedAt && (
                                 <div>
-                                    <p className="text-sm font-medium text-gray-700">Published on:</p>
+                                    <p className="text-sm font-medium">Published on:</p>
                                     <p className="text-sm">{formatDate(new Date(post.publishedAt))}</p>
                                 </div>
                             )}
                             {post.status === "DRAFT" && (
                                 <div>
-                                    <p className="text-sm font-medium text-gray-700">Draft created on:</p>
+                                    <p className="text-sm font-medium">Draft created on:</p>
                                     <p className="text-sm">{formatDate(post.createdAt ? new Date(post.createdAt) : undefined)}</p>
                                 </div>
                             )}
@@ -247,7 +247,7 @@ const PostView: React.FC<PostViewModalProps> = ({ post }) => {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-lg">Platform Preview</CardTitle>
-                            <p className="text-sm text-gray-500">How this post will look</p>
+                            <p className="text-sm text-muted-foreground">How this post will look</p>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {post.platformPosts.map((platformPost: EnhancedPlatformPost, idx: number) => (

@@ -26,7 +26,7 @@ const NotificationHistory: React.FC = () => {
                             <Send className="h-6 w-6 text-green-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-default-600">Total Sent</p>
+                            <p className="text-sm font-medium text-muted-foreground">Total Sent</p>
                             <p className="text-2xl font-bold">
                                 {notifications.filter((n) => n.status === NotificationStatusEnum.Values.PUBLISHED).length}
                             </p>
@@ -40,7 +40,7 @@ const NotificationHistory: React.FC = () => {
                             <Clock className="h-6 w-6 text-blue-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-default-600">Scheduled</p>
+                            <p className="text-sm font-medium text-muted-foreground">Scheduled</p>
                             <p className="text-2xl font-bold">
                                 {notifications.filter((n) => n.status === NotificationStatusEnum.Values.SCHEDULED).length}
                             </p>
@@ -50,11 +50,11 @@ const NotificationHistory: React.FC = () => {
 
                 <Card>
                     <CardContent className="flex items-center p-6">
-                        <div className="p-2 bg-gray-100 rounded-lg">
-                            <Edit className="h-6 w-6 text-gray-600" />
+                        <div className="p-2 bg-muted/10 rounded-lg">
+                            <Edit className="h-6 w-6 text-muted-foreground" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-default-600">Drafts</p>
+                            <p className="text-sm font-medium text-muted-foreground">Drafts</p>
                             <p className="text-2xl font-bold">
                                 {notifications.filter((n) => n.status === NotificationStatusEnum.Values.DRAFT).length}
                             </p>
@@ -108,8 +108,8 @@ const NotificationHistory: React.FC = () => {
                             <div className="p-3 bg-accent/10 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                                 <FileText className="h-8 w-8 text-accent" />
                             </div>
-                            <h3 className="text-lg font-medium text-default-600 mb-2">No notifications found</h3>
-                            <p className="text-gray-500 mb-4">
+                            <h3 className="text-lg font-medium text-muted-foreground mb-2">No notifications found</h3>
+                            <p className="text-muted-foreground mb-4">
                                 No {filterStatus === "all" ? "" : filterStatus + " "}notifications found. Try changing your filter selection.
                             </p>
                             <Button variant="outline" onClick={() => setFilterStatus("all")}>

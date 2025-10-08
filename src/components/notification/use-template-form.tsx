@@ -131,7 +131,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
                                     </DropdownMenu>
                                 }
                             />
-                            <p className="text-xs text-gray-500 mt-1">{title.length}/50 characters</p>
+                            <p className="text-xs text-muted-foreground mt-1">{title.length}/50 characters</p>
                         </div>
 
                         <div>
@@ -160,7 +160,7 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
                                 onChange={(e) => setBody(e.target.value)}
                                 maxLength={200}
                             />
-                            <p className="text-xs text-gray-500 mt-1">{body.length}/200 characters</p>
+                            <p className="text-xs text-muted-foreground mt-1">{body.length}/200 characters</p>
                         </div>
 
                         <div>
@@ -227,12 +227,12 @@ const UseTemplateForm: React.FC<UseTemplateFormProps> = ({ template, onClose }) 
                         )}
 
                         <div className="pt-4 border-t">
-                            <div className="text-sm text-gray-600 mb-4">
+                            <div className="text-sm text-muted-foreground mb-4">
                                 <p className="flex items-center gap-2 mb-1">
                                     <Users className="h-4 w-4" />
                                     Estimated reach: All subscribers
                                 </p>
-                                <p className="text-xs text-gray-500">Based on current active subscribers</p>
+                                <p className="text-xs text-muted-foreground">Based on current active subscribers</p>
                             </div>
 
                             <Button

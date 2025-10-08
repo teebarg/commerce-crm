@@ -21,8 +21,8 @@ const AuthUI = () => {
                         <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg">
                             {authMode === "email" ? <Send className="w-8 h-8 text-white" /> : <Lock className="w-8 h-8 text-white" />}
                         </div>
-                        <h1 className="text-3xl font-bold text-default-900 mb-2">Welcome Back</h1>
-                        <p className="text-default-600">
+                        <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
+                        <p className="text-muted-foreground">
                             {authMode === "email" ? "Sign in with a magic link" : "Sign in to your account"}
                         </p>
                     </div>
@@ -59,7 +59,7 @@ const AuthUI = () => {
                 </div>
 
                 <div className="mt-8 text-center">
-                    <p className="text-sm text-gray-500">Protected by industry-standard encryption</p>
+                    <p className="text-sm text-muted-foreground">Protected by industry-standard encryption</p>
                 </div>
             </div>
         </div>

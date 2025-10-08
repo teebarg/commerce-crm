@@ -14,7 +14,7 @@ export function useProgressBar() {
     return progress;
 }
 
-export function ProgressBar({ className, children }: { className: string; children: ReactNode }) {
+export function ProgressBar({ className, children }: { className?: string; children: ReactNode }) {
     const progress = useProgress();
     const width = `${progress.value}%`;
 

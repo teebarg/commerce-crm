@@ -109,7 +109,6 @@ const NotificationComposer: React.FC = () => {
                 </CardContent>
             </Card>
 
-            {/* Compose Form */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>
@@ -141,7 +140,7 @@ const NotificationComposer: React.FC = () => {
                                     </DropdownMenu>
                                 }
                             />
-                            <p className="text-xs text-gray-500 mt-1">{title.length}/50 characters</p>
+                            <p className="text-xs text-muted-foreground mt-1">{title.length}/50 characters</p>
                         </div>
 
                         <div>
@@ -163,14 +162,14 @@ const NotificationComposer: React.FC = () => {
                                 </DropdownMenu>
                             </div>
                             <textarea
-                                className="w-full px-3 py-2 border border-input rounded-md text-sm resize-none"
+                                className="w-full px-3 py-2 rounded-md text-sm resize-none bg-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                                 rows={4}
                                 placeholder="Enter your notification message"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 maxLength={200}
                             />
-                            <p className="text-xs text-gray-500 mt-1">{message.length}/200 characters</p>
+                            <p className="text-xs text-muted-foreground mt-1">{message.length}/200 characters</p>
                         </div>
 
                         <div>

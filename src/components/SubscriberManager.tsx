@@ -12,7 +12,6 @@ const SubscriberManager = () => {
     const [filterStatus, setFilterStatus] = useState("all");
 
     const { data, isLoading } = api.push.subscriptions.useQuery();
-    const { data: events, isLoading: eventsLoading } = api.push.getEvents.useQuery();
     const mutation = api.push.processEvents.useMutation();
 
     const subscribers = useMemo(() => {
@@ -57,7 +56,7 @@ const SubscriberManager = () => {
                     <CardContent className="flex items-center p-6">
                         <Users className="h-8 w-8 text-blue-600" />
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-default-500">Total Subscribers</p>
+                            <p className="text-sm font-medium text-muted-foreground">Total Subscribers</p>
                             <p className="text-2xl font-bold">{isLoading ? "-" : subscribers.length}</p>
                         </div>
                     </CardContent>
@@ -67,7 +66,7 @@ const SubscriberManager = () => {
                     <CardContent className="flex items-center p-6">
                         <UserCheck className="h-8 w-8 text-green-600" />
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-default-500">Active</p>
+                            <p className="text-sm font-medium text-muted-foreground">Active</p>
                             <p className="text-2xl font-bold">{isLoading ? "-" : subscribers.filter((s) => s.status === "active").length}</p>
                         </div>
                     </CardContent>
@@ -77,7 +76,7 @@ const SubscriberManager = () => {
                     <CardContent className="flex items-center p-6">
                         <UserX className="h-8 w-8 text-red-600" />
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-default-500">Inactive</p>
+                            <p className="text-sm font-medium text-muted-foreground">Inactive</p>
                             <p className="text-2xl font-bold">{isLoading ? "-" : subscribers.filter((s) => s.status !== "active").length}</p>
                         </div>
                     </CardContent>
@@ -86,8 +85,8 @@ const SubscriberManager = () => {
             <div className="flex items-center justify-between gap-3 px-4">
                 <CardTitle>Push Notifications</CardTitle>
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => processEvents(10)} disabled={mutation.isPending || (events?.queueLength ?? 0) === 0} variant="default">
-                        {mutation.isPending ? "Processing..." : eventsLoading ? "Loading..." : `Process Events (${events?.queueLength ?? 0})`}
+                    <Button onClick={() => processEvents(10)} disabled={mutation.isPending} variant="default">
+                        {mutation.isPending ? "Processing..." : "Process Events"}
                     </Button>
                 </div>
             </div>
@@ -132,9 +131,9 @@ const SubscriberManager = () => {
                                         <p className="font-medium overflow-hidden text-ellipsis line-clamp-1 max-w-[50vw]">{subscriber.endpoint}</p>
                                         <div className="flex items-center gap-2">
                                             {["ios", "android"].includes(subscriber.device) ? (
-                                                <Smartphone className="h-4 w-4 text-gray-500" />
+                                                <Smartphone className="h-4 w-4 text-muted-foreground" />
                                             ) : (
-                                                <Globe className="h-4 w-4 text-gray-500" />
+                                                <Globe className="h-4 w-4 text-muted-foreground" />
                                             )}
                                             <span className="text-sm">{subscriber.userAgent.split(" ")[0]}</span>
                                         </div>
@@ -151,14 +150,14 @@ const SubscriberManager = () => {
                         ))}
                     </div>
                     {isLoading && (
-                        <div className="text-center py-8 text-default-500">
+                        <div className="text-center py-8 text-muted-foreground">
                             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
                             <p>Loading subscribers...</p>
                         </div>
                     )}
 
                     {!isLoading && filteredSubscribers.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-muted-foreground">
                             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
                             <p>No subscribers found matching your criteria.</p>
                         </div>

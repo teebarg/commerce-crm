@@ -66,8 +66,7 @@ const PostManager: React.FC = () => {
                 </Card>
             </div>
 
-            {/* Filters */}
-            <Card className="bg-default-100 border-0 shadow-lg">
+            <Card className="border-0 shadow-lg">
                 <CardHeader>
                     <CardTitle>Filters</CardTitle>
                 </CardHeader>
@@ -105,7 +104,7 @@ const PostManager: React.FC = () => {
                 </CardContent>
             </Card>
 
-            <Card className="bg-content2 border-0 shadow-lg">
+            <Card className="border-0 shadow-lg">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <FileText className="h-5 w-5 text-purple-600" />
@@ -116,9 +115,9 @@ const PostManager: React.FC = () => {
                 <CardContent>
                     {filteredPosts?.length === 0 ? (
                         <div className="text-center py-12">
-                            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
-                            <p className="text-gray-500">No posts match your current filters.</p>
+                            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                            <h3 className="text-lg font-medium mb-2">No posts found</h3>
+                            <p className="text-muted-foreground">No posts match your current filters.</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">

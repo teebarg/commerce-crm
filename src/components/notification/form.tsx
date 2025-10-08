@@ -109,11 +109,11 @@ const NotificationForm = forwardRef<ChildRef, Props>(({ onClose, notification },
                                     </DropdownMenu>
                                 }
                             />
-                            <p className="text-xs text-gray-500 mt-1">{title.length}/50 characters</p>
+                            <p className="text-xs text-muted-foreground mt-1">{title.length}/50 characters</p>
                         </div>
                         <div>
                             <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-gray-500 mb-0.5">Message*</label>
+                                <label className="text-sm font-medium text-muted-foreground mb-0.5">Message*</label>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <UIButton size="icon" variant="ghost" aria-label="Insert emoji">
@@ -130,7 +130,7 @@ const NotificationForm = forwardRef<ChildRef, Props>(({ onClose, notification },
                                 </DropdownMenu>
                             </div>
                             <Textarea rows={4} placeholder="Enter your notification message" maxLength={200} {...register("body")} error={errors.body?.message} />
-                            <p className="text-xs text-gray-500 mt-1">{body.length}/200 characters</p>
+                            <p className="text-xs text-muted-foreground mt-1">{body.length}/200 characters</p>
                         </div>
                         <div>
                             <Input

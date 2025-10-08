@@ -34,7 +34,7 @@ const UnderConstruction: React.FC = () => {
                             Under Construction
                         </Badge>
 
-                        <h1 className="mb-6 text-4xl leading-tight font-bold text-default-900 md:text-6xl">
+                        <h1 className="mb-6 text-4xl leading-tight font-bold md:text-6xl">
                             {`We're building something`}
                             <span className="block bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">amazing here</span>
                         </h1>

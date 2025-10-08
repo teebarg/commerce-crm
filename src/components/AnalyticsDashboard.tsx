@@ -72,7 +72,6 @@ const AnalyticsDashboard = () => {
 
     return (
         <div className="space-y-6">
-            {/* Header Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="gradient-blue">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -120,8 +119,7 @@ const AnalyticsDashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Platform Performance */}
-                <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+                <Card className="border-0 shadow-lg">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <TrendingUp className="h-5 w-5 text-purple-600" />
@@ -131,7 +129,7 @@ const AnalyticsDashboard = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {platformStats.map((stat, index) => (
-                            <div key={index} className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
+                            <div key={index} className="p-4 bg-secondary rounded-lg">
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center space-x-3">
                                         <div className={`h-8 w-8 ${stat.color} rounded-full flex items-center justify-center`}>
@@ -146,15 +144,15 @@ const AnalyticsDashboard = () => {
 
                                 <div className="grid grid-cols-3 gap-4 text-sm">
                                     <div>
-                                        <p className="text-gray-500">Followers</p>
+                                        <p className="text-muted-foreground">Followers</p>
                                         <p className="font-semibold">{stat.followers}</p>
                                     </div>
                                     <div>
-                                        <p className="text-gray-500">Engagement</p>
+                                        <p className="text-muted-foreground">Engagement</p>
                                         <p className="font-semibold">{stat.engagement}</p>
                                     </div>
                                     <div>
-                                        <p className="text-gray-500">Posts</p>
+                                        <p className="text-muted-foreground">Posts</p>
                                         <p className="font-semibold">{stat.posts}</p>
                                     </div>
                                 </div>
@@ -170,9 +168,7 @@ const AnalyticsDashboard = () => {
                         ))}
                     </CardContent>
                 </Card>
-
-                {/* Top Performing Posts */}
-                <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+                <Card className="border-0 shadow-lg">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <TrendingUp className="h-5 w-5 text-blue-600" />
@@ -182,15 +178,15 @@ const AnalyticsDashboard = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {topPosts.map((post, index) => (
-                            <div key={post.id} className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                            <div key={post.id} className="p-4 bg-secondary rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
                                     <Badge variant="secondary" className="bg-purple-100 text-purple-700">
                                         #{index + 1} {post.platform}
                                     </Badge>
-                                    <span className="text-xs text-gray-500">{post.date}</span>
+                                    <span className="text-xs text-muted-foreground">{post.date}</span>
                                 </div>
 
-                                <p className="text-sm text-gray-700 mb-3 line-clamp-2">{post.content}</p>
+                                <p className="text-sm mb-3 line-clamp-2">{post.content}</p>
 
                                 <div className="flex items-center justify-between text-sm">
                                     <div className="flex items-center space-x-4">
@@ -207,7 +203,7 @@ const AnalyticsDashboard = () => {
                                             <span>{post.shares}</span>
                                         </div>
                                     </div>
-                                    <div className="text-xs text-gray-500">{post.likes + post.comments + post.shares} total interactions</div>
+                                    <div className="text-xs text-muted-foreground">{post.likes + post.comments + post.shares} total interactions</div>
                                 </div>
                             </div>
                         ))}
@@ -216,7 +212,7 @@ const AnalyticsDashboard = () => {
             </div>
 
             {/* Engagement Insights */}
-            <Card className="bg-white/80 backdrop-blur-md border-0 shadow-lg">
+            <Card className="border-0 shadow-lg">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <BarChart3 className="h-5 w-5 text-green-600" />
@@ -226,17 +222,17 @@ const AnalyticsDashboard = () => {
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="text-center p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
+                        <div className="text-center p-4 bg-secondary rounded-lg">
                             <div className="text-2xl font-bold text-purple-600 mb-2">3:00 PM</div>
-                            <p className="text-sm text-gray-600">Best time to post</p>
+                            <p className="text-sm text-muted-foreground">Best time to post</p>
                         </div>
-                        <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg">
+                        <div className="text-center p-4 bg-secondary rounded-lg">
                             <div className="text-2xl font-bold text-blue-600 mb-2">Tuesday</div>
-                            <p className="text-sm text-gray-600">Most active day</p>
+                            <p className="text-sm text-muted-foreground">Most active day</p>
                         </div>
-                        <div className="text-center p-4 bg-gradient-to-r from-green-50 to-purple-50 rounded-lg">
+                        <div className="text-center p-4 bg-secondary rounded-lg">
                             <div className="text-2xl font-bold text-green-600 mb-2">4.2%</div>
-                            <p className="text-sm text-gray-600">Avg. engagement rate</p>
+                            <p className="text-sm text-muted-foreground">Avg. engagement rate</p>
                         </div>
                     </div>
                 </CardContent>

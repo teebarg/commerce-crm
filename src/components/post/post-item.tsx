@@ -112,16 +112,16 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
                                     key={index}
                                     src={image.url}
                                     alt="Post image"
-                                    className="w-8 h-8 rounded-full object-cover border-2 border-white"
+                                    className="w-8 h-8 rounded-full object-cover"
                                     width={100}
                                     height={100}
                                 />
                             ))}
                         </div>
-                        {post.media.length > 2 && <span className="text-xs text-gray-500">+{post.media.length - 2}</span>}
+                        {post.media.length > 2 && <span className="text-xs text-muted-foreground">+{post.media.length - 2}</span>}
                     </div>
                 ) : (
-                    <span className="text-gray-400 text-sm flex items-center gap-1">
+                    <span className="text-muted-foreground text-sm flex items-center gap-1">
                         <ImageIcon className="h-4 w-4" />
                         No images
                     </span>
@@ -146,7 +146,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
                     </div>
                 )}
                 {post.status === "PUBLISHED" && post.publishedAt && <div className="text-sm">{formatDate(post.publishedAt)}</div>}
-                {post.status === "DRAFT" && <span className="text-gray-400 text-sm">Not scheduled</span>}
+                {post.status === "DRAFT" && <span className="text-muted-foreground text-sm">Not scheduled</span>}
             </TableCell>
             <TableCell>
                 <div className="flex items-center space-x-2">

@@ -12,26 +12,23 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-default text-default-foreground hover:bg-default/90",
+                default: "bg-primary text-primary-foreground hover:bg-primary/90",
                 destructive: "bg-rose-500 text-white hover:bg-rose-600/90",
-                outline: "border border-divider bg-background hover:bg-content1",
+                outline: "border border-input bg-background hover:bg-accent",
                 primary: "bg-primary text-primary-foreground hover:bg-primary/90",
                 secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
                 ghost: "hover:bg-accent hover:text-accent-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
                 success: "bg-success text-white hover:bg-success/90",
                 emerald: "bg-emerald-700 text-white hover:bg-emerald-800",
-                bordered: "bg-transparent border-2 border-primary text-primary hover:bg-primary-500 hover:text-white",
-                borderedSecondary: "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary-500 hover:text-white",
-                transparent: "bg-transparent text-default-foreground px-0 py-0 hover:bg-transparent",
+                contrast: "bg-contrast text-contrast-foreground",
             },
             size: {
-                default: "h-10 px-4 py-2 min-w-32",
+                default: "h-10 px-4 py-2",
                 xs: "h-7 rounded-md px-2",
                 sm: "h-9 rounded-md px-3",
-                lg: "h-11 rounded-md px-8 text-base font-normal min-w-32",
+                lg: "h-11 rounded-md px-8",
                 icon: "p-2",
-                iconOnly: "h-auto w-auto bg-transparent hover:bg-transparent",
             },
         },
         defaultVariants: {
@@ -66,7 +63,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 {isLoading ? (
                     <>
                         <Loader className="mr-2 h-4 w-4 animate-spin" />
-                        {size === "icon" || size === "iconOnly" ? "" : "Loading..."}
+                        {size === "icon" ? "" : "Loading..."}
                     </>
                 ) : (
                     <>
