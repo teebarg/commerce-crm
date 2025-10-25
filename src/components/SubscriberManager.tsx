@@ -1,16 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Users, UserCheck, UserX, Globe, Smartphone } from "lucide-react";
+import { useMemo } from "react";
+import { Users, Globe, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 
 const SubscriberManager = () => {
-    const [filterStatus, setFilterStatus] = useState("all");
-
     const { data, isLoading } = api.push.subscriptions.useQuery();
     const mutation = api.push.processEvents.useMutation();
 
@@ -25,18 +22,10 @@ const SubscriberManager = () => {
                 country: "-",
                 subscribeDate: s.createdAt ? new Date(s.createdAt).toISOString().slice(0, 10) : "",
                 lastActive: lastEvent?.occurredAt ? new Date(lastEvent.occurredAt).toISOString().slice(0, 10) : "-",
-                status: lastEvent?.eventType ? "active" : "inactive",
                 device: lastEvent?.deviceType?.toLowerCase() ?? "desktop",
             };
         });
     }, [data]);
-
-    const filteredSubscribers = useMemo(() => {
-        return (subscribers ?? []).filter((subscriber) => {
-            const matchesFilter = filterStatus === "all" || subscriber.status === filterStatus;
-            return matchesFilter;
-        });
-    }, [subscribers, filterStatus]);
 
     const processEvents = async (limit = 50) => {
         mutation.mutate(
@@ -61,26 +50,6 @@ const SubscriberManager = () => {
                         </div>
                     </CardContent>
                 </Card>
-
-                <Card>
-                    <CardContent className="flex items-center p-6">
-                        <UserCheck className="h-8 w-8 text-green-600" />
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-muted-foreground">Active</p>
-                            <p className="text-2xl font-bold">{isLoading ? "-" : subscribers.filter((s) => s.status === "active").length}</p>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardContent className="flex items-center p-6">
-                        <UserX className="h-8 w-8 text-red-600" />
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-muted-foreground">Inactive</p>
-                            <p className="text-2xl font-bold">{isLoading ? "-" : subscribers.filter((s) => s.status !== "active").length}</p>
-                        </div>
-                    </CardContent>
-                </Card>
             </div>
             <div className="flex items-center justify-between gap-3 px-4">
                 <CardTitle>Push Notifications</CardTitle>
@@ -102,26 +71,8 @@ const SubscriberManager = () => {
                     <CardDescription>Manage your push notification subscribers</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                        <div className="flex gap-2">
-                            <Button variant={filterStatus === "all" ? "default" : "outline"} size="lg" onClick={() => setFilterStatus("all")}>
-                                All
-                            </Button>
-                            <Button variant={filterStatus === "active" ? "default" : "outline"} size="lg" onClick={() => setFilterStatus("active")}>
-                                Active
-                            </Button>
-                            <Button
-                                variant={filterStatus === "inactive" ? "default" : "outline"}
-                                size="lg"
-                                onClick={() => setFilterStatus("inactive")}
-                            >
-                                Inactive
-                            </Button>
-                        </div>
-                    </div>
-
                     <div className="space-y-4">
-                        {filteredSubscribers.map((subscriber, idx: number) => (
+                        {subscribers.map((subscriber, idx: number) => (
                             <div
                                 key={idx}
                                 className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
@@ -136,9 +87,6 @@ const SubscriberManager = () => {
                                                 <Globe className="h-4 w-4 text-muted-foreground" />
                                             )}
                                             <span className="text-sm">{subscriber.userAgent.split(" ")[0]}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <Badge variant={subscriber.status === "active" ? "default" : "secondary"}>{subscriber.status}</Badge>
                                         </div>
                                     </div>
                                 </div>
@@ -156,7 +104,7 @@ const SubscriberManager = () => {
                         </div>
                     )}
 
-                    {!isLoading && filteredSubscribers.length === 0 && (
+                    {!isLoading && subscribers.length === 0 && (
                         <div className="text-center py-8 text-muted-foreground">
                             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
                             <p>No subscribers found matching your criteria.</p>
