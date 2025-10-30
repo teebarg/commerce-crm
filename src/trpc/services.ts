@@ -39,6 +39,7 @@ export const sendNotificationsToSubscribers = async (subscriptions: PushSubscrip
     if (failedSubscriptions.length > 0) {
         console.log(`Failed to send notifications to: ${JSON.stringify(failedSubscriptions)}`);
     }
+    console.log(`Sent notifications to: ${JSON.stringify(sentSubscriptions)}`);
 
     return { sentSubscriptions, failedSubscriptions };
 };
