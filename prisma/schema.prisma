@@ -272,8 +272,8 @@ model Notification {
 model PushSubscription {
   id       String  @id @default(cuid())
   endpoint String  @unique
-  p256dh   String
-  auth     String
+  p256dh   String  @db.Text
+  auth     String  @db.Text
   group    String?
 
   userId String?
