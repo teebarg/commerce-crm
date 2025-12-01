@@ -80,16 +80,22 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
 
                             <div>
                                 <p className="text-muted-foreground">Open Rate</p>
-                                <p className="font-medium">{notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${openRate}%` : "-"}</p>
+                                <p className="font-medium">
+                                    {notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${openRate}%(${opened})` : "-"}
+                                </p>
                             </div>
 
                             <div>
                                 <p className="text-muted-foreground">Delivery Rate</p>
-                                <p className="font-medium">{notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${deliveryRate}%` : "-"}</p>
+                                <p className="font-medium">
+                                    {notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${deliveryRate}%(${delivered})` : "-"}
+                                </p>
                             </div>
                             <div>
                                 <p className="text-muted-foreground">Dismiss Rate</p>
-                                <p className="font-medium">{notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${dismissRate}%` : "-"}</p>
+                                <p className="font-medium">
+                                    {notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${dismissRate}%(${dismissed})` : "-"}
+                                </p>
                             </div>
                         </div>
 
