@@ -26,6 +26,7 @@ export const sendNotificationsToSubscribers = async (subscriptions: PushSubscrip
             subscriberId: subscriber.id,
             notificationId: notification.id,
         });
+        console.log("Payload:", payload);
 
         try {
             await webpush.sendNotification(subscription, payload);
