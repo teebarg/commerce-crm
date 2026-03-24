@@ -1,5 +1,6 @@
 DOCKER_COMPOSE = docker compose
-SERVICE = commerce-crm
+SERVICE = app
+PROJECT = crm
 
 .PHONY: all
 all: build up
@@ -10,7 +11,7 @@ build:
 
 .PHONY: up
 up:
-	$(DOCKER_COMPOSE) up
+	$(DOCKER_COMPOSE) -p $(PROJECT) up --build
 
 .PHONY: update
 update:
@@ -36,17 +37,13 @@ clean:
 deploy:
 	vercel deploy --prod
 
-.PHONY: migrate
-migrate:
-	docker-compose run --rm app npx prisma migrate dev
+# .PHONY: migrate
+# migrate:
+# 	docker-compose run --rm app npx prisma migrate dev
 
-.PHONY: push
-push:
-	docker-compose run --rm app npx prisma db push
-
-.PHONY: studio
-studio:
-	docker-compose run --rm -p 5555:5555 app npx prisma studio
+# .PHONY: push
+# push:
+# 	docker-compose run --rm app npx prisma db push
 
 .PHONY: lint
 lint:
@@ -63,3 +60,16 @@ format:
 .PHONY: typecheck
 typecheck:
 	docker-compose run --rm app npm run typecheck
+
+# prisma helpers
+.PHONY: dpf
+dpf:
+	$(DOCKER_COMPOSE) -p $(PROJECT) exec $(SERVICE) prisma format
+
+.PHONY: dpg
+dpg:
+	$(DOCKER_COMPOSE) -p $(PROJECT) exec $(SERVICE) prisma generate
+
+.PHONY: dpm
+dpm:
+	$(DOCKER_COMPOSE) -p $(PROJECT) exec $(SERVICE) prisma migrate dev
