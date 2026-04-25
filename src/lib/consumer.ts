@@ -4,7 +4,13 @@ export async function handlePushEvent(ctx: any, event: any) {
         ctx.db.notification.upsert({
             where: { id: rest.notificationId },
             update: {},
-            create: { id: rest.notificationId, title, body, status: "PUBLISHED", sentAt: new Date() },
+            create: {
+                id: rest.notificationId,
+                title: title || `Notification ${rest.notificationId}`,
+                body: body || `Notification ${rest.notificationId}`,
+                status: "PUBLISHED",
+                sentAt: new Date(),
+            },
         }),
         ctx.db.notificationEvent.create({
             data: {
