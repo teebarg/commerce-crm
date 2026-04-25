@@ -1,10 +1,18 @@
 export async function handlePushEvent(ctx: any, event: any) {
-    await ctx.db.notificationEvent.create({
-        data: {
-            ...event,
-            occurredAt: new Date(),
-        },
-    });
+    const { title, body, subscriberId, ...rest } = event;
+    await ctx.db.$transaction([
+        ctx.db.notification.upsert({
+            where: { id: rest.notificationId },
+            update: {},
+            create: { id: rest.notificationId, title, body, status: "PUBLISHED", sentAt: new Date() },
+        }),
+        ctx.db.notificationEvent.create({
+            data: {
+                ...rest,
+                occurredAt: new Date(),
+            },
+        }),
+    ]);
 }
 
 export async function handleNewUser(ctx: any, event: any) {

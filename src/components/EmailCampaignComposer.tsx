@@ -10,11 +10,7 @@ import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import ProductSearchClient from "./product-search";
-import { X } from "lucide-react";
-import { type EmailCampaign, type EmailProduct, type Promotion } from "@/schemas/notification.schema";
-import { currency } from "@/lib/utils";
-import Image from "next/image";
+import { type EmailCampaign, type Promotion } from "@/schemas/notification.schema";
 
 interface EmailCampaignComposerProps {
     initialData?: EmailCampaign;
@@ -41,10 +37,6 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
             urgency: "",
         }
     );
-
-    // Featured Products
-    const [selectedProducts, setSelectedProducts] = useState<EmailProduct[]>(initialData?.data?.featuredProducts ?? []);
-    const [showProductSearch, setShowProductSearch] = useState(false);
 
     const { data: groups } = api.email.getGroups.useQuery();
     const { data: recipients, refetch: refetchRecipients } = api.email.getRecipients.useQuery({ groupId: selectedGroup }, { enabled: false });
@@ -105,7 +97,7 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
 
         const campaignData = {
             promotion: Object.values(promotion).some(Boolean) ? promotion : undefined,
-            featuredProducts: selectedProducts.length > 0 ? selectedProducts : [],
+            featuredProducts: [],
         };
 
         if (initialData?.id) {
@@ -131,11 +123,6 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                 data: campaignData,
             });
         }
-    };
-
-    const handleProductSelect = (product: EmailProduct) => {
-        setSelectedProducts((products) => [...products, product]);
-        setShowProductSearch(false);
     };
 
     return (
@@ -193,64 +180,6 @@ const EmailCampaignComposer: React.FC<EmailCampaignComposerProps> = ({ initialDa
                         placeholder="Limited time offer"
                     />
                 </div>
-
-                <div className="border rounded-lg p-4 space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold">Featured Products</h3>
-                        <Button variant="outline" onClick={() => setShowProductSearch(true)}>
-                            Add Product
-                        </Button>
-                    </div>
-
-                    {selectedProducts.length > 0 && (
-                        <div className="grid grid-cols-2 gap-4">
-                            {selectedProducts.map((product, idx: number) => (
-                                <div key={idx} className="relative border rounded-md p-4 flex items-center gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="absolute right-2 top-2"
-                                        onClick={() => {
-                                            setSelectedProducts((products) => products.filter((_, i) => i !== idx));
-                                        }}
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                    <div className="relative w-12 h-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
-                                        <Image
-                                            fill
-                                            alt={product.name}
-                                            className="object-cover group-hover:scale-105 transition-transform duration-200"
-                                            sizes="96px"
-                                            src={product.imageUrl}
-                                        />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-medium truncate text-ellipsis max-w-sm text-wrap line-clamp-1">{product.name}</h4>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="font-semibold">{currency(product.price)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {showProductSearch && (
-                    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex justify-center">
-                        <div className="bg-card rounded-lg shadow-lg p-6 w-full max-w-2xl">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold">Search Products</h3>
-                                <Button variant="ghost" size="icon" onClick={() => setShowProductSearch(false)}>
-                                    <X className="h-4 w-4" />
-                                </Button>
-                            </div>
-                            <ProductSearchClient onProductSelect={handleProductSelect} />
-                        </div>
-                    </div>
-                )}
-
                 {!initialData && (
                     <>
                         <div className="space-y-2">
