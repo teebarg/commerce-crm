@@ -11,6 +11,21 @@ const STREAM_NAME = "FCM";
 const GROUP_NAME = "FCM";
 const CONSUMER_NAME = "fcm-worker";
 
+async function ensureGroup(
+    stream: string,
+    group: string
+) {
+    try {
+        if (!redis) return;
+        await redis.xgroup(
+            "CREATE", stream, group, "$", "MKSTREAM"
+        );
+    } catch (err) {
+        if (err instanceof Error && err.message.includes("BUSYGROUP")) return;
+        throw err;
+    }
+}
+
 export const pushNotificationRouter = createTRPCRouter({
     templates: protectedProcedure.query(async ({ ctx }) => {
         const templates = await ctx.db.notificationTemplate.findMany({
@@ -44,7 +59,7 @@ export const pushNotificationRouter = createTRPCRouter({
                 by: ["eventType"],
                 where: {
                     notificationId: input,
-                    eventType: { in: ["DELIVERED", "OPENED", "DISMISSED"] },
+                    eventType: { in: ["DELIVERED", "OPENED", "DISMISSED", "CLICKED"] },
                 },
                 _count: { eventType: true },
             });
@@ -52,8 +67,8 @@ export const pushNotificationRouter = createTRPCRouter({
             const delivered = eventStats.find((s) => s.eventType === "DELIVERED")?._count.eventType || 0;
             const opened = eventStats.find((s) => s.eventType === "OPENED")?._count.eventType || 0;
             const dismissed = eventStats.find((s) => s.eventType === "DISMISSED")?._count.eventType || 0;
-
-            return { delivered, opened, dismissed };
+            const clicked = eventStats.find((s) => s.eventType === "CLICKED")?._count.eventType || 0;
+            return { delivered, opened, dismissed, clicked };
         } catch (error) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -156,7 +171,8 @@ export const pushNotificationRouter = createTRPCRouter({
                 });
             }
 
-            const events = await redis.xrange("FCM", "-", "+", "COUNT", 10);
+            await ensureGroup(STREAM_NAME, GROUP_NAME);
+            const events = await redis.xrange(STREAM_NAME, "-", "+", "COUNT", 10);
 
             const parsed = events.map(([id, fields]) => {
                 const data: Record<string, string> = {};
@@ -207,6 +223,7 @@ export const pushNotificationRouter = createTRPCRouter({
             //     return { id, data };
             // });
 
+            await ensureGroup(STREAM_NAME, GROUP_NAME);
             const events = await redis.xreadgroup("GROUP", GROUP_NAME, CONSUMER_NAME, "COUNT", limit, "BLOCK", 5000, "STREAMS", STREAM_NAME, ">");
             const streams = parseStreamResponse(events);
             if (!streams?.length) {

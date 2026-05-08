@@ -13,10 +13,12 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
     const recipients = (notification.sentCount ?? 0) + (notification.failedCount ?? 0);
     const delivered = metrics?.delivered ?? notification.sentCount ?? 0;
     const opened = metrics?.opened ?? 0;
+    const clicked = metrics?.clicked ?? 0;
     const dismissed = metrics?.dismissed ?? 0;
     const deliveryRate = recipients > 0 ? Math.round((delivered / recipients) * 100) : 0;
     const openRate = delivered > 0 ? Math.round((opened / delivered) * 100) : 0;
     const dismissRate = delivered > 0 ? Math.round((dismissed / delivered) * 100) : 0;
+    const clickRate = delivered > 0 ? Math.round((clicked / delivered) * 100) : 0;
     const getStatusVariant = (status: NotificationStatusEnum) => {
         switch (status) {
             case "PUBLISHED":
@@ -70,18 +72,20 @@ export const HistoryCard = ({ notification }: { notification: Notification }) =>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                             <div>
                                 <p className="text-muted-foreground">Audience</p>
-                                <p className="font-medium">All Subscribers</p>
-                            </div>
-
-                            <div>
-                                <p className="text-muted-foreground">Recipients</p>
-                                <p className="font-medium">{recipients.toLocaleString()}</p>
+                                <p className="font-medium">All Subscribers({recipients.toLocaleString()})</p>
                             </div>
 
                             <div>
                                 <p className="text-muted-foreground">Open Rate</p>
                                 <p className="font-medium">
                                     {notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${openRate}%(${opened})` : "-"}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p className="text-muted-foreground">Click Rate</p>
+                                <p className="font-medium">
+                                    {notification.status === NotificationStatusEnum.Values.PUBLISHED ? `${clickRate}%(${clicked})` : "-"}
                                 </p>
                             </div>
 
